@@ -193,4 +193,6 @@ def attractionId():
 			}
 		response = make_response(errorData,500)
 		return response
-app.run(port=3000)
+
+if __name__=="__main__":
+	app.run(host="0.0.0.0",port=3000)
