@@ -3,6 +3,7 @@ import json
 import mysql.connector
 mydb = mysql.connector.connect(
 	host="localhost",
+	#此處為連接instance遠端mysql的帳號密碼
 	user="root",
 	password="Gtio556$",
 	database="tripdata"
@@ -80,43 +81,41 @@ def attractions():
 			sql = f"select * from spot where id > '{count1}' and id <= '{count2}'"
 			mycursor.execute(sql)
 			mydata = mycursor.fetchall()
-			if mydata:
-				if count < 26:
-					jsonData["nextPage"] = count+1
-				else:
-					jsonData["nextPage"] = "null"
-				for i in range(len(mydata)):
-					#開一個字典提供給資料庫資料
-					listData ={}
-					#將資料庫資料使用迴圈一一放入data列表中的變數
-					listData["id"] = mydata[i][0]
-					listData["name"] = mydata[i][1]
-					listData["category"] = mydata[i][2]
-					listData["description"] = mydata[i][3]
-					listData["address"] = mydata[i][4]
-					listData["transport"] = mydata[i][5]
-					listData["mrt"] = mydata[i][6]
-					listData["latitude"] = mydata[i][7]
-					listData["longitude"] = mydata[i][8]
-					listData["images"] = mydata[i][9]
-					#把這圈的資料apppend進jsonData之中
-					jsonData["data"].append(listData)
-				return jsonData
-		elif count == 0 and keyword != None:
+			if count < 26:
+				jsonData["nextPage"] = count+1
+			else:
+				jsonData["nextPage"] = "null"
+			for i in range(len(mydata)):
+				#開一個字典提供給資料庫資料
+				listData ={}
+				#將資料庫資料使用迴圈一一放入data列表中的變數
+				listData["id"] = mydata[i][0]
+				listData["name"] = mydata[i][1]
+				listData["category"] = mydata[i][2]
+				listData["description"] = mydata[i][3]
+				listData["address"] = mydata[i][4]
+				listData["transport"] = mydata[i][5]
+				listData["mrt"] = mydata[i][6]
+				listData["latitude"] = mydata[i][7]
+				listData["longitude"] = mydata[i][8]
+				listData["images"] = mydata[i][9]
+				#把這圈的資料apppend進jsonData之中
+				jsonData["data"].append(listData)
+			return jsonData
+		elif keyword != None:
 			#先把json字典中的列表清空
 			jsonData["data"].clear()
+			#將使用者輸入page轉成整數
+			page = str(page)
+			count = int(page)
 			#將使用者輸入的關鍵字放入資料庫做篩選
-			sql = f"select * from spot where name like '%{keyword}%' limit 12"
+			sql = f"select * from spot where name like '%{keyword}%'"
 			mycursor.execute(sql)
 			mydata = mycursor.fetchall()
-			if mydata:
-				#判斷資料數量來分類頁數
-				if len(mydata) < 12:
-					jsonData["nextPage"] = "null"
-				elif len(mydata) > 12 and len(mydata) <= 24:
-					jsonData["nextPage"] = 1
-				elif len(mydata) > 24 and len(mydata) <= 36:
-					jsonData["nextPage"] = 2
+		#判斷資料數量來分類頁數
+			#處理小於12筆的資料
+			if len(mydata)/12 <= 1 and count == 0:
+				jsonData["nextPage"] = "null"
 				for i in range(len(mydata)):
 					#開一個字典提供給資料庫資料
 					listData ={}
@@ -134,8 +133,129 @@ def attractions():
 					#把這圈的資料apppend進jsonData之中
 					jsonData["data"].append(listData)
 				return jsonData
+
+			#關鍵字搜尋結果超過12筆資料(0,1,2,3...頁的處理)
+			elif len(mydata)/12 > 1:
+				#將第一輪剩下數字存起來供第二輪迴圈做篩選
+				leftData = len(mydata)
+				#關鍵字搜尋展示第一輪資料共12筆
+				if count == 0:
+					jsonData["nextPage"] = 1
+					for i in range(12):
+						listData = {}
+						listData["id"] = mydata[i][0]
+						listData["name"] = mydata[i][1]
+						listData["category"] = mydata[i][2]
+						listData["description"] = mydata[i][3]
+						listData["address"] = mydata[i][4]
+						listData["transport"] = mydata[i][5]
+						listData["mrt"] = mydata[i][6]
+						listData["latitude"] = mydata[i][7]
+						listData["longitude"] = mydata[i][8]
+						listData["images"] = mydata[i][9]
+						jsonData["data"].append(listData)
+					return jsonData
+				elif count == 1:
+					#判斷還剩幾筆資料如果超過放到下一頁
+					if leftData <= 23:
+						num = leftData
+						jsonData["nextPage"] = "null"
+					else:
+						num = 24
+						jsonData["nextPage"] = count+1
+					for i in range(12,num):
+						listData = {}
+						listData["id"] = mydata[i][0]
+						listData["name"] = mydata[i][1]
+						listData["category"] = mydata[i][2]
+						listData["description"] = mydata[i][3]
+						listData["address"] = mydata[i][4]
+						listData["transport"] = mydata[i][5]
+						listData["mrt"] = mydata[i][6]
+						listData["latitude"] = mydata[i][7]
+						listData["longitude"] = mydata[i][8]
+						listData["images"] = mydata[i][9]
+						jsonData["data"].append(listData)
+					return jsonData
+				elif count == 2:
+					if leftData <= 35:
+						num = leftData
+						jsonData["nextPage"] = "null"
+					else:
+						num = 36
+						jsonData["nextPage"] = 3
+					for i in range(24,num):
+						listData = {}
+						listData["id"] = mydata[i][0]
+						listData["name"] = mydata[i][1]
+						listData["category"] = mydata[i][2]
+						listData["description"] = mydata[i][3]
+						listData["address"] = mydata[i][4]
+						listData["transport"] = mydata[i][5]
+						listData["mrt"] = mydata[i][6]
+						listData["latitude"] = mydata[i][7]
+						listData["longitude"] = mydata[i][8]
+						listData["images"] = mydata[i][9]
+						jsonData["data"].append(listData)
+					return jsonData
+				elif count == 3:
+					if leftData <= 36:
+						num = leftData
+						jsonData["nextPage"] = "null"
+					else:
+						num = 48
+						jsonData["nextPage"] = 4
+					for i in range(36,num):
+						listData = {}
+						listData["id"] = mydata[i][0]
+						listData["name"] = mydata[i][1]
+						listData["category"] = mydata[i][2]
+						listData["description"] = mydata[i][3]
+						listData["address"] = mydata[i][4]
+						listData["transport"] = mydata[i][5]
+						listData["mrt"] = mydata[i][6]
+						listData["latitude"] = mydata[i][7]
+						listData["longitude"] = mydata[i][8]
+						listData["images"] = mydata[i][9]
+						jsonData["data"].append(listData)
+					return jsonData
+				elif count == 4:
+					if leftData <= 59:
+						num = leftData
+						jsonData["nextPage"] = "null"
+					else:
+						num = 60
+						jsonData["nextPage"] = 5
+					for i in range(48,num):
+						listData = {}
+						listData["id"] = mydata[i][0]
+						listData["name"] = mydata[i][1]
+						listData["category"] = mydata[i][2]
+						listData["description"] = mydata[i][3]
+						listData["address"] = mydata[i][4]
+						listData["transport"] = mydata[i][5]
+						listData["mrt"] = mydata[i][6]
+						listData["latitude"] = mydata[i][7]
+						listData["longitude"] = mydata[i][8]
+						listData["images"] = mydata[i][9]
+						jsonData["data"].append(listData)
+					return jsonData
+				#使用者將關鍵字所有頁面看完，並且超過了頁數
+				else:
+					errorData = {
+							"error":True,
+							"message":"已顯示完所有資料"
+					}
+					return errorData
+			#使用者搜尋頁數超過
+			else:
+				errorData = {
+							"error":True,
+							"message":"已超出頁數"
+					}
+				return errorData
+		#使用者輸入鍵字並不存在
 		else:
-			#開一個存放錯誤訊息的字典，為
 			errorData = {
 							"error":True,
 							"message":"輸入頁面或關鍵字不存在"
