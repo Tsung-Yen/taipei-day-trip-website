@@ -57,8 +57,8 @@ for i in range(len(clist)):
     
 
 
-#將資料寫入資料庫
-    sql = "insert into spot(name,category,description,address,transport,mrt,latitude,longitude,images)values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-    val = (name,category,description,address,transport,mrt,latitude,longitude,images)
-    mycursor.execute(sql,val)
-    mydb.commit()
+# #將資料寫入資料庫
+#     sql = "insert into spot(name,category,description,address,transport,mrt,latitude,longitude,images)values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+#     val = (name,category,description,address,transport,mrt,latitude,longitude,images)
+#     mycursor.execute(sql,val)
+#     mydb.commit()

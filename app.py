@@ -31,8 +31,8 @@ def thankyou():
 @app.route("/api/attractions")
 def attractions():
 	#抓取使用者輸入頁面及關鍵字
-	page = request.args.get("page")
-	keyword = request.args.get("keyword")
+	page = request.args.get("page",0)
+	keyword = request.args.get("keyword","博物館")
 	#先判斷使用者輸入是否符合api格式:
 	if page != None:
 		#使用者輸入參數為NoneType，需做轉型
@@ -149,9 +149,10 @@ def attractions():
 			}
 		response = make_response(errorData,500)
 		return 	response
-@app.route("/api/attraction/")
-def attractionId():
-	attractionId = request.args.get("attractionId")
+@app.route("/api/attraction/<attractionId>")
+def attractionId(attractionId):
+	assert attractionId == request.view_args["attractionId"]
+	attractionId = int(attractionId)
 	#判斷是否為使用者輸入造成伺服器壞掉
 	if attractionId != None:
 		#開一個字典當作頁面，供資料庫資料存放
@@ -193,6 +194,7 @@ def attractionId():
 			}
 		response = make_response(errorData,500)
 		return response
+
 
 if __name__=="__main__":
 	app.run(host="0.0.0.0",port=3000,debug=True)
