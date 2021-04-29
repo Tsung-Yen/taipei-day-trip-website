@@ -31,8 +31,8 @@ def thankyou():
 @app.route("/api/attractions")
 def attractions():
 	#抓取使用者輸入頁面及關鍵字
-	page = request.args.get("page",0)
-	keyword = request.args.get("keyword","博物館")
+	page = request.args.get("page")
+	keyword = request.args.get("keyword")
 	#先判斷使用者輸入是否符合api格式:
 	if page != None:
 		#使用者輸入參數為NoneType，需做轉型
