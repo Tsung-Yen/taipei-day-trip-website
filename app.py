@@ -1,6 +1,9 @@
 from flask import *
+#匯入Flask_Cors(在不同源的情況下瀏覽器會將以收到的request拒絕Javascript存取，須設定路由的response規則)
+from flask_cors import CORS
 import json
 import mysql.connector
+
 mydb = mysql.connector.connect(
 	host="localhost",
 	#此處為連接instance遠端mysql的帳號密碼
@@ -11,9 +14,12 @@ mydb = mysql.connector.connect(
 mycursor=mydb.cursor()
 
 app=Flask(__name__)
+#只要來自此路由底下的request都允許存取
+cors = CORS(app,resources={r"/api/*":{"origins":"*"}})
 app.config["JSON_AS_ASCII"]=False
 app.config['JSON_SORT_KEYS'] = False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
+
 
 # Pages
 @app.route("/")
@@ -71,7 +77,6 @@ def attractions():
 					listData["images"] = mydata[i][9]
 					#把這圈的資料apppend進jsonData之中
 					jsonData["data"].append(listData)
-				
 				return jsonData	
 		elif count > 0 and count <=26 and keyword == None:
 			#先把json字典中的列表清空
