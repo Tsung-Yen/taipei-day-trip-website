@@ -204,7 +204,7 @@ def attractions():
 						jsonData["data"].append(listData)
 					return jsonData
 				elif count == 3:
-					if leftData <= 36:
+					if leftData <= 47:
 						num = leftData
 						jsonData["nextPage"] = "null"
 					else:

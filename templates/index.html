@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>首頁</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            /*載入字型連結*/
+            @import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC');
+            body{
+                margin:0px;
+                font-family:Noto Sans TC;
+            }
+            nav{
+                margin: 0 auto;
+                display:flex;
+                align-items: center;
+                padding:6px;
+                justify-content: center;
+                background:rgb(255, 255, 255);
+                width: 1200px;
+                /* 將nav固定在最上方 */
+                position:sticky;
+                top:0px;
+            }
+            nav>.title{
+                flex:auto;
+                font-size:30px;
+                font-weight:bold;
+                color: rgba(68, 136, 153, 1);
+                font-style:normal;
+                /* background-color: darkred; */
+            }
+            nav>.item{
+                flex:none;
+                font-size:15px;
+                width:75px;
+                text-align:center;
+                /* background-color: darkturquoise; */
+            }
+            .outter{
+                background: linear-gradient(135deg, #AADDEE 0%, #66AABB 100%);
+                height:340px;
+                width:auto;
+                display:flex;
+                position:sticky;
+                top:55px;
+                justify-content: center;
+            }
+            .outter>.inner{
+                margin-top:40px;
+                height:300px;
+                width:1200px;
+                background-image:url("https://www.linkpicture.com/q/welcome1.png");
+                background-size:contain;
+                background-repeat:no-repeat;
+                background-position:right bottom;
+            }
+            .inner>.t1{
+                font-size:28px;
+                color:white;
+                font-weight:bold;
+            }
+            .inner>.t2{
+                font-size: 16px;
+                color:white;
+            }
+            .insert[type="text"]{
+                width:400px;
+                height:46px;
+                font-size:20px;
+                font-weight:bold;
+                /*Border*/
+                border-top-left-radius: 0.5em;
+                border-bottom-left-radius:0.5em;
+                border:0.5px solid rgb(97, 90, 90);
+            }
+            .butt{
+                width:60px;
+                height:49px;
+                margin-left:-5px;
+                line-height: 50.7px;
+                background: #448899;
+                background-image:url("https://www.linkpicture.com/q/icon_search_1.png");
+                background-repeat: no-repeat;
+                background-size: 30px;
+                background-position:10px;
+                /*border style*/
+                border-top-right-radius:0.5em;
+                border-bottom-right-radius: 0.5em;
+                border:0.5px solid rgb(97, 90, 90);
+            }
+
+            /* 圖片方格(圖片加上文字資訊外框) */
+            .container{
+                display:flex;
+                justify-content: center;
+            }
+            .container>.part{
+                width:1250px;
+                margin-top:50px;
+                display:flex;
+                flex-wrap:wrap;
+                justify-content:center;
+                
+            }
+            /*單格景點(存放圖片及文字方塊)*/
+            .part>.spot{
+                flex:none;
+                margin:10px;
+                width:280px;
+                height:260px;
+                font-size:16px;
+                line-height: 13px;
+                /*Border*/
+                border:0.5px solid rgb(97, 90, 90);
+                border-radius:0.5em;
+                box-shadow: 0px 0px;
+                /* background-color:red; */
+            }
+            img{
+                width:100%;
+                height:65%;
+                border-top-right-radius: 7px;
+                border-top-left-radius: 7px;
+                margin-bottom:15px;
+            }
+            .spot>.spotname{
+                text-indent: 20px;
+                height:8%;
+                /* background: chartreuse; */
+               
+            }
+            /*文字方塊(存放mrt,cat)*/
+            .cube{
+                margin-top:20px;
+                margin:20px;
+                height:15%;
+                display:flex;
+                width:auto;
+                /* background-color: rgb(250, 6, 6); */
+            }
+            .cube>.mrt{
+                flex:auto;
+                
+            }
+            .cube>.cat{
+                flex:none;
+                height:15%;
+            }
+            /*copyright最下半部*/
+            .bottom{
+                margin-top:60px;
+                width:auto;
+                text-align:center;
+                padding:15px;
+                font-size:16px;
+                color:white;
+                background-color: #757575;
+                position:sticky;
+                bottom:0;
+            }
+            @media(max-width:1200px){
+                nav{
+                    width:92%;
+                }
+                
+                .inner{
+                    width:90%;
+                    height:20%;
+                    margin-left:4%;
+                    margin-left:4%;
+                }
+                .part>.spot{
+                    width:45%;
+                    height:auto;
+                }
+            }
+            @media(max-width:600px){
+                nav{
+                    width:93%;
+                }
+                .inner{
+                    width:90%;
+                    
+                    margin-left:4%;
+                    margin-left:4%;
+                }
+                .part>.spot{
+                    width:90%;
+                    height:auto;
+                }
+                .inner>.insert{
+                    width:65%;
+                }
+            }
+            
+        </style>
+        <script type="text/javascript">
+            var nexPage = null;
+            //完成連線
+            function getPageData(pagenum){
+                let openUrl = "http://127.0.0.1:3000/api/attractions?page="+pagenum;
+                fetch(openUrl).then(res=>res.json())
+                .then((jsonData)=>{
+                    nextPage = jsonData["nextPage"];
+                    var pageDataLen = jsonData["data"].length
+                    for(let i=0;i<pageDataLen;i++){
+                        let name = jsonData["data"][i]["name"];
+                        let mrt = jsonData["data"][i]["mrt"];
+                        let category = jsonData["data"][i]["category"];
+                        let img = jsonData["data"][i]["images"];
+                        let images = filtImg(img);
+                        //create empty html tag
+                        let part = document.querySelector(".part");
+
+                        //add a div to Dom
+                        //add single box which contain image&textbox
+                        let spotDiv = document.createElement("div");
+                        spotDiv.className = "spot";
+                        // spotDiv.style.width = "280px";
+                        // spotDiv.style.height = "260px"
+
+                        //add img(1.the first data in spot)
+                        let imgImg = document.createElement("img");
+                        imgImg.src = images;
+                        
+                        //add title name(2.sec data in spot)
+                        let nameP = document.createElement("div");
+                        nameP.className = "spotname";
+                        let nameText = document.createTextNode(name);
+
+                        //add text cube(3.thir data in spot)
+                        let cubeDiv = document.createElement("div");
+                        cubeDiv.className = "cube";
+
+                        //add first text to cube(first data in cube)
+                        let mrtP = document.createElement("div");
+                        mrtP.className = "mrt";
+                        let mrtText = document.createTextNode(mrt);
+
+                        //add Sec text to cube(Sec data in cube)
+                        let catP = document.createElement("div");
+                        catP.className = "cat";
+                        let catText = document.createTextNode(category);
+                        
+                        //container append spotDiv
+                        part.append(spotDiv);
+                        //put three data into spotDiv
+                        spotDiv.append(imgImg);
+                        spotDiv.append(nameP);
+                        nameP.append(nameText);
+                        spotDiv.append(cubeDiv);
+                        
+                        //put two p tag into cube
+                        cubeDiv.append(mrtP);
+                        mrtP.append(mrtText);
+                        cubeDiv.append(catP);
+                        catP.append(catText);
+                    }
+                })
+            }
+            function clearDiv(){
+                //將預先秀出的資料移除(移出div並在將原本的容器div命名玩className放回去)
+                let delSpotDiv = document.querySelector(".part");
+                    delSpotDiv.remove();
+                    let container = document.querySelector(".container");
+                    let createPart = document.createElement("div");
+                    createPart.className = "part";
+                    container.append(createPart);
+            }
+            //使用者透過搜尋關鍵字獲得資料
+            let keyword = null;
+            let keywordhistory = null;      //如果使用者未滑玩所有頁面再次搜尋，比對上次關鍵字結果不同。將div移除
+            let kynextPage = null;
+            let kypage = 0;
+            function keywordSearch(){ 
+                keyword = document.querySelector(".insert").value;
+                if(keyword != keywordhistory ){
+                    clearDiv();
+                    kypage = 0;
+                }
+                //取得連線
+                // keyword = document.querySelector(".insert").value;
+                keywordhistory = keyword;
+                let url = "http://127.0.0.1:3000/api/attractions?page="+kypage+"&keyword="+keyword;
+                fetch(url).then((res)=>{
+                    return res.json()})
+                .then((jsonData)=>{
+                    let num = jsonData["data"].length;
+                    for(let i =0;i<num;i++){
+                        kynextPage = jsonData["nextPage"];
+                        let name = jsonData["data"][i]["name"];
+                        let mrt = jsonData["data"][i]["mrt"];
+                        let category = jsonData["data"][i]["category"];
+                        let img = jsonData["data"][i]["images"];
+                        let images = filtImg(img);
+                        //抓取標籤並塞入內部資料
+                        let container = document.querySelector(".part");
+                        let spotDiv = document.createElement("div");
+                        spotDiv.className = "spot";
+                        let imgImg = document.createElement("img");
+                        imgImg.src = images;
+                        let nameDiv = document.createElement("div");
+                        nameDiv.className = "spotname";
+                        let nameText = document.createTextNode(name);
+                        let cubeDiv = document.createElement("div");
+                        cubeDiv.className = "cube";
+                        let mrtDiv = document.createElement("div");
+                        mrtDiv.className = "mrt";
+                        let mrtText = document.createTextNode(mrt);
+                        let catDiv = document.createElement("div");
+                        catDiv.className = "cat";
+                        let catText = document.createTextNode(category);
+
+                        //將資料一個個放入對應的標籤中
+                        container.append(spotDiv);
+                        spotDiv.append(imgImg);
+                        spotDiv.append(nameDiv);
+                        nameDiv.append(nameText);
+                        spotDiv.append(cubeDiv);
+                        cubeDiv.append(mrtDiv);
+                        mrtDiv.append(mrtText);
+                        cubeDiv.append(catDiv);
+                        catDiv.append(catText);
+                    }
+                });
+            }
+            // //偵測使用者滑動狀況，如果以捲動到底部載入下一頁資料
+            // function scrollPos(){
+            //     window.addEventListener('scroll',function(){
+            //         if(window.scrollY+window.innerHeight+30 >= document.documentElement.scrollHeight){
+            //             //如果keyword有被搜尋則不繼續對page提出發送
+            //             if(keyword == null){
+                            
+            //                 if (nextPage<=26){
+            //                     getPageData(nextPage);
+            //                 }
+            //             }else{
+            //                 //當使用者關鍵字搜尋滑到底，停止載入
+            //                 if(kynextPage!="null"){
+            //                     kypage+=1;
+            //                     keywordSearch();
+            //                 }
+            //             }
+            //         }
+            //         // console.log(document.documentElement.scrollHeight);
+            //         // console.log(window.scrollY+window.innerHeight);
+            //     });
+            // }
+            //初始化函式:一載入頁面就直接秀出第一頁
+            function initShow(){
+                getPageData(0);
+                // scrollPos();
+            }
+            initShow();
+        //以上部分為初始化第一頁資料
+
+            //過濾圖片函式(將第圖片不乾淨的字元過濾將其分割，並回傳第一張)
+            function filtImg(data){
+                //取得第一張圖片
+                let result = data.split(",",1);
+                return result;
+            }
+            function init(){
+                //將input&button綁再一起
+                let input = document.querySelector(".insert");
+                input.addEventListener("keyup", function(event) {
+                    if (event.keyCode === 13) {
+                        event.preventDefault();
+                        document.getElementById("butt").click();
+                    }
+                });
+            }
+
+            //Debounce function
+            const debounce=(fn,delay)=>{
+                let timer;
+                return function(){
+                    clearTimeout(timer)
+                    timer = setTimeout(()=>{
+                        fn()
+                    },delay)
+                }
+            }
+
+            let incrementCount = ()=>{
+                if(keyword == null){
+                    if (nextPage<=26){
+                        getPageData(nextPage);
+                    }
+                }else{
+                    //當使用者關鍵字搜尋滑到底，停止載入
+                    if(kynextPage!="null"){
+                        kypage+=1;
+                        keywordSearch();
+                    }
+                }
+            }
+
+            incrementCount = debounce(incrementCount,200);
+            window.addEventListener("scroll",incrementCount);
+            
+            
+        </script>
+    </head>
+    <body onload="init();">    
+        <nav>
+            <div class="title" onclick="location.href='http://127.0.0.1:3000/'">台北一日遊</div>
+            <div class="item">預定行程</div>
+            <div class="item">登入/註冊</div>
+        </nav>
+        <div class="outter">
+            <div class="inner">
+                <div class="t1">輕鬆享受台北一日悠閒</div>
+                </br>
+                <div class="t2">探索每個角落，體驗城市的深度旅遊行程</div>
+                </br>
+                
+                <input class="insert" type="text" placeholder="輸入景點名稱查詢">
+                <input class="butt" id ="butt" type="button" value=" " onclick="keywordSearch();">
+                
+                
+            </div>
+        </div>
+        <div class="container">
+            <div class="part"></div>
+            <!-- <div class="up" id="up">
+                <div class="spot">
+                    <div id="img1"></div>
+                    <p class="name" id="name1"></p>
+                    <div class="cube">
+                        <p class="mrt" id="mrt1"></p>
+                        <p class="cat" id="cat1"></p>
+                    </div>
+                    
+                </div>
+                <div class="spot">
+                    <div id="img2"></div>
+                    <p class="name" id="name2"></p>
+                    <div class="cube">
+                        <p class="mrt" id="mrt2"></p>
+                        <p class="cat" id="cat2"></p>
+                    </div>
+                </div>
+                <div class="spot">
+                    <div id="img3"></div>
+                    <p class="name" id="name3"></p>
+                    <div class="cube">
+                        <p class="mrt" id="mrt3"></p>
+                        <p class="cat" id="cat3"></p>
+                    </div>
+                </div>
+                <div class="spot">
+                    <div id="img4"></div>
+                    <p class="name" id="name4"></p>
+                    <div class="cube">
+                        <p class="mrt" id="mrt4"></p>
+                        <p class="cat" id="cat4"></p>
+                    </div>
+                </div>
+            </div> -->
+        </div>
+        <div class="bottom" id="bottom">COPYRIGHT © 2021 台北一日遊</div>
+    </body>
+</html>

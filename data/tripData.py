@@ -17,7 +17,7 @@ with open("taipei-attractions.json" , "r" , encoding="utf-8")as response:
 
 clist = data["result"]["results"]
 
-testImg = []
+testdata=[]
 ans = []
 for i in range(len(clist)):
     name = clist[i]["stitle"]
@@ -43,22 +43,30 @@ for i in range(len(clist)):
         splitHttp.remove(splitHttp[-1])             
         
     #將http一一加回網址中
-    num = len(splitHttp)
-    # print(num)
-    for j in range(num):
-        data = "http"+splitHttp[j]
-        testImg.append(data)
-    newImg = str(testImg)
-    ans.append(newImg)
-    testImg.clear()
+    # num = len(splitHttp)
+    # # print(num)
+    # for j in range(num):
+    #     data = "http"+splitHttp[j]
+    #     testImg.append(data)
+    # newImg = str(testImg)
+    # ans.append(newImg)
+    # testImg.clear()
+
     #處理完的IMG
-    images = ans[i]
+    # images = ans[i]
     # print(images)
+    test = []
+    for j in range(len(splitHttp)):
+        img = "http"+splitHttp[j]+","
+        test.append(img)
+    testdata.append(test)
+    # print(testdata[i])
+    testimages = testdata[i]
+    images = ''.join(testimages)
     
 
-
-# #將資料寫入資料庫
-#     sql = "insert into spot(name,category,description,address,transport,mrt,latitude,longitude,images)values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-#     val = (name,category,description,address,transport,mrt,latitude,longitude,images)
-#     mycursor.execute(sql,val)
-#     mydb.commit()
+#將資料寫入資料庫
+    sql = "insert into spot(name,category,description,address,transport,mrt,latitude,longitude,images)values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    val = (name,category,description,address,transport,mrt,latitude,longitude,images)
+    mycursor.execute(sql,val)
+    mydb.commit()
