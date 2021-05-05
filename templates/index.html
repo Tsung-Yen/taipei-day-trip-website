@@ -200,7 +200,7 @@
             var nexPage = null;
             //完成連線
             function getPageData(pagenum){
-                let openUrl = "http://127.0.0.1:3000/api/attractions?page="+pagenum;
+                let openUrl = "http://3.131.86.32/api/attractions?page="+pagenum;
                 fetch(openUrl).then(res=>res.json())
                 .then((jsonData)=>{
                     nextPage = jsonData["nextPage"];
@@ -283,7 +283,7 @@
                 //取得連線
                 // keyword = document.querySelector(".insert").value;
                 keywordhistory = keyword;
-                let url = "http://127.0.0.1:3000/api/attractions?page="+kypage+"&keyword="+keyword;
+                let url = "http://3.131.86.32/api/attractions?page="+kypage+"&keyword="+keyword;
                 fetch(url).then((res)=>{
                     return res.json()})
                 .then((jsonData)=>{
@@ -406,7 +406,7 @@
     </head>
     <body onload="init();">    
         <nav>
-            <div class="title" onclick="location.href='http://127.0.0.1:3000/'">台北一日遊</div>
+            <div class="title" onclick="location.href='http://3.131.86.32:3000/'">台北一日遊</div>
             <div class="item">預定行程</div>
             <div class="item">登入/註冊</div>
         </nav>
