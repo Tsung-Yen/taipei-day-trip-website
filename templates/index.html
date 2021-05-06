@@ -6,10 +6,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
             /*載入字型連結*/
-            @import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC');
+            /* @import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC'); */
             body{
                 margin:0px;
-                font-family:Noto Sans TC;
+                /* font-family:Noto Sans TC; */
             }
             nav{
                 margin: 0 auto;
@@ -204,7 +204,7 @@
                 fetch(openUrl).then(res=>res.json())
                 .then((jsonData)=>{
                     nextPage = jsonData["nextPage"];
-                    var pageDataLen = jsonData["data"].length
+                    let pageDataLen = jsonData["data"].length
                     for(let i=0;i<pageDataLen;i++){
                         let name = jsonData["data"][i]["name"];
                         let mrt = jsonData["data"][i]["mrt"];
@@ -263,11 +263,11 @@
             function clearDiv(){
                 //將預先秀出的資料移除(移出div並在將原本的容器div命名玩className放回去)
                 let delSpotDiv = document.querySelector(".part");
-                    delSpotDiv.remove();
-                    let container = document.querySelector(".container");
-                    let createPart = document.createElement("div");
-                    createPart.className = "part";
-                    container.append(createPart);
+                delSpotDiv.remove();
+                let container = document.querySelector(".container");
+                let createPart = document.createElement("div");
+                createPart.className = "part";
+                container.append(createPart);
             }
             //使用者透過搜尋關鍵字獲得資料
             let keyword = null;
@@ -348,6 +348,7 @@
             //         // console.log(window.scrollY+window.innerHeight);
             //     });
             // }
+
             //初始化函式:一載入頁面就直接秀出第一頁
             function initShow(){
                 getPageData(0);
@@ -374,7 +375,7 @@
             }
 
             //Debounce function
-            const debounce=(fn,delay)=>{
+            let debounce=(fn,delay)=>{
                 let timer;
                 return function(){
                     clearTimeout(timer)
