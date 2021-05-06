@@ -67,19 +67,21 @@
             }
             .insert[type="text"]{
                 width:400px;
-                height:46px;
-                font-size:20px;
+                height:45px;
+                font-size:21px;
                 font-weight:bold;
                 /*Border*/
                 border-top-left-radius: 0.5em;
                 border-bottom-left-radius:0.5em;
                 border:0.5px solid rgb(97, 90, 90);
             }
-            .butt{
-                width:60px;
-                height:49px;
+            .butt[type="button"]{
+                position:absolute;
+                width:56px;
+                height:48.7px;
+                font-size:21px;
                 margin-left:-5px;
-                line-height: 50.7px;
+                color:#448899;
                 background: #448899;
                 background-image:url("https://www.linkpicture.com/q/icon_search_1.png");
                 background-repeat: no-repeat;
@@ -167,9 +169,12 @@
                 
                 .inner{
                     width:90%;
-                    height:20%;
                     margin-left:4%;
                     margin-left:4%;
+                }
+                .inner>.insert{
+                    width:30%;
+                    height:15%;
                 }
                 .part>.spot{
                     width:45%;
@@ -192,6 +197,7 @@
                 }
                 .inner>.insert{
                     width:65%;
+                    height:15%;
                 }
             }
             
@@ -350,11 +356,11 @@
             // }
 
             //初始化函式:一載入頁面就直接秀出第一頁
-            function initShow(){
-                getPageData(0);
-                // scrollPos();
-            }
-            initShow();
+            // function initShow(){
+            //     getPageData(0);
+            //     // scrollPos();
+            // }
+            // initShow();
         //以上部分為初始化第一頁資料
 
             //過濾圖片函式(將第圖片不乾淨的字元過濾將其分割，並回傳第一張)
@@ -364,6 +370,7 @@
                 return result;
             }
             function init(){
+                getPageData(0);
                 //將input&button綁再一起
                 let input = document.querySelector(".insert");
                 input.addEventListener("keyup", function(event) {
@@ -419,7 +426,7 @@
                 </br>
                 
                 <input class="insert" type="text" placeholder="輸入景點名稱查詢">
-                <input class="butt" id ="butt" type="button" value=" " onclick="keywordSearch();">
+                <input class="butt" id ="butt" type="button" value=" " placeholder="嗨" onclick="keywordSearch();">
                 
                 
             </div>
