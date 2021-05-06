@@ -11,6 +11,12 @@
                 margin:0px;
                 /* font-family:Noto Sans TC; */
             }
+            .upper{
+                width:auto;
+                background-color: rgb(255, 255, 255);
+                position:sticky;
+                top:0px;
+            }
             nav{
                 margin: 0 auto;
                 display:flex;
@@ -20,8 +26,6 @@
                 background:rgb(255, 255, 255);
                 width: 1200px;
                 /* 將nav固定在最上方 */
-                position:sticky;
-                top:0px;
             }
             nav>.title{
                 flex:auto;
@@ -40,34 +44,38 @@
             }
             .outter{
                 background: linear-gradient(135deg, #AADDEE 0%, #66AABB 100%);
-                height:340px;
                 width:auto;
                 display:flex;
-                position:sticky;
-                top:55px;
+                /* position:sticky;
+                top:55px; */
                 justify-content: center;
             }
             .outter>.inner{
-                margin-top:40px;
                 height:300px;
                 width:1200px;
                 background-image:url("https://www.linkpicture.com/q/welcome1.png");
                 background-size:contain;
                 background-repeat:no-repeat;
                 background-position:right bottom;
+                align-items: center;
             }
-            .inner>.t1{
+            .searchPartText{
+                margin-top: 65px;
+                position: relative;
+            }
+            .searchPartText>.t1{
                 font-size:28px;
                 color:white;
                 font-weight:bold;
             }
-            .inner>.t2{
+            .searchPartText>.t2{
                 font-size: 16px;
                 color:white;
             }
             .insert[type="text"]{
                 width:400px;
                 height:45px;
+                text-indent: 15px;
                 font-size:21px;
                 font-weight:bold;
                 /*Border*/
@@ -76,7 +84,6 @@
                 border:0.5px solid rgb(97, 90, 90);
             }
             .butt[type="button"]{
-                position:absolute;
                 width:56px;
                 height:48.7px;
                 font-size:21px;
@@ -166,15 +173,14 @@
                 nav{
                     width:92%;
                 }
-                
-                .inner{
+                .outter>.inner>.searchPartText{
                     width:90%;
                     margin-left:4%;
-                    margin-left:4%;
+                    background-position: 300px bottom;
                 }
-                .inner>.insert{
-                    width:30%;
-                    height:15%;
+                .searchPartText>.insert{
+                    width:26%;
+                    text-indent: 6px;
                 }
                 .part>.spot{
                     width:45%;
@@ -185,19 +191,22 @@
                 nav{
                     width:93%;
                 }
-                .inner{
-                    width:90%;
-                    
-                    margin-left:4%;
-                    margin-left:4%;
+                .outter>.inner{
+        
+                    margin-left:2%;
+                    background-position: 100px bottom;
                 }
                 .part>.spot{
                     width:90%;
                     height:auto;
                 }
-                .inner>.insert{
-                    width:65%;
-                    height:15%;
+                .searchPartText>.insert{
+                    width:60%;
+                    text-indent: 6px;
+                }
+                .outter>.inner>.searchPartText{
+                    margin-left:2%;
+                    background-position: 300px bottom;
                 }
             }
             
@@ -412,27 +421,32 @@
                 // console.log(window.scrollY+window.innerHeight);
             }
 
-            incrementCount = debounce(incrementCount,300);
+            incrementCount = debounce(incrementCount,200);
             window.addEventListener("scroll",incrementCount);
             
             
         </script>
     </head>
-    <body onload="init();">    
-        <nav>
-            <div class="title" onclick="location.href='http://3.131.86.32:3000/'">台北一日遊</div>
-            <div class="item">預定行程</div>
-            <div class="item">登入/註冊</div>
-        </nav>
+    <body onload="init();">
+        <div class="upper">  
+            <nav>
+                <div class="title" onclick="location.href='http://3.131.86.32:3000/'">台北一日遊</div>
+                <div class="item">預定行程</div>
+                <div class="item">登入/註冊</div>
+            </nav>
+        </div>
         <div class="outter">
             <div class="inner">
-                <div class="t1">輕鬆享受台北一日悠閒</div>
-                </br>
-                <div class="t2">探索每個角落，體驗城市的深度旅遊行程</div>
-                </br>
+                <div class="searchPartText">
+                    <div class="t1">輕鬆享受台北一日悠閒</div>
+                    </br>
+                    <div class="t2">探索每個角落，體驗城市的深度旅遊行程</div>
+                    </br>
+                    
+                    <input class="insert" type="text" placeholder="輸入景點名稱查詢">
+                    <input class="butt" id ="butt" type="button" value=" " placeholder="嗨" onclick="keywordSearch();">
+                </div>
                 
-                <input class="insert" type="text" placeholder="輸入景點名稱查詢">
-                <input class="butt" id ="butt" type="button" value=" " placeholder="嗨" onclick="keywordSearch();">
                 
                 
             </div>
