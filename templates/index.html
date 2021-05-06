@@ -393,17 +393,23 @@
             }
 
             let incrementCount = ()=>{
-                if(keyword == null){
-                    if (nextPage<=26){
-                        getPageData(nextPage);
-                    }
-                }else{
-                    //當使用者關鍵字搜尋滑到底，停止載入
-                    if(kynextPage!="null"){
-                        kypage+=1;
-                        keywordSearch();
+                if(window.scrollY+window.innerHeight+30 >= document.documentElement.scrollHeight){
+                //如果keyword有被搜尋則不繼續對page提出發送
+                    if(keyword == null){
+                        
+                        if (nextPage<=26){
+                            getPageData(nextPage);
+                        }
+                    }else{
+                        //當使用者關鍵字搜尋滑到底，停止載入
+                        if(kynextPage!="null"){
+                            kypage+=1;
+                            keywordSearch();
+                        }
                     }
                 }
+                // console.log(document.documentElement.scrollHeight);
+                // console.log(window.scrollY+window.innerHeight);
             }
 
             incrementCount = debounce(incrementCount,300);
