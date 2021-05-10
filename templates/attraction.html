@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- <link rel="stylesheet" href="/static/css/attraction.css" type="text/css"> -->
+        <!-- <script src="/static/js/attraction.js"></script> -->
+        <title>attraction</title>
+        <style type="text/css">
+            @import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC');
+            body{
+                margin:0px;
+                font-family:Noto Sans TC;
+            }
+            .navigationBar{
+                width:auto;
+                position: sticky ;
+                top:0;
+                z-index:999;
+                background: white;
+            }
+            .navigationBar>nav{
+                margin:0 auto;
+                width:1200px;
+                padding:8px;
+                display:flex;
+                justify-content: center;
+                align-items: center;
+                background:rgb(255, 255, 255);
+            }
+            nav>.title{
+                flex:auto;
+                font-size:30px;
+                font-weight:bold;
+                color: rgba(68, 136, 153, 1);
+                /* background-color: darkred; */
+            }
+            nav>.item{
+                flex:none;
+                font-size:15px;
+                width:75px;
+                text-align:center;
+                /* background-color: darkturquoise; */
+            }
+            .hr1{
+                height:1px;
+                top:56px;
+                position:sticky;
+                background: rgb(226, 217, 217);
+            }
+            .container{
+                width:1200px;
+                display:flex;
+                flex-wrap: wrap;
+                margin:0 auto;
+                margin-top: 20px;
+                margin-bottom: 35px;
+                position:relative;
+            }
+            .container>.slideimg{
+                flex:none;
+                width:45%;
+                height:auto;
+                margin-top:25px;
+                margin-right: 30px;
+            }
+            .slideimg>img{
+                width:100%;
+                height:100%;
+                border-radius: 0.5em;
+            }
+            .slideimg>.slide>.left{
+                cursor: pointer;
+                position:absolute;
+                top: 50%;
+                left:0;
+                width: 36px;
+                height: auto;
+            }
+            .slideimg>.slide>.right{
+                cursor: pointer;
+                position: absolute;
+                top: 50%;
+                left:42%;
+                width: 36px;
+                height: auto;
+            }
+            .container>.bookingContent{
+                flex:auto;
+                width:40%;
+                height:auto;
+            }
+            .bookingContent>.spotname{
+                font-size:24px;
+                font-weight: bold;
+            }
+            .bookingContent>.catmrt{
+                margin-top: 20px;
+                font-size:16px;
+                font-weight:bold;
+            }
+            .bookingContent>.bookui{
+                width:auto;
+                height:320px;
+                text-indent:10px;
+                padding:8px;
+                border-radius: 0.5em;
+                background:#E8E8E8;
+            }
+            .bookui>.bkt{
+                font-size:16px;
+                font-weight: bold;
+                margin-top:20px;
+            }
+            .bookui>.bkc{
+                font-size: 16px;
+            }
+            /*bkdateui*/
+            .bookui>form>.bkdateui{
+                display: flex;
+                height:auto;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            .bkdateui>.inputText{
+                flex:none;
+                width:92px;
+                line-height: 10px;
+            }
+            .bkdateui>.inputdate{
+                flex:none;
+                margin-right:8px;
+                margin-top: 4px;
+                width:180px;
+                height:28px;
+            }
+            /*bktimeui*/
+            .bookui>form>.bktimeui{
+                display:flex;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            .bktimeui>.radio1{
+                /* remove standard background appearance */
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                flex:none;
+                width:22px;
+                height:22px;
+                padding: 6px;
+                margin-top: 17px;
+                margin-left:15px;
+                background-clip:initial;
+                background-color: #ffffff;
+                border-radius: 50%;
+            }
+            .bktimeui>.dottxt1{
+                flex:none;
+                font-weight:100px;
+                margin-left:-7px;
+            }
+            .bktimeui>.radio2{
+                /* remove standard background appearance */
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                flex:none;
+                width:22px;
+                height:22px;
+                padding: 6px;
+                margin-top: 17px;
+                margin-left:15px;
+                background-clip:initial;
+                background-color: #ffffff;
+                border-radius: 50%;
+            }
+            .bktimeui>.dottxt2{
+                flex:none;
+                font-weight:100px;
+                margin-left:-7px;
+            }
+            /* appearance for checked radiobutton */
+            input[type="radio"]:checked {
+                background: rgba(68, 136, 153, 1);
+            }
+            /*bookfee*/
+            .bookui>form>.bookfee{
+                display:flex;
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 12px;
+            }
+            .bookfee>.p2{
+                flex:none;
+            }
+            .bookfee>.p3{
+                flex:none;
+            }
+            /*btn*/
+            .bookui>form>.btn{
+                font-size: 19px;
+                width:154px;
+                height:36px;
+                margin-left:15px;
+                color:white;
+                cursor: pointer;
+                border-radius: 0.5em;
+                border-style:none;
+                background: rgba(68, 136, 153, 1);
+            }
+
+            .hr2{
+                width:1200px;
+                height:1px;
+                background: rgb(223, 213, 213);
+                margin:0 auto;
+            }
+            /*content*/
+            .content{
+                width:1200px;
+                margin: 0 auto;
+                font-size: 16px;
+                font-weight: 320;
+            }
+            /*description*/
+            .content>.description{
+                margin-top: 30px;
+            }
+            /*address*/
+            .content>.address{
+                margin-top: 35px;
+            }
+            .content>.address>.addt{
+                font-size: 17px;
+                font-weight: bold;
+            }
+            .content>.address>p{
+                line-height:15px;
+            }
+            /*transport*/
+            .content>.transport{
+                margin-top: 35px;
+            }
+            .content>.transport>.transt{
+                font-size: 17px;
+                font-weight: bold;
+            }
+            .content>.transport>p{
+                margin-bottom: 10px;
+            }
+            /*footer*/
+            footer{
+                margin-top:60px;
+                width:auto;
+                text-align:center;
+                padding:15px;
+                font-size:16px;
+                color:white;
+                background-color: #757575;
+                position:sticky;
+                bottom:0;
+            }
+            @media(max-width:1200px){
+                .navigationBar>nav{
+                    width:92%;
+                }
+                .container{
+                    width:92%;
+                    height:auto;
+                }
+                .container>.bookingContent{
+                    height:auto;
+    
+                }
+                .container>.slideimg{
+                    margin-right: 1%;
+                    
+                    margin-left: 0;
+                   
+                    /* position: static;
+                    left: 20%;
+                    transform: translateX(-20%); */
+                } 
+                .content{
+                    width:90%;
+                } 
+                .bookui>form>.btn{
+                    margin-top:-20px;
+                }
+            }
+            @media(max-width:910px){
+                .container{
+                    width:99%;
+                    height:auto;
+                }
+                .slideimg>.slide>.right{
+                    position: absolute;
+                    top: 50%;
+                    left:40%;
+                }
+            }
+            @media(max-width:700px){
+                .navigationBar>nav{
+                    width:94%;
+                }
+                .container{
+                    width:90%;
+                }
+                .container>.slideimg{
+                    width:117%;
+                    margin-left: -7%;
+                    height:auto;
+                }
+                .container>.bookingContent{
+                    width:95%;
+                    height:auto;
+                    margin-top: -15px;
+                }
+                .slideimg>.slide>.left{
+                    position: absolute;
+                    top: 24%;
+                    left:-5%;
+                }
+                .slideimg>.slide>.right{
+                    position: absolute;
+                    top: 24%;
+                    left:98%;
+                }
+            }
+            @media(max-width:500px){
+                .slideimg>.slide>.left{
+                    position: absolute;
+                    top: 20%;
+                    left:-5%;
+                }
+                .slideimg>.slide>.right{
+                    position: absolute;
+                    top: 20%;
+                    left:95%;
+                }
+            }
+        </style>
+        <script> 
+            function init(){
+                connect();
+            }
+            //connecting to Ajax
+            var path = window.location.href;
+            var data = path.split("/");
+            var pathData = data[4];
+            function connect(){
+                url = "http://3.131.86.32:3000/api/attraction/"+pathData;
+                fetch(url).then(res=>res.json())
+                .then((jsondata)=>{
+                    let name = jsondata['name'];
+                    let category = jsondata['category'];
+                    let mrt = jsondata['mrt'];
+                    let description = jsondata['description'];
+                    let address = jsondata['address'];
+                    let transport = jsondata['transport'];
+                    let imageData = jsondata['images'].split(",");
+                    let image = imageData.slice(0,-1);
+                    let images = image[0];
+                    //圖片更換(上半部:圖片輪播及購票資訊)
+                    let slideimg = document.querySelector(".slideimg");
+                    let img = document.createElement("img");
+                    img.src = images;
+                    img.id = "showImg";
+                    slideimg.append(img);
+                    let bookingcont = document.querySelector(".bookingContent");
+                    let spotname = document.createElement("p");
+                    spotname.className = "spotname";
+                    spotname.textContent = name;
+
+                    let catmrt = document.createElement("p");
+                    catmrt.textContent = category+" at "+mrt;
+                    catmrt.className = "catmrt";
+                    bookingcont.append(spotname);
+                    bookingcont.append(catmrt);
+
+                    let bookui = document.createElement("div");
+                    bookui.className = "bookui";
+                    let bkt = document.createElement("p");
+                    bkt.textContent = "訂購導覽行程";
+                    bkt.className = "bkt";
+                    let bkc = document.createElement("p");
+                    bkc.textContent = "以此景點為中心的一日行程，帶您探索城市角落故事";
+                    bkc.className = "bkc";
+                    bookingcont.append(bookui);
+                    bookui.append(bkt);
+                    bookui.append(bkc);
+
+                    let submitForm = document.createElement("form");
+                    let bkdateui = document.createElement("div");
+                    bkdateui.className = "bkdateui";
+                    let inputText = document.createElement("p");
+                    inputText.textContent = "選擇日期 : ";
+                    inputText.className = "inputText";
+                    let inputdate = document.createElement("input");
+                    inputdate.type = "date";
+                    inputdate.className = "inputdate";
+                    inputdate.required = true;
+                    bookui.append(submitForm);
+                    submitForm.append(bkdateui);
+                    bkdateui.append(inputText);
+                    bkdateui.append(inputdate);
+
+                    let bktimeui = document.createElement("div");
+                    bktimeui.className = "bktimeui";
+                    let p1 = document.createElement("p");
+                    p1.textContent = "選擇時間 : ";
+                    //radio1,2 &timetext
+                    let radio1 = document.createElement("input");
+                    radio1.type = "radio";
+                    radio1.className = "radio1";
+                    radio1.name = "time";
+                    radio1.required = true;
+                    let dottxt1 = document.createElement("p");
+                    dottxt1.textContent = "上半天";
+                    dottxt1.className = "dottxt1";
+                    let radio2 = document.createElement("input");
+                    radio2.type = "radio";
+                    radio2.className = "radio2";
+                    radio2.name = "time";
+                    radio2.required = true;
+                    let dottxt2 = document.createElement("p");
+                    dottxt2.textContent = "下半天";
+                    dottxt2.className = "dottxt2";
+                    submitForm.append(bktimeui);
+                    bktimeui.append(p1);
+                    bktimeui.append(radio1);
+                    bktimeui.append(dottxt1);
+                    bktimeui.append(radio2);
+                    bktimeui.append(dottxt2); 
+                    //bkfee
+                    let bookfee = document.createElement("div");
+                    bookfee.className = "bookfee";
+                    let p2 = document.createElement("p");
+                    p2.textContent = "導覽費用 :";
+                    let p3 = document.createElement("p");
+                    p3.className = "fee";
+                    let inputbutt = document.createElement("input");
+                    inputbutt.type = "submit";
+                    inputbutt.className = "btn";
+                    inputbutt.value = "開始預訂行程";
+                    submitForm.append(bookfee);
+                    bookfee.append(p2);
+                    bookfee.append(p3);
+                    submitForm.append(inputbutt);
+
+                    //下半部(description,address,transport)
+                    let content = document.querySelector(".content");
+                    let descrip = document.createElement("div");
+                    descrip.textContent = description;
+                    descrip.className = "description";
+                    content.append(descrip);
+                    //address
+                    let adds = document.createElement("div");
+                    adds.className = "address";
+                    let addt = document.createElement("p");
+                    addt.textContent = "景點地址 : ";
+                    addt.className = "addt";
+                    let addcont = document.createElement("p");
+                    addcont.textContent = address;
+                    content.append(adds);
+                    adds.append(addt);
+                    adds.append(addcont);
+                    //transport
+                    let trans = document.createElement("div");
+                    trans.className = "transport";
+                    let transt = document.createElement("p");
+                    transt.textContent = "交通方式 : ";
+                    transt.className = "transt";
+                    let transcont = document.createElement("p");
+                    transcont.textContent = transport;
+                    content.append(trans);
+                    trans.append(transt);
+                    trans.append(transcont);
+
+                    //get user select time
+                    let dot1 = document.querySelector(".radio1");
+                    let fee = document.querySelector(".fee");
+                    dot1.addEventListener("click" , function(){
+                        fee.innerHTML = "新台幣2000元";
+                    })
+                    let dot2 = document.querySelector(".radio2");
+                    dot2.addEventListener("click" , function(){
+                        fee.innerHTML = "新台幣2500元";
+                    })
+                
+                
+
+                    //change img
+                    let currentImgNum = 0;
+                    let switched = null;
+                    let next = document.querySelector(".right");
+                    let prev = document.querySelector(".left");
+                    let curImg = document.getElementById("showImg");
+                    next.addEventListener("click" , function(){
+                        curImg.remove();
+                        if(currentImgNum == 0){
+                            currentImgNum++;
+                        }else if(currentImgNum < image.length-1){
+                            currentImgNum++;
+                        }else{
+                            currentImgNum = 0
+                        }
+                        if(switched == null){
+                            let newImg = document.createElement("img");
+                            newImg.src = image[currentImgNum];
+                            newImg.id = "newImg";
+                            slideimg.append(newImg);
+                            switched = 1;
+                        }else{
+                            let switchImg = document.getElementById("newImg");
+                            switchImg.remove();
+                            let newImg = document.createElement("img");
+                            newImg.src = image[currentImgNum];
+                            newImg.id = "newImg";
+                            slideimg.append(newImg);
+                        }
+                    });
+                    prev.addEventListener("click" , function(){
+                        curImg.remove();
+                        if(currentImgNum == 0){
+                            currentImgNum = image.length-1;
+                        }else if(currentImgNum < image.lenght-1 || currentImgNum !=0){
+                            currentImgNum = currentImgNum-1;
+                        }else if(currentImgNum == image.length-1){
+                            currentImgNum = currentImgNum-1;
+                        }
+                        if(switched == null){
+                            let newImg = document.createElement("img");
+                            newImg.src = image[currentImgNum];
+                            newImg.id = "newImg";
+                            slideimg.append(newImg);
+                            switched = 1;
+                        }else{
+                            let switchImg = document.getElementById("newImg");
+                            switchImg.remove();
+                            let newImg = document.createElement("img");
+                            newImg.src = image[currentImgNum];
+                            newImg.id = "newImg";
+                            slideimg.append(newImg);
+                        }
+                    });
+                });
+            }
+        </script>
+    </head>
+    <body onload="init();">
+        <div class="navigationBar">  
+            <nav>
+                <div class="title" onclick="location.href='http://3.131.86.32:3000/'">台北一日遊</div>
+                <div class="item" id="item">預定行程</div>
+                <div class="item">登入/註冊</div>
+            </nav>
+        </div>
+        <div class="hr1"></div>
+        <div class="container">
+            <div class="slideimg">
+                <!-- <img src="https://www.travel.taipei/d_upload_ttn/sceneadmin/pic/11000848.jpg"> -->
+                <div class="slide">
+                    <img class="left"src="https://i.ibb.co/5hw705Q/btn-left-Arrow.png">
+                    <img class="right" src="https://i.ibb.co/JxtFtBm/btn-right-Arrow.png">
+                </div>
+            </div>
+            <div class="bookingContent">
+                <!-- <p class="spotname">平安鐘</p>
+                <p class="catmrt">公共藝術 at 忠孝復興</p>
+                <div class="bookui">
+                    <p class="bkt">訂購導覽行程</p>
+                    <p class="bkc">以此景點為中心的一日行程，帶您探索城市角落故事</p>
+                    <div class="bkdateui">
+                       
+                        選擇日期 : <input id="date" type="date">
+                    </div>
+                    <div class="bktimeui">
+                        <p>選擇時間 :</p>
+
+                    </div>
+                    <div class="bkfee">
+                        <p>導覽費用 :</p>
+                        <p>新台幣2000元</p>
+                    </div>
+                    <input class="btn" type="button" value="開始預訂行程">
+                </div> -->
+            </div>
+        </div>
+        <div class="hr2"></div>
+        <div class="content">
+            <!-- <div class="description">
+                北投溫泉從日據時代便有盛名，深受喜愛泡湯的日人自然不會錯過，瀧乃湯、星乃湯、鐵乃湯就是日本人依照溫泉的特性與療效給予的名稱
+                ，據說對皮膚病、神經過敏、氣喘、風濕等具有很好的療效，也因此成為了北部最著名的泡湯景點之一。新北投溫泉的泉源為大磺嘴溫泉，
+                泉質屬硫酸鹽泉，PH值約為3~4之間，水質呈黃白色半透明，泉水溫度約為50-90℃，帶有些許的硫磺味 。目前北投的溫泉旅館、飯店、
+                會館大部分集中於中山路、光明路沿線以及北投公園地熱谷附近，總計約有44家，每一家都各有其特色，多樣的溫泉水療以及遊憩設施，
+                提供遊客泡湯養生，而鄰近的景點也是非常值得造訪，例如被列為三級古蹟的三寶吟松閣、星乃湯、瀧乃湯以及北投第一家溫泉旅館「天狗庵」
+                ，都有著深遠的歷史背景，而北投公園、北投溫泉博物館、北投文物館、地熱谷等，更是遊客必遊的景點，來到北投除了可以讓溫泉洗滌身心疲憊
+                ，也可以順便了解到北投溫泉豐富的人文歷史。
+            </div>
+            <div class="address">
+                <p class="addt">景點地址 :</p>
+                <p>台北市大安區 忠孝路東路4段</p>
+            </div>
+            <div class="transport">
+                <p class="transt">交通方式 :</p>
+                <p>北投溫泉從日據時代便有盛名，深受喜愛泡湯的日人自然不會錯過，瀧乃湯、星乃湯、鐵乃湯就是日本人依照溫泉的特性與療效給予的名稱 
+                ，據說對皮膚病、神經過敏、氣喘、風濕等具有很好的療效，也因此成為了北部最著名的泡湯景點之一。</p>
+            </div>-->
+        </div>
+        <footer>COPYRIGHT © 2021 台北一日遊</footer>
+    </body>
+</html>
