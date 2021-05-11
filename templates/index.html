@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>首頁</title>
+        <title>台北一日遊</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
@@ -82,6 +82,7 @@
                 font-size:21px;
                 font-weight:bold;
                 /*Border*/
+                border-style: none;
                 border-top-left-radius: 0.5em;
                 border-bottom-left-radius:0.5em;
                 border:0.5px solid rgb(97, 90, 90);
@@ -99,6 +100,7 @@
                 background-size: 30px;
                 background-position:10px;
                 /*border style*/
+                border-style: none;
                 border-top-right-radius:0.5em;
                 border-bottom-right-radius: 0.5em;
                 border:0.5px solid rgb(97, 90, 90);
@@ -137,6 +139,9 @@
                 border-top-right-radius: 7px;
                 border-top-left-radius: 7px;
                 margin-bottom:15px;
+            }
+            img:hover{
+                opacity: 0.8;
             }
             .spot>.spotname{
                 text-indent: 20px;
@@ -228,6 +233,7 @@
                     nextPage = jsonData["nextPage"];
                     let pageDataLen = jsonData["data"].length
                     for(let i=0;i<pageDataLen;i++){
+                        let linknum = jsonData["data"][i]["id"]; //放入link url
                         let name = jsonData["data"][i]["name"];
                         let mrt = jsonData["data"][i]["mrt"];
                         let category = jsonData["data"][i]["category"];
@@ -243,7 +249,11 @@
                         // spotDiv.style.width = "280px";
                         // spotDiv.style.height = "260px"
 
-                        //add img(1.the first data in spot)
+                        //add url to spot(1.the first data in spot)
+                        let clicklink = document.createElement("a")
+                        clicklink.href = "http://3.131.86.32:3000/attraction/"+linknum;
+                        clicklink.className = "link";
+                        //add img(put it into <a> will let user can click the bounds inside the img size)
                         let imgImg = document.createElement("img");
                         imgImg.src = images;
                         
@@ -269,7 +279,8 @@
                         //container append spotDiv
                         part.append(spotDiv);
                         //put three data into spotDiv
-                        spotDiv.append(imgImg);
+                        spotDiv.append(clicklink);
+                        clicklink.append(imgImg);
                         spotDiv.append(nameP);
                         nameP.append(nameText);
                         spotDiv.append(cubeDiv);
@@ -312,6 +323,7 @@
                     let num = jsonData["data"].length;
                     for(let i =0;i<num;i++){
                         kynextPage = jsonData["nextPage"];
+                        let keywordId = jsonData["data"][i]["id"];
                         let name = jsonData["data"][i]["name"];
                         let mrt = jsonData["data"][i]["mrt"];
                         let category = jsonData["data"][i]["category"];
@@ -321,6 +333,8 @@
                         let container = document.querySelector(".part");
                         let spotDiv = document.createElement("div");
                         spotDiv.className = "spot";
+                        let keywordLink = document.createElement("a");
+                        keywordLink.href = "http://3.131.86.32:3000/attraction/"+keywordId;
                         let imgImg = document.createElement("img");
                         imgImg.src = images;
                         let nameDiv = document.createElement("div");
@@ -337,7 +351,8 @@
 
                         //將資料一個個放入對應的標籤中
                         container.append(spotDiv);
-                        spotDiv.append(imgImg);
+                        spotDiv.append(keywordLink);
+                        keywordLink.append(imgImg);
                         spotDiv.append(nameDiv);
                         nameDiv.append(nameText);
                         spotDiv.append(cubeDiv);
