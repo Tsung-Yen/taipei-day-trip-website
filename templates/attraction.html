@@ -36,6 +36,7 @@
                 /* background-color: darkred; */
             }
             nav>.item{
+                cursor:pointer;
                 flex:none;
                 font-size:15px;
                 width:75px;
@@ -48,6 +49,84 @@
                 position:sticky;
                 background: rgb(226, 217, 217);
             }
+            /*彈出視窗*/
+            .popup_form{
+                z-index: 998;
+                display:none;
+                position:absolute;
+                top:70px;
+                margin-left:40%;
+                width:340px;
+                height:275px;
+                text-align: center;
+                border-radius: 0.5em;
+                border:solid;
+                border-width:1.5px;
+                border-color: rgb(196, 189, 189);
+                background: rgb(255, 255, 255);
+            }
+            .popup_form>.title{
+                display:flex;
+                margin-bottom: -10px;
+                
+            }
+            .title>.sign_title{
+                flex:auto;
+                color:rgb(77, 70, 70);
+                font-size: 25px;
+                font-weight: 400;
+            }
+           
+            .title>.cancle:after{
+                position:absolute;
+                content:"\d7";
+                font-size:26px;
+                font-weight:bold;
+                top:18px;
+                left:88%;
+                border-radius: 0.5em;
+                color:rgb(150, 138, 138);
+            }
+            form>.account{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.pw{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.btn{
+                cursor:pointer;
+                width:92%;
+                height:42px;
+                font-size: 19px;
+                color:white;
+                border-style: none;
+                border-radius: 0.3em;
+                background: rgba(68, 136, 153, 1);
+            }
+            .popup_form>.sign_up{
+                width:90%;
+                height:38px;
+                color:rgb(128, 118, 118);
+                font-size: 17px;
+                margin-left:22px;
+                line-height: 8px;
+            }
+
+
             .container{
                 width:1200px;
                 display:flex;
@@ -344,13 +423,36 @@
         <script> 
             function init(){
                 connect();
+
+                //sign in butt press
+                let sign = document.getElementById("sign");
+                let pressSign = ()=>{
+                    let body = document.getElementById("body");
+                    let signinView = document.querySelector(".popup_form");
+                    body.style.boxShadow = "rgba(0,0,0,.5)";
+                    signinView.style.display = "initial";
+                    
+                    //sign in button
+                    let signinButt = document.querySelector(".btn");
+                    // signinButt.addEventListener("click",function(){
+                    //     alert("yp");
+                    // })
+
+                    //click cancle
+                    let canclebutt = document.querySelector(".cancle");
+                    canclebutt.addEventListener("click" , function(){
+                        signinView.style.display = "none";
+                        body.style.boxShadow = "rgba(0,0,0,.0)";
+                    });
+                }
+                sign.addEventListener("click" , pressSign);
             }
             //connecting to Ajax
             var path = window.location.href;
             var data = path.split("/");
             var pathData = data[4];
             function connect(){
-                url = "http://3.131.86.32:3000/api/attraction/"+pathData;
+                url = "http://127.0.0.1:3000/api/attraction/"+pathData;
                 fetch(url).then(res=>res.json())
                 .then((jsondata)=>{
                     let name = jsondata['name'];
@@ -549,15 +651,27 @@
             }
         </script>
     </head>
-    <body onload="init();">
+    <body onload="init();" id="body">
         <div class="navigationBar">  
             <nav>
                 <div class="title" onclick="location.href='http://3.131.86.32:3000/'">台北一日遊</div>
                 <div class="item" id="item">預定行程</div>
-                <div class="item">登入/註冊</div>
+                <div class="item" id="sign">登入/註冊</div>
             </nav>
         </div>
         <div class="hr1"></div>
+        <div class="popup_form">
+            <div class="title">
+                <p class="sign_title">登入會員帳號</p>
+                <p class="cancle"></p>
+            </div>
+            <form>
+                <input class="account" type="text" placeholder="請輸入電子信箱" required="required">
+                <input class="pw" type="password" placeholder="輸入密碼" required="required">
+                <input class="btn" type="button" value="登入帳號">
+            </form>
+            <p class="sign_up">還沒有帳戶？點此註冊</p>
+        </div>
         <div class="container">
             <div class="slideimg">
                 <!-- <img src="https://www.travel.taipei/d_upload_ttn/sceneadmin/pic/11000848.jpg"> -->

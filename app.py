@@ -8,7 +8,7 @@ mydb = mysql.connector.connect(
 	host="localhost",
 	#此處為連接instance遠端mysql的帳號密碼
 	user="root",
-	password="Gtio556$",
+	password="root",
 	database="tripdata"
 )
 mycursor=mydb.cursor()
@@ -22,7 +22,7 @@ app.config["TEMPLATES_AUTO_RELOAD"]=True
 
 
 # Pages
-@app.route("/")
+@app.route("/" , methods=["GET","POST"])
 def index():
 	return render_template("index.html")
 @app.route("/attraction/<id>")
@@ -276,6 +276,7 @@ def attractions():
 		return 	response
 @app.route("/api/attraction/<attractionId>")
 def attractionId(attractionId):
+	#可抓取使用者在路由上輸入的值
 	assert attractionId == request.view_args["attractionId"]
 	attractionId = int(attractionId)
 	#判斷是否為使用者輸入造成伺服器壞掉
@@ -319,7 +320,44 @@ def attractionId(attractionId):
 			}
 		response = make_response(errorData,500)
 		return response
+@app.route("/api/user/userstatus/",)  #取得當前登入的使用者資訊
+def status():
+	return "test User status"
 
+@app.route("/api/user/signup/",methods=["POST"])
+def signup():
+	if request.method == "POST":
+		data = request.get_json()
+		name = data["name"]
+		email = data["email"]
+		password = data["password"]
+		userStatus = {}
+	#write user data in mysql
+	sql = f"select * from user where email = '{email}' limit 1"
+	mycursor.execute(sql)
+	mydata = mycursor.fetchone()
+
+	if mydata:
+		userStatus["error"] = True
+		userStatus["message"] = "信箱已被註冊，請重新輸入"
+		return userStatus
+	else:
+		sql = "insert into user(name,email,password) values(%s,%s,%s)"
+		val = (name , email , password)
+		mycursor.execute(sql,val)
+		mydb.commit()
+		userStatus["ok"] = True
+		return userStatus
+		
+@app.route("/api/user/signin/" , methods=["PATCH"])
+def signin():
+	#抓取使用者輸入帳號密碼
+	
+	return "test signin"
+
+@app.route("/api/user/signout/")
+def signout():
+	return "test sign out"
 
 if __name__=="__main__":
 	app.run(host="0.0.0.0",port=3000,debug=True)
