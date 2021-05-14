@@ -615,7 +615,7 @@
                             signOut.addEventListener("click" ,()=>{
                                 let signoutUrl = "http://3.131.86.32:3000/api/user/signout/";
                                 fetch(signoutUrl,{method:"DELETE", "Content-Type":"application/json"})
-                                
+                                signOut.remove();
                                 sign = document.createElement("p");
                                 sign.id = "sign";
                                 sign.className = "item";
@@ -623,7 +623,7 @@
                                 nav.append(sign);
                                 window.setTimeout(()=>{
                                     location.reload();
-                                });                
+                                },500);                
                             });
                         }
                     });
