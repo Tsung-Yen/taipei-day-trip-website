@@ -547,6 +547,7 @@
                 //偵測使用者狀態
                 let sign = document.getElementById("sign");
                 let statusUrl = "http://3.131.86.32:3000/api/user/userstatus/";
+                let nav = document.getElementById("nav");
                 fetch(statusUrl).then((res=>res.json()))
                 .then((user)=>{
                     if(user == null){
@@ -554,7 +555,6 @@
                     }else{
                         //使用者已登入系統
                         sign.remove();
-                        let nav = document.getElementById("nav");
                         let newSign = document.createElement("p");
                         newSign.className = "item";
                         newSign.id = "sign_out";
