@@ -567,11 +567,11 @@
                             let signOutUrl = "http://3.131.86.32:3000/api/user/signout/";
                             fetch(signOutUrl,{method:"DELETE"},headers={"Content-Type":"application/json"})
                             signOut.remove();
-                            let newSign = document.createElement("p");
-                            newSign.className = "item";
-                            newSign.id = "sign";
-                            newSign.textContent = "登入/註冊";
-                            nav.append(newSign);
+                            sign = document.createElement("p");
+                            sign.className = "item";
+                            sign.id = "sign";
+                            sign.textContent = "登入/註冊";
+                            nav.append(sign);
                             window.setTimeout(()=>{
                                 location.reload();
                             });
