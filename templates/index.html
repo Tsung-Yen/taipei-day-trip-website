@@ -406,7 +406,7 @@
             var nexPage = null;
             //完成連線
             function getPageData(pagenum){
-                let openUrl = "http://127.0.0.1:3000/api/attractions?page="+pagenum;
+                let openUrl = "http://3.131.86.32:3000/api/attractions?page="+pagenum;
                 fetch(openUrl).then(res=>res.json())
                 .then((jsonData)=>{
                     nextPage = jsonData["nextPage"];
@@ -430,7 +430,7 @@
 
                         //add url to spot(1.the first data in spot)
                         let clicklink = document.createElement("a")
-                        clicklink.href = "http://127.0.0.1:3000/attraction/"+linknum;
+                        clicklink.href = "http://3.131.86.32:3000/attraction/"+linknum;
                         clicklink.className = "link";
                         //add img(put it into <a> will let user can click the bounds inside the img size)
                         let imgImg = document.createElement("img");
@@ -497,7 +497,7 @@
                 //取得連線
                 // keyword = document.querySelector(".insert").value;
                 keywordhistory = keyword;
-                let url = "http://127.0.0.1:3000/api/attractions?page="+kypage+"&keyword="+keyword;
+                let url = "http://3.131.86.32:3000/api/attractions?page="+kypage+"&keyword="+keyword;
                 fetch(url).then((res)=>{
                     return res.json()})
                 .then((jsonData)=>{
@@ -515,7 +515,7 @@
                         let spotDiv = document.createElement("div");
                         spotDiv.className = "spot";
                         let keywordLink = document.createElement("a");
-                        keywordLink.href = "http://127.0.0.1:3000/attraction/"+keywordId;
+                        keywordLink.href = "http://3.131.86.32:3000/attraction/"+keywordId;
                         let imgImg = document.createElement("img");
                         imgImg.src = images;
                         let nameDiv = document.createElement("div");
@@ -591,19 +591,83 @@
                         document.getElementById("butt").click();
                     }
                 });
+                //載入首頁時同時連上userstatus檢視使用者狀態
+                checkUser();
+                let sign = document.getElementById("sign");
+                function checkUser(){
+                    let userstatusUrl = "http://3.131.86.32:3000/api/user/userstatus/"
+                    fetch(userstatusUrl).then((res)=>res.json())
+                    .then((jsonData)=>{
+                        if(jsonData == null){
+                            
+                        }else{
+                            //使用者已登入
+                            sign.remove();
+                            var newSign = document.createElement("p");
+                            newSign.id = "newsign";
+                            newSign.className = "item";
+                            newSign.textContent = "登出系統";
+                            let nav = document.getElementById("nav");
+                            nav.append(newSign);
+
+                            //使用者點擊登出系統
+                            let signOut = document.getElementById("newsign");
+                            signOut.addEventListener("click" ,()=>{
+                                let signoutUrl = "http://3.131.86.32:3000/api/user/signout/";
+                                fetch(signoutUrl,{method:"DELETE", "Content-Type":"application/json"})
+                                sign = document.createElement("p");
+                                sign.id = "sign";
+                                sign.className = "item";
+                                sign.textContent = "登入/註冊";
+                                nav.append(sign);
+                                window.setTimeout(()=>{
+                                    location.reload();
+                                });                
+                            });
+                        }
+                    });
+                }
+                
 
                 //POPup sign in butt press("使用者點擊後秀出登入視窗")
-                let sign = document.getElementById("sign");
                 let pressSign = ()=>{
-                    let mask = document.querySelector(".mask");
-                    let canclebutt = document.querySelector(".cancle");
-                    let signinView = document.querySelector(".popup_form");
+                    var mask = document.querySelector(".mask");
+                    var canclebutt = document.querySelector(".cancle");
+                    var signinView = document.querySelector(".popup_form");
                     mask.style.display = "initial";
                     signinView.style.display = "initial";
                     cancle(canclebutt,signinView);
+                    //sign in button(使用者輸入信箱及密碼後送出)
+                    let signinForm = document.getElementById("signin_form");
+                    signinForm.addEventListener("submit",(e)=>{
+                        e.preventDefault();
+                        let signinEmail = document.getElementById("signin_email").value;
+                        let signinPassword = document.getElementById("signin_password").value;
+                        let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
+                        let userData ={
+                            "email":signinEmail,
+                            "password":signinPassword
+                        }
+                        fetch(signinUrl,{method:"PATCH",headers:{"Content-Type":"application/json"}
+                        ,body:JSON.stringify(userData)})        //body is the place the data was send.
+                        .then(res=>res.json()).then((signinStatus)=>{
+                            let message = signinStatus["message"];
+                            let signinResult = document.getElementById("signin_result");
+                            if(message == null){
+                                signinResult.innerHTML = "登入成功!!";
+                                window.setTimeout(
+                                    function(){
+                                        location.reload()
+                                    },1000)
+                            }else{
+                                signinResult.innerHTML = message;
+                            }
+                            
+                        });
+                    });
 
                     //sign up butt("使用者點擊後切換到註冊視窗")
-                    let signup = document.querySelector(".sign_up");
+                    var signup = document.querySelector(".sign_up");
                     let cancleSignupButt = document.querySelector(".signup_cancle");
                     let signupAlready = document.querySelector(".sign_in");
                     signup.addEventListener("click", function(){
@@ -639,7 +703,7 @@
                                     }
                                 }
                             };
-                            xmlhttp.open("POST","http://127.0.0.1:3000/api/user/signup/",true);
+                            xmlhttp.open("POST","http://3.131.86.32:3000/api/user/signup/",true);
                             xmlhttp.setRequestHeader("Content-type","application/json");
                             //將取得的資料放入字典data
                             var data = {
@@ -716,7 +780,7 @@
     </head>
     <body onload="init();" id="body">
         <div class="upper">  
-            <nav>
+            <nav id ="nav">
                 <div class="title" onclick="location.href='http://3.131.86.32:3000/'">台北一日遊</div>
                 <div class="item">預定行程</div>
                 <div class="item" id="sign">登入/註冊</div>

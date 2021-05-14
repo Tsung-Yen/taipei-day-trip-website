@@ -2,13 +2,14 @@ from flask import *
 #匯入Flask_Cors(在不同源的情況下瀏覽器會將以收到的request拒絕Javascript存取，須設定路由的response規則)
 from flask_cors import CORS
 import json
+import hashlib
 import mysql.connector
 
 mydb = mysql.connector.connect(
 	host="localhost",
 	#此處為連接instance遠端mysql的帳號密碼
 	user="root",
-	password="root",
+	password="Gtio556$",
 	database="tripdata"
 )
 mycursor=mydb.cursor()
@@ -20,9 +21,10 @@ app.config["JSON_AS_ASCII"]=False
 app.config['JSON_SORT_KEYS'] = False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
 
-
+#創造一個字典存放使用者名稱
+currentUser={}
 # Pages
-@app.route("/" , methods=["GET","POST"])
+@app.route("/")
 def index():
 	return render_template("index.html")
 @app.route("/attraction/<id>")
@@ -320,9 +322,24 @@ def attractionId(attractionId):
 			}
 		response = make_response(errorData,500)
 		return response
-@app.route("/api/user/userstatus/",)  #取得當前登入的使用者資訊
+@app.route("/api/user/userstatus/",methods=["GET"])  #取得當前登入的使用者資訊
 def status():
-	return "test User status"
+	userStatus= {}
+	key = request.cookies.get("key")
+	if key in currentUser:
+		id = currentUser[key]["id"]
+		name = currentUser[key]["name"]
+		email = currentUser[key]["email"]
+		print(id,name,email)
+		data = {}
+		data["id"] = id
+		data["name"] = name
+		data["email"] = email
+		userStatus["data"] = data
+		return userStatus
+	else:
+		return "null"
+	
 
 @app.route("/api/user/signup/",methods=["POST"])
 def signup():
@@ -348,16 +365,48 @@ def signup():
 		mydb.commit()
 		userStatus["ok"] = True
 		return userStatus
-		
-@app.route("/api/user/signin/" , methods=["PATCH"])
-def signin():
-	#抓取使用者輸入帳號密碼
-	
-	return "test signin"
 
-@app.route("/api/user/signout/")
+
+
+@app.route("/api/user/signin/",methods=["PATCH"])
+def signin():
+	userStatus = {}
+	#抓取使用者輸入帳號密碼
+	data = request.get_json()
+	email = data["email"]
+	password = data["password"]
+	print(email,password)
+	#使用者輸入資料和db比對
+	sql = f"select * from user where email = '{email}' and password = '{password}' limit 1"
+	mycursor.execute(sql)
+	mydata = mycursor.fetchone()
+
+	if mydata:
+		userStatus["ok"] = True
+		response = make_response(userStatus)
+		id = mydata[0]
+		name = mydata[1]
+		email = mydata[2]
+		key = hashlib.sha256((name+"afdaadasdda").encode("utf-8")).hexdigest()
+		currentUser[key]={
+			"id":id,
+			"name":name,
+			"email":email
+		}
+		response.set_cookie(key="key" , value=key)
+		return response
+	else:
+		userStatus["error"] = True
+		userStatus["message"] = "輸入信箱或密碼錯誤"
+		return userStatus
+
+@app.route("/api/user/signout/",methods=["DELETE"])
 def signout():
-	return "test sign out"
+	userStatus = {}
+	userStatus["ok"] = True
+	outResponse = make_response(userStatus)
+	outResponse.set_cookie(key="key" , value="" , expires=0)
+	return outResponse
 
 if __name__=="__main__":
 	app.run(host="0.0.0.0",port=3000,debug=True)

@@ -16,7 +16,7 @@
                 width:auto;
                 position: sticky ;
                 top:0;
-                z-index:999;
+                z-index:997;
                 background: white;
             }
             .navigationBar>nav{
@@ -43,7 +43,7 @@
                 text-align:center;
                 /* background-color: darkturquoise; */
             }
-            .hr1{
+            .navigationBar>.hr1{
                 height:1px;
                 top:56px;
                 position:sticky;
@@ -51,11 +51,10 @@
             }
             /*彈出視窗*/
             .popup_form{
-                z-index: 998;
+                z-index: 999;
                 display:none;
+                margin:23px 40%;
                 position:absolute;
-                top:70px;
-                margin-left:40%;
                 width:340px;
                 height:275px;
                 text-align: center;
@@ -68,7 +67,6 @@
             .popup_form>.title{
                 display:flex;
                 margin-bottom: -10px;
-                
             }
             .title>.sign_title{
                 flex:auto;
@@ -76,7 +74,6 @@
                 font-size: 25px;
                 font-weight: 400;
             }
-           
             .title>.cancle:after{
                 position:absolute;
                 content:"\d7";
@@ -84,6 +81,7 @@
                 font-weight:bold;
                 top:18px;
                 left:88%;
+                cursor:pointer;
                 border-radius: 0.5em;
                 color:rgb(150, 138, 138);
             }
@@ -117,13 +115,99 @@
                 border-radius: 0.3em;
                 background: rgba(68, 136, 153, 1);
             }
-            .popup_form>.sign_up{
+            .popup_form>.sign_in{
                 width:90%;
                 height:38px;
                 color:rgb(128, 118, 118);
                 font-size: 17px;
                 margin-left:22px;
                 line-height: 8px;
+                cursor:pointer;
+            }
+            /*彈出視窗註冊視窗*/
+            .popup_signup_form{
+                z-index: 999;
+                display:none;
+                margin:23px 40%;
+                position:absolute;
+                width:340px;
+                height:320px;
+                text-align: center;
+                border-radius: 0.5em;
+                border:solid;
+                border-width:1.5px;
+                border-color: rgb(196, 189, 189);
+                background: rgb(255, 255, 255);
+            }
+            .popup_signup_form>.title{
+                display:flex;
+                margin-bottom: -10px;
+            }
+            .title>.sign_title{
+                flex:auto;
+                color:rgb(77, 70, 70);
+                font-size: 25px;
+                font-weight: 400;
+            }
+            .title>.cancle:after{
+                position:absolute;
+                content:"\d7";
+                font-size:26px;
+                font-weight:bold;
+                top:18px;
+                left:88%;
+                cursor:pointer;
+                border-radius: 0.5em;
+                color:rgb(150, 138, 138);
+            }
+            form>.name{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.account{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.pw{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.signup_btn{
+                cursor:pointer;
+                width:92%;
+                height:42px;
+                font-size: 19px;
+                color:white;
+                border-style: none;
+                border-radius: 0.3em;
+                background: rgba(68, 136, 153, 1);
+            }
+            .popup_signup_form>.sign_up{
+                width:90%;
+                height:38px;
+                color:rgb(128, 118, 118);
+                font-size: 17px;
+                margin-left:22px;
+                line-height: 8px;
+                cursor:pointer;
             }
 
 
@@ -166,7 +250,7 @@
             }
             .container>.bookingContent{
                 flex:auto;
-                width:40%;
+                width:45%;
                 height:auto;
             }
             .bookingContent>.spotname{
@@ -290,7 +374,7 @@
             }
 
             .hr2{
-                width:1200px;
+                width:auto;
                 height:1px;
                 background: rgb(223, 213, 213);
                 margin:0 auto;
@@ -340,9 +424,25 @@
                 position:sticky;
                 bottom:0;
             }
+            .mask{
+                display:none;
+                height:1046px;
+                width:100%;
+                position:absolute;
+                top:0;
+                background: black;
+                opacity:0.3;
+                z-index:998;
+            }
             @media(max-width:1200px){
                 .navigationBar>nav{
                     width:92%;
+                }
+                .popup_signup_form{
+                    margin: 23px 35%;
+                }
+                .popup_form{
+                    margin: 23px 35%;
                 }
                 .container{
                     width:92%;
@@ -350,22 +450,20 @@
                 }
                 .container>.bookingContent{
                     height:auto;
-    
                 }
                 .container>.slideimg{
                     margin-right: 1%;
-                    
                     margin-left: 0;
-                   
-                    /* position: static;
-                    left: 20%;
-                    transform: translateX(-20%); */
                 } 
+                
                 .content{
                     width:90%;
                 } 
                 .bookui>form>.btn{
                     margin-top:-20px;
+                }
+                .mask{
+                    height:1070px;
                 }
             }
             @media(max-width:910px){
@@ -383,16 +481,22 @@
                 .navigationBar>nav{
                     width:94%;
                 }
+                .popup_form{
+                    margin: 23px 20%;
+                }
+                .popup_signup_form{
+                    margin: 23px 20%;
+                }
                 .container{
                     width:90%;
                 }
                 .container>.slideimg{
-                    width:117%;
-                    margin-left: -7%;
+                    width:114%;
+                    margin-left: -8%;
                     height:auto;
                 }
                 .container>.bookingContent{
-                    width:95%;
+                    width:97%;
                     height:auto;
                     margin-top: -15px;
                 }
@@ -408,6 +512,12 @@
                 }
             }
             @media(max-width:500px){
+                .popup_form{
+                    margin: 23px 5%;
+                }
+                .popup_signup_form{
+                    margin: 23px 5%;
+                }
                 .slideimg>.slide>.left{
                     position: absolute;
                     top: 20%;
@@ -418,41 +528,151 @@
                     top: 20%;
                     left:95%;
                 }
+                .mask{
+                    height:185%;
+                }
+            }
+            @media(max-width:300px){
+                .popup_form{
+                    margin: 23px 2%;
+                }
+                .popup_signup_form{
+                    margin: 23px 2%;
+                }
             }
         </style>
         <script> 
             function init(){
                 connect();
-
-                //sign in butt press
+                //偵測使用者狀態
                 let sign = document.getElementById("sign");
-                let pressSign = ()=>{
-                    let body = document.getElementById("body");
-                    let signinView = document.querySelector(".popup_form");
-                    body.style.boxShadow = "rgba(0,0,0,.5)";
-                    signinView.style.display = "initial";
-                    
-                    //sign in button
-                    let signinButt = document.querySelector(".btn");
-                    // signinButt.addEventListener("click",function(){
-                    //     alert("yp");
-                    // })
+                let statusUrl = "http://3.131.86.32:3000/api/user/userstatus/";
+                fetch(statusUrl).then((res=>res.json()))
+                .then((user)=>{
+                    if(user == null){
+                        
+                    }else{
+                        //使用者已登入系統
+                        sign.remove();
+                        let nav = document.getElementById("nav");
+                        let newSign = document.createElement("p");
+                        newSign.className = "item";
+                        newSign.id = "sign_out";
+                        newSign.textContent = "登出系統";
+                        nav.append(newSign);
 
-                    //click cancle
-                    let canclebutt = document.querySelector(".cancle");
-                    canclebutt.addEventListener("click" , function(){
-                        signinView.style.display = "none";
-                        body.style.boxShadow = "rgba(0,0,0,.0)";
+                        //user press sign out(透過method將key刪除)
+                        let signOut = document.getElementById("sign_out");
+                        signOut.addEventListener("click",()=>{
+                            let signOutUrl = "http://3.131.86.32:3000/api/user/signout/";
+                            fetch(signOutUrl,{method:"DELETE"},headers={"Content-Type":"application/json"})
+                            signOut.remove();
+                            let newSign = document.createElement("p");
+                            newSign.className = "item";
+                            newSign.id = "sign";
+                            newSign.textContent = "登入/註冊";
+                            nav.append(newSign);
+                            window.setTimeout(()=>{
+                                location.reload();
+                            });
                     });
-                }
-                sign.addEventListener("click" , pressSign);
+                    }
+                });
+
+                //sign in butt press(當使用者為未登入狀態，彈出登入視窗)
+                sign.addEventListener("click" , ()=>{
+                    let popSigninForm = document.querySelector(".popup_form");
+                    let mask = document.querySelector(".mask");
+                    let signinCancle = document.querySelector(".cancle");
+                    popSigninForm.style.display = "initial";
+                    mask.style.display = "initial";
+                    cancleBox(signinCancle,popSigninForm);
+                    //登入功能
+                    let signin_form = document.getElementById("signin_form");
+                    signin_form.addEventListener("submit",(e)=>{
+                        e.preventDefault();
+                        let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
+                        let email = document.getElementById("signin_email").value;
+                        let password = document.getElementById("signin_pw").value;
+                        let data = {
+                            "email":email,
+                            "password":password
+                        };
+                        fetch(signinUrl,{method:"PATCH",headers:{"Content-Type":"application/json"}
+                        ,body:JSON.stringify(data)}).then((res)=>res.json())
+                        .then((userStatus)=>{
+                            let message = userStatus["message"];
+                            let signinResult = document.getElementById("signin_result");
+                            if(message == null){
+                                signinResult.innerHTML = "登入成功!!";                                
+                                window.setTimeout(()=>{
+                                    location.reload();
+                                },1000);
+                            }else{
+                                signinResult.innerHTML = message;
+                            }
+                        })
+                        
+                    });
+
+                    //sign up box
+                    let backToSignup = document.querySelector(".sign_in");
+                    backToSignup.addEventListener("click",()=>{
+                        let popSignupForm = document.querySelector(".popup_signup_form");
+                        popSigninForm.style.display = "none";
+                        popSignupForm.style.display = "initial";
+                        let signupCancle = document.getElementById("signup_cancle");
+                        cancleBox(signupCancle,popSignupForm);
+
+                        //user finish signup
+                        let signupForm = document.getElementById("signup_form");
+                        signupForm.addEventListener("submit" , (e)=>{
+                            e.preventDefault();
+                            let signUpResult = document.getElementById("signup_result");
+                            let name = document.getElementById("signup_name").value;
+                            let email = document.getElementById("signup_email").value;
+                            let password = document.getElementById("signup_password").value;
+                            data = {
+                                "name":name,
+                                "email":email,
+                                "password":password
+                            }
+                            let signUpUrl = "http://3.131.86.32:3000/api/user/signup/";
+                            fetch(signUpUrl,{method:"POST",headers:{"Content-Type":"application/json"},
+                            body:JSON.stringify(data)}).then((res)=>res.json())
+                            .then((user)=>{
+                                let message = user["message"];
+                                if(message != null){
+                                    signUpResult.innerHTML = message;
+                                }else{
+                                    signUpResult.innerHTML = "註冊成功!!"
+                                }
+                            });
+                        });
+
+                        //back to signinBox
+                        let backToSignin = document.querySelector(".sign_up");
+                        backToSignin.addEventListener("click",()=>{
+                            popSigninForm.style.display = "initial";
+                            popSignupForm.style.display = "none";
+                        });
+                    });
+
+                    //cancle butt
+                    function cancleBox(p1,p2){
+                        p1.addEventListener("click",()=>{
+                            p2.style.display = "none";
+                            mask.style.display = "none";
+                        });
+                    }
+                });              
             }
             //connecting to Ajax
             var path = window.location.href;
             var data = path.split("/");
             var pathData = data[4];
             function connect(){
-                url = "http://127.0.0.1:3000/api/attraction/"+pathData;
+                url = "http://3.131.86.32:3000/api/attraction/"+pathData;
                 fetch(url).then(res=>res.json())
                 .then((jsondata)=>{
                     let name = jsondata['name'];
@@ -653,24 +873,37 @@
     </head>
     <body onload="init();" id="body">
         <div class="navigationBar">  
-            <nav>
+            <nav id="nav">
                 <div class="title" onclick="location.href='http://3.131.86.32:3000/'">台北一日遊</div>
                 <div class="item" id="item">預定行程</div>
                 <div class="item" id="sign">登入/註冊</div>
             </nav>
+            <div class="hr1"></div>
         </div>
-        <div class="hr1"></div>
         <div class="popup_form">
             <div class="title">
                 <p class="sign_title">登入會員帳號</p>
                 <p class="cancle"></p>
             </div>
-            <form>
-                <input class="account" type="text" placeholder="請輸入電子信箱" required="required">
-                <input class="pw" type="password" placeholder="輸入密碼" required="required">
-                <input class="btn" type="button" value="登入帳號">
+            <form id="signin_form" method="PATCH">
+                <input class="account" id="signin_email" type="text" placeholder="請輸入電子信箱" required="required">
+                <input class="pw" id="signin_pw" type="password" placeholder="輸入密碼" required="required">
+                <input class="btn" type="submit" value="登入帳號">
             </form>
-            <p class="sign_up">還沒有帳戶？點此註冊</p>
+            <p class="sign_in" id="signin_result">還沒有帳戶？點此註冊</p>
+        </div>
+        <div class="popup_signup_form">
+            <div class="title">
+                <p class="sign_title">註冊會員帳號</p> 
+                <p class="cancle" id="signup_cancle"></p>
+            </div>
+            <form id="signup_form" method="POST">
+                <input class="name" id="signup_name" type="text" placeholder="輸入姓名" required="required">
+                <input class="account" id="signup_email" type="text" placeholder="輸入電子信箱" required="required">
+                <input class="pw" id="signup_password" type="password" placeholder="輸入密碼" required="required">
+                <input class="signup_btn" type="submit" value="註冊帳號">
+            </form>
+            <p class="sign_up" id="signup_result">已經有帳戶了？點此登入</p>
         </div>
         <div class="container">
             <div class="slideimg">
@@ -724,5 +957,6 @@
             </div>-->
         </div>
         <footer>COPYRIGHT © 2021 台北一日遊</footer>
+        <div class="mask"></div>
     </body>
 </html>
