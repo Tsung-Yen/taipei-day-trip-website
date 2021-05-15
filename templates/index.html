@@ -598,9 +598,8 @@
                     let userstatusUrl = "http://3.131.86.32:3000/api/user/userstatus/"
                     fetch(userstatusUrl).then((res)=>res.json())
                     .then((jsonData)=>{
-                        if(jsonData == null){
+                        if(jsonData != null){
                             
-                        }else{
                             //使用者已登入
                             sign.remove();
                             var newSign = document.createElement("p");
@@ -623,119 +622,95 @@
                                 nav.append(sign);
                                 window.setTimeout(()=>{
                                     location.reload();
-                                },500);                
-                            });
+                                },500);      
+
+                        });
                         }
                     });
                 }
                 
-
-                //POPup sign in butt press("使用者點擊後秀出登入視窗")
-                let pressSign = ()=>{
-                    var mask = document.querySelector(".mask");
-                    var canclebutt = document.querySelector(".cancle");
-                    var signinView = document.querySelector(".popup_form");
-                    mask.style.display = "initial";
-                    signinView.style.display = "initial";
-                    cancle(canclebutt,signinView);
-                    //sign in button(使用者輸入信箱及密碼後送出)
-                    let signinForm = document.getElementById("signin_form");
-                    signinForm.addEventListener("submit",(e)=>{
-                        e.preventDefault();
-                        let signinEmail = document.getElementById("signin_email").value;
-                        let signinPassword = document.getElementById("signin_password").value;
-                        let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
-                        let userData ={
-                            "email":signinEmail,
-                            "password":signinPassword
+                //test(操作1:點擊彈出登入框)
+                let popupForm = document.querySelector(".popup_form");
+                let mask = document.querySelector(".mask");
+                let signinCancle = document.getElementById("signin_cancle") 
+                sign.addEventListener("click" , ()=>{
+                    popupForm.style.display = "block";
+                    mask.style.display = "block";
+                    cancleBox(signinCancle,popupForm);
+                });
+                //(操作2:使用者登入)
+                let signinForm = document.getElementById("signin_form");
+                let signinResult = document.getElementById("signin_result");
+                signinForm.addEventListener("submit",(e)=>{
+                    e.preventDefault();
+                    let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
+                    let email = document.getElementById("signin_email").value;
+                    let password = document.getElementById("signin_password").value;
+                    let data = {
+                        "email":email,
+                        "password":password
+                    };
+                    fetch(signinUrl,{method:"PATCH",headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify(data)}).then((res)=>res.json())
+                    .then((user)=>{
+                        let ok = user["ok"];
+                        if(ok == true){
+                            signinResult.innerHTML = "登入成功!!";
+                            window.setTimeout(()=>{
+                                location.reload();
+                            },1000);
+                        }else{
+                            let message = user["message"];
+                            signinResult.innerHTML = message;
                         }
-                        fetch(signinUrl,{method:"PATCH",headers:{"Content-Type":"application/json"}
-                        ,body:JSON.stringify(userData)})        //body is the place the data was send.
-                        .then(res=>res.json()).then((signinStatus)=>{
-                            let message = signinStatus["message"];
-                            let signinResult = document.getElementById("signin_result");
-                            if(message == null){
-                                signinResult.innerHTML = "登入成功!!";
-                                window.setTimeout(
-                                    function(){
-                                        location.reload()
-                                    },1000)
-                            }else{
-                                signinResult.innerHTML = message;
-                            }
-                            
-                        });
                     });
-
-                    //sign up butt("使用者點擊後切換到註冊視窗")
-                    var signup = document.querySelector(".sign_up");
-                    let cancleSignupButt = document.querySelector(".signup_cancle");
-                    let signupAlready = document.querySelector(".sign_in");
-                    signup.addEventListener("click", function(){
-                        let signUpView = document.querySelector(".popup_form_sign_up");
-                        signinView.style.display = "none";
-                        signUpView.style.display = "initial";
-
-                        //user finish sign up and press button("使用者註冊完畢便將表單送出")
-                        let signupForm = document.getElementById("signup_form");
-                        signupForm.addEventListener("submit" , (e)=>{
-                            e.preventDefault();     //avoid page redirection
-                            let name = document.getElementById("signup_name").value;
-                            let email = document.getElementById("signup_account").value;
-                            let password = document.getElementById("signup_pw").value;
-
-                            var xmlhttp;
-                            if (window.XMLHttpRequest){
-                                //  IE7 , Firefox, Chrome, Opera, Safari 瀏覽器執行程式碼
-                                xmlhttp=new XMLHttpRequest();
-                            }
-                            else{
-                                // IE6, IE5 瀏覽器執行程式碼
-                                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-                            }
-                            xmlhttp.onreadystatechange=function(){
-                                if (xmlhttp.readyState===4 && xmlhttp.status===200){
-                                    let data = JSON.parse(this.responseText);
-                                    let signupResult = document.getElementById("signup_result");
-                                    if(data["message"] == null){
-                                        signupResult.innerHTML = "註冊成功!";
-                                    }else{
-                                        signupResult.innerHTML = data["message"];
-                                    }
-                                }
-                            };
-                            xmlhttp.open("POST","http://3.131.86.32:3000/api/user/signup/",true);
-                            xmlhttp.setRequestHeader("Content-type","application/json");
-                            //將取得的資料放入字典data
-                            var data = {
-                                "name": name,
-                                "email": email,
-                                "password": password
-                            };
-                            var data_json = JSON.stringify(data);
-                            xmlhttp.send(data_json);
-                        });
-            
-
-                        //click sign up already(redirect to sign in view.使用者已經註冊過點擊切會登入視窗)
-                        signupAlready.addEventListener("click",function(){
-                            signinView.style.display = "initial";
-                            signUpView.style.display = "none";
-                        });
-                        //sign up cancle button press(點擊回到首頁)
-                        cancle(cancleSignupButt,signUpView);
+                });
+                //(操作3:使用者尚未註冊，切換至註冊頁面) 
+                let popupSignupForm = document.querySelector(".popup_form_sign_up");
+                let signupCancle = document.querySelector(".signup_cancle");   
+                signinResult.addEventListener("click",()=>{
+                    popupForm.style.display = "none";
+                    popupSignupForm.style.display = "block";
+                    cancleBox(signupCancle,popupSignupForm);
+                });
+                //(操作4:使用者註冊完畢送出)
+                let signupForm = document.getElementById("signup_form");
+                let signupUrl = "http://3.131.86.32:3000/api/user/signup/";
+                let signupResult = document.getElementById("signup_result");
+                signupForm.addEventListener("submit",(e)=>{
+                    e.preventDefault();
+                    let name = document.getElementById("signup_name").value;
+                    let email = document.getElementById("signup_email").value;
+                    let password = document.getElementById("signup_pw").value;
+                    let data = {
+                        "name":name,
+                        "email":email,
+                        "password":password
+                    };
+                    fetch(signupUrl,{method:"POST",headers:{"Content-Type":"application/json"}
+                    ,body:JSON.stringify(data)}).then((res)=>res.json())
+                    .then((user)=>{
+                        let ok = user["ok"];
+                        if(ok == true){
+                            signupResult.innerHTML = "註冊成功!!";
+                        }else{
+                            let message = user["message"];
+                            signupResult.innerHTML = message;
+                        }
                     });
-
-                    //click cancle function(返回首頁函式)
-                    function cancle(p1,p2){
-                        p1.addEventListener("click" , function(){
-                            p2.style.display = "none";
-                            mask.style.display = "none";
-                        });
-                    }
+                });
+                //(操作5:使用者返回登入)
+                signupResult.addEventListener("click",()=>{
+                    popupSignupForm.style.display = "none";
+                    popupForm.style.display = "block";
+                });
+                // click cancle function(返回首頁函式)
+                function cancleBox(p1,p2){
+                    p1.addEventListener("click" , function(){
+                        p2.style.display = "none";
+                        mask.style.display = "none";
+                    });
                 }
-                sign.addEventListener("click" , pressSign);
-
             }
 
             //Debounce function
@@ -791,7 +766,7 @@
             <div class="popup_form">
                 <div class="title">
                     <p class="sign_title">登入會員帳號</p>
-                    <p class="cancle"></p>
+                    <p class="cancle" id="signin_cancle"></p>
                 </div>
                 <form id="signin_form" method="PATCH">
                     <input class="account" type="text" placeholder="請輸入電子信箱" required="required" id="signin_email">
@@ -807,7 +782,7 @@
                 </div>
                 <form id="signup_form" method="POST">
                     <input class="name" type="text" placeholder="請輸入姓名"  id="signup_name" required="required">
-                    <input class="account" type="text" placeholder="請輸入電子郵件" id="signup_account" required="required" >
+                    <input class="account" type="text" placeholder="請輸入電子郵件" id="signup_email" required="required" >
                     <input class="pw" type="password" placeholder="請輸入密碼" id="signup_pw" required="required" >
                     <button class="btn" type="submit">註冊新帳號</button>
                 </form>

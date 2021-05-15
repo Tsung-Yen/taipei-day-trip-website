@@ -358,13 +358,19 @@ def signup():
 		userStatus["error"] = True
 		userStatus["message"] = "信箱已被註冊，請重新輸入"
 		return userStatus
-	else:
+	elif  not mydata:
 		sql = "insert into user(name,email,password) values(%s,%s,%s)"
 		val = (name , email , password)
 		mycursor.execute(sql,val)
 		mydb.commit()
 		userStatus["ok"] = True
 		return userStatus
+	else:
+		userStatus["error"] = True
+		userStatus["message"] = "伺服器錯誤"
+		return userStatus
+		
+	
 
 
 
@@ -375,7 +381,6 @@ def signin():
 	data = request.get_json()
 	email = data["email"]
 	password = data["password"]
-	print(email,password)
 	#使用者輸入資料和db比對
 	sql = f"select * from user where email = '{email}' and password = '{password}' limit 1"
 	mycursor.execute(sql)
