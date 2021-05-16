@@ -2,6 +2,7 @@ from flask import *
 #匯入Flask_Cors(在不同源的情況下瀏覽器會將以收到的request拒絕Javascript存取，須設定路由的response規則)
 from flask_cors import CORS
 import json
+import hashlib
 import mysql.connector
 
 mydb = mysql.connector.connect(
@@ -20,7 +21,8 @@ app.config["JSON_AS_ASCII"]=False
 app.config['JSON_SORT_KEYS'] = False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
 
-
+#創造一個字典存放使用者名稱
+currentUser={}
 # Pages
 @app.route("/")
 def index():
@@ -276,6 +278,7 @@ def attractions():
 		return 	response
 @app.route("/api/attraction/<attractionId>")
 def attractionId(attractionId):
+	#可抓取使用者在路由上輸入的值
 	assert attractionId == request.view_args["attractionId"]
 	attractionId = int(attractionId)
 	#判斷是否為使用者輸入造成伺服器壞掉
@@ -319,7 +322,96 @@ def attractionId(attractionId):
 			}
 		response = make_response(errorData,500)
 		return response
+@app.route("/api/user/userstatus/",methods=["GET"])  #取得當前登入的使用者資訊
+def status():
+	userStatus= {}
+	key = request.cookies.get("key")
+	if key in currentUser:
+		id = currentUser[key]["id"]
+		name = currentUser[key]["name"]
+		email = currentUser[key]["email"]
+		print(id,name,email)
+		data = {}
+		data["id"] = id
+		data["name"] = name
+		data["email"] = email
+		userStatus["data"] = data
+		return userStatus
+	else:
+		return "null"
+	
 
+@app.route("/api/user/signup/",methods=["POST"])
+def signup():
+	if request.method == "POST":
+		data = request.get_json()
+		name = data["name"]
+		email = data["email"]
+		password = data["password"]
+		userStatus = {}
+	#write user data in mysql
+	sql = f"select * from user where email = '{email}' limit 1"
+	mycursor.execute(sql)
+	mydata = mycursor.fetchone()
+
+	if mydata:
+		userStatus["error"] = True
+		userStatus["message"] = "信箱已被註冊，請重新輸入"
+		return userStatus
+	elif  not mydata:
+		sql = "insert into user(name,email,password) values(%s,%s,%s)"
+		val = (name , email , password)
+		mycursor.execute(sql,val)
+		mydb.commit()
+		userStatus["ok"] = True
+		return userStatus
+	else:
+		userStatus["error"] = True
+		userStatus["message"] = "伺服器錯誤"
+		return userStatus
+		
+	
+
+
+
+@app.route("/api/user/signin/",methods=["PATCH"])
+def signin():
+	userStatus = {}
+	#抓取使用者輸入帳號密碼
+	data = request.get_json()
+	email = data["email"]
+	password = data["password"]
+	#使用者輸入資料和db比對
+	sql = f"select * from user where email = '{email}' and password = '{password}' limit 1"
+	mycursor.execute(sql)
+	mydata = mycursor.fetchone()
+
+	if mydata:
+		userStatus["ok"] = True
+		response = make_response(userStatus)
+		id = mydata[0]
+		name = mydata[1]
+		email = mydata[2]
+		key = hashlib.sha256((name+"afdaadasdda").encode("utf-8")).hexdigest()
+		currentUser[key]={
+			"id":id,
+			"name":name,
+			"email":email
+		}
+		response.set_cookie(key="key" , value=key)
+		return response
+	else:
+		userStatus["error"] = True
+		userStatus["message"] = "輸入信箱或密碼錯誤"
+		return userStatus
+
+@app.route("/api/user/signout/",methods=["DELETE"])
+def signout():
+	userStatus = {}
+	userStatus["ok"] = True
+	outResponse = make_response(userStatus)
+	outResponse.set_cookie(key="key" , value="" , expires=0)
+	return outResponse
 
 if __name__=="__main__":
 	app.run(host="0.0.0.0",port=3000,debug=True)
