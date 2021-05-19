@@ -33,6 +33,7 @@
                 font-size:30px;
                 font-weight:bold;
                 color: rgba(68, 136, 153, 1);
+                cursor:pointer;
                 /* background-color: darkred; */
             }
             nav>.item{
@@ -544,6 +545,12 @@
         <script> 
             function init(){
                 connect();
+                menberSys();
+                bookSchedule();
+                bookingCart();
+            }
+            //會員系統
+            function menberSys(){
                 //偵測使用者狀態
                 let sign = document.getElementById("sign");
                 let statusUrl = "http://3.131.86.32:3000/api/user/userstatus/";
@@ -558,12 +565,11 @@
                         newSign.id = "sign_out";
                         newSign.textContent = "登出系統";
                         nav.append(newSign);
-
                         //(使用者登出，透過method將key清空)
                         let signOut = document.getElementById("sign_out");
                         signOut.addEventListener("click",()=>{
                             let signOutUrl = "http://3.131.86.32:3000/api/user/signout/";
-                            fetch(signOutUrl,{method:"DELETE"},headers={"Content-Type":"application/json"})
+                            fetch(signOutUrl,{method:"DELETE"},headers={"Content-Type":"application/json"});
                             signOut.remove();
                             sign = document.createElement("p");
                             sign.className = "item";
@@ -660,12 +666,104 @@
                     });
                 }
             }
+            //開始預定(attraction頁面，建立新的預定系統)
+            function bookSchedule(){
+                let morning = document.querySelector(".radio1");
+                let afternoon = document.querySelector(".radio2");
+                let time = null;
+                let price = null;
+                //取得使用者當前資料序號
+                let attractionId = pathData;
+                //使用者選擇早上
+                morning.addEventListener("click",()=>{
+                    time = "morning";
+                    price = 2000;
+                });
+                //使用者選擇下午
+                afternoon.addEventListener("click",()=>{
+                    time = "afternoon";
+                    price = 2500
+                });
+                let bookForm = document.getElementById("book_form");
+                bookForm.addEventListener("submit",(e)=>{
+                    e.preventDefault();
+                    let date = document.querySelector(".inputdate").value;
+                    let data = {
+                        "attractionId":attractionId,
+                        "date":date,
+                        "time":time,
+                        "price":price
+                    }
+                    //將使用者選擇預定時間地點資料傳給後端
+                    let newBookingUrl = "http://3.131.86.32:3000/api/booking/bookingschedule/";
+                    fetch(newBookingUrl,{method:"POST",headers:{"Content-Type":"application/json"}
+                    ,body:JSON.stringify(data)}).then((res)=>res.json()).then((result)=>{
+                        let ok = result["ok"];
+                        if(ok!=null){
+                            window.setTimeout(()=>{
+                                location.href = "http://3.131.86.32:3000/booking";
+                            },500);
+                        }else{
+                            //使用者尚未登入，登入視窗彈出
+                            let popupForm = document.querySelector(".popup_form");
+                            let mask = document.querySelector(".mask");
+                            let signinCancle = document.querySelector(".cancle");
+                            popupForm.style.display = "block";
+                            mask.style.display = "block";
+                            cancleBox(signinCancle,popupForm,mask);
+                        }
+                    });
+                });
+                //(離開登入頁面)
+                function cancleBox(p1,p2,p3){
+                    p1.addEventListener("click" , function(){
+                        p2.style.display = "none";
+                        p3.style.display = "none";
+                    });
+                }
+            }
+            //查看預定完成後的購物車
+            function bookingCart(){
+                let booking = document.getElementById("booking");
+                let statusUrl = "http://3.131.86.32:3000/api/user/userstatus/";
+                booking.addEventListener("click",()=>{
+                    //先檢查使用者狀態(如果尚未登入直接倒回首頁，已登入可進入購物車頁面)
+                    fetch(statusUrl).then((res)=>res.json()).then((user)=>{
+                        if(user!=null){
+                            location.href = "http://3.131.86.32:3000/booking";
+                        }else{
+                            //使用者尚未登入，登入視窗彈出
+                            let popupForm = document.querySelector(".popup_form");
+                            let mask = document.querySelector(".mask");
+                            let signinCancle = document.querySelector(".cancle");
+                            popupForm.style.display = "block";
+                            mask.style.display = "block";
+                            cancleBox(signinCancle,popupForm,mask);
+                        }
+                    });
+                });
+
+                //(返回按鈕)
+                function cancleBox(p1,p2,p3){
+                    p1.addEventListener("click" , function(){
+                        p2.style.display = "none";
+                        p3.style.display = "none";
+                    });
+                }
+            }
+            //點擊台北一日遊回到首頁
+            function returnHome(){
+                let home = document.getElementById("backto_home");
+                home.addEventListener("click",()=>{
+                    location.href = "http://3.131.86.32:3000/";
+                });
+            }
             //connecting to Ajax
             var path = window.location.href;
             var data = path.split("/");
             var pathData = data[4];
             function connect(){
-                url = "http://3.131.86.32:3000/api/attraction/"+pathData;
+                url = "http://127.0.0.1:3000/api/attraction/"+pathData;
                 fetch(url).then(res=>res.json())
                 .then((jsondata)=>{
                     let name = jsondata['name'];
@@ -684,85 +782,12 @@
                     img.id = "showImg";
                     slideimg.append(img);
                     let bookingcont = document.querySelector(".bookingContent");
-                    let spotname = document.createElement("p");
-                    spotname.className = "spotname";
+                    let spotname = document.querySelector(".spotname");
                     spotname.textContent = name;
 
-                    let catmrt = document.createElement("p");
+                    let catmrt = document.querySelector(".catmrt");
                     catmrt.textContent = category+" at "+mrt;
-                    catmrt.className = "catmrt";
-                    bookingcont.append(spotname);
-                    bookingcont.append(catmrt);
 
-                    let bookui = document.createElement("div");
-                    bookui.className = "bookui";
-                    let bkt = document.createElement("p");
-                    bkt.textContent = "訂購導覽行程";
-                    bkt.className = "bkt";
-                    let bkc = document.createElement("p");
-                    bkc.textContent = "以此景點為中心的一日行程，帶您探索城市角落故事";
-                    bkc.className = "bkc";
-                    bookingcont.append(bookui);
-                    bookui.append(bkt);
-                    bookui.append(bkc);
-
-                    let submitForm = document.createElement("form");
-                    let bkdateui = document.createElement("div");
-                    bkdateui.className = "bkdateui";
-                    let inputText = document.createElement("p");
-                    inputText.textContent = "選擇日期 : ";
-                    inputText.className = "inputText";
-                    let inputdate = document.createElement("input");
-                    inputdate.type = "date";
-                    inputdate.className = "inputdate";
-                    inputdate.required = true;
-                    bookui.append(submitForm);
-                    submitForm.append(bkdateui);
-                    bkdateui.append(inputText);
-                    bkdateui.append(inputdate);
-
-                    let bktimeui = document.createElement("div");
-                    bktimeui.className = "bktimeui";
-                    let p1 = document.createElement("p");
-                    p1.textContent = "選擇時間 : ";
-                    //radio1,2 &timetext
-                    let radio1 = document.createElement("input");
-                    radio1.type = "radio";
-                    radio1.className = "radio1";
-                    radio1.name = "time";
-                    radio1.required = true;
-                    let dottxt1 = document.createElement("p");
-                    dottxt1.textContent = "上半天";
-                    dottxt1.className = "dottxt1";
-                    let radio2 = document.createElement("input");
-                    radio2.type = "radio";
-                    radio2.className = "radio2";
-                    radio2.name = "time";
-                    radio2.required = true;
-                    let dottxt2 = document.createElement("p");
-                    dottxt2.textContent = "下半天";
-                    dottxt2.className = "dottxt2";
-                    submitForm.append(bktimeui);
-                    bktimeui.append(p1);
-                    bktimeui.append(radio1);
-                    bktimeui.append(dottxt1);
-                    bktimeui.append(radio2);
-                    bktimeui.append(dottxt2); 
-                    //bkfee
-                    let bookfee = document.createElement("div");
-                    bookfee.className = "bookfee";
-                    let p2 = document.createElement("p");
-                    p2.textContent = "導覽費用 :";
-                    let p3 = document.createElement("p");
-                    p3.className = "fee";
-                    let inputbutt = document.createElement("input");
-                    inputbutt.type = "submit";
-                    inputbutt.className = "btn";
-                    inputbutt.value = "開始預訂行程";
-                    submitForm.append(bookfee);
-                    bookfee.append(p2);
-                    bookfee.append(p3);
-                    submitForm.append(inputbutt);
 
                     //下半部(description,address,transport)
                     let content = document.querySelector(".content");
@@ -795,7 +820,7 @@
 
                     //get user select time
                     let dot1 = document.querySelector(".radio1");
-                    let fee = document.querySelector(".fee");
+                    let fee = document.querySelector(".p3");
                     dot1.addEventListener("click" , function(){
                         fee.innerHTML = "新台幣2000元";
                     })
@@ -867,8 +892,8 @@
     <body onload="init();" id="body">
         <div class="navigationBar">  
             <nav id="nav">
-                <div class="title" onclick="location.href='http://3.131.86.32:3000/'">台北一日遊</div>
-                <div class="item" id="item">預定行程</div>
+                <div class="title" id="backto_home">台北一日遊</div>
+                <div class="item" id="booking">預定行程</div>
                 <div class="item" id="sign">登入/註冊</div>
             </nav>
             <div class="hr1"></div>
@@ -907,25 +932,30 @@
                 </div>
             </div>
             <div class="bookingContent">
-                <!-- <p class="spotname">平安鐘</p>
-                <p class="catmrt">公共藝術 at 忠孝復興</p>
+                <p class="spotname"></p>
+                <p class="catmrt"></p>
                 <div class="bookui">
                     <p class="bkt">訂購導覽行程</p>
                     <p class="bkc">以此景點為中心的一日行程，帶您探索城市角落故事</p>
-                    <div class="bkdateui">
-                       
-                        選擇日期 : <input id="date" type="date">
-                    </div>
-                    <div class="bktimeui">
-                        <p>選擇時間 :</p>
-
-                    </div>
-                    <div class="bkfee">
-                        <p>導覽費用 :</p>
-                        <p>新台幣2000元</p>
-                    </div>
-                    <input class="btn" type="button" value="開始預訂行程">
-                </div> -->
+                    <form id="book_form" method="POST">
+                        <div class="bkdateui">
+                            <p class="inputText">選擇日期 : </p>
+                            <input class="inputdate" id="date" type="date" required="required">
+                        </div>
+                        <div class="bktimeui">
+                            <p>選擇時間 :</p>
+                            <input type="radio" class="radio1" name="time" required="required">
+                            <p class="dottxt1">上半天</p>
+                            <input type="radio" class="radio2" name="time" required="required">
+                            <p class="dottxt2">下半天</p>
+                        </div>
+                        <div class="bookfee">
+                            <p class="p2">導覽費用 :</p>
+                            <p class="p3"></p>
+                        </div>
+                        <input class="btn" type="submit" value="開始預訂行程">
+                    </form>
+                </div>
             </div>
         </div>
         <div class="hr2"></div>

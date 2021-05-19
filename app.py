@@ -1,3 +1,4 @@
+from types import MethodDescriptorType
 from flask import *
 #匯入Flask_Cors(在不同源的情況下瀏覽器會將以收到的request拒絕Javascript存取，須設定路由的response規則)
 from flask_cors import CORS
@@ -21,8 +22,14 @@ app.config["JSON_AS_ASCII"]=False
 app.config['JSON_SORT_KEYS'] = False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
 
-#創造一個字典存放使用者名稱
+#創造一個字典存放使用者名稱key
 currentUser={}
+#創造一個字典存放使用者當前預定景點資訊
+userBookingData = {}
+#創造一個字典紀錄當前使用者名稱
+user = {}
+#創造一個字典提供購物車API存取資料及清空資料
+bookHistory = {}
 # Pages
 @app.route("/")
 def index():
@@ -322,6 +329,7 @@ def attractionId(attractionId):
 			}
 		response = make_response(errorData,500)
 		return response
+#以下4個路由為(1.使用者狀態，2.註冊，3.登入，4.登出)
 @app.route("/api/user/userstatus/",methods=["GET"])  #取得當前登入的使用者資訊
 def status():
 	userStatus= {}
@@ -340,7 +348,6 @@ def status():
 	else:
 		return "null"
 	
-
 @app.route("/api/user/signup/",methods=["POST"])
 def signup():
 	if request.method == "POST":
@@ -370,10 +377,6 @@ def signup():
 		userStatus["message"] = "伺服器錯誤"
 		return userStatus
 		
-	
-
-
-
 @app.route("/api/user/signin/",methods=["PATCH"])
 def signin():
 	userStatus = {}
@@ -387,6 +390,9 @@ def signin():
 	mydata = mycursor.fetchone()
 
 	if mydata:
+		#紀錄當前使用者名稱提供其他api展示用(無關此api)
+		user["username"] = mydata[1]
+		#當前api
 		userStatus["ok"] = True
 		response = make_response(userStatus)
 		id = mydata[0]
@@ -412,6 +418,86 @@ def signout():
 	outResponse = make_response(userStatus)
 	outResponse.set_cookie(key="key" , value="" , expires=0)
 	return outResponse
+
+#以下三個路由為(1.使用者取得未確認下單的行程，2.建立新的預定行程，3.刪除預定行程)
+@app.route("/api/booking/bookingcart/" , methods=["GET"])
+def bookingCart():
+	key = request.cookies.get("key")
+	attraction = {}
+	if key in currentUser:
+		if userBookingData:
+			#撈取使用者選定景點資料，再一一放入字典供api回傳給前端
+			attractionId = userBookingData["attractionId"]
+			sql = f"select id,name,address,images from spot where id = '{attractionId}' limit 1"
+			mycursor.execute(sql)
+			mydata = mycursor.fetchone()
+			if mydata:
+				#先將圖片處理成一張
+				imageData = mydata[3].split(",")
+				image = imageData[0]
+				#將資料寫入字典
+				attraction["id"] = mydata[0]
+				attraction["name"] = mydata[1]
+				attraction["address"] = mydata[2]
+				attraction["image"] = image
+			data = {}
+			data["attraction"] = attraction
+			bookHistory["data"] = data
+			bookHistory["date"] = userBookingData["date"]
+			bookHistory["time"] = userBookingData["time"]
+			bookHistory["price"] = userBookingData["price"]
+			bookHistory["name"] = user["username"]
+			return bookHistory
+		else:
+			return "null"
+	else:
+		result = {}
+		result["error"] = True
+		result["message"] = "尚未登入會員"
+		return result
+
+@app.route("/api/booking/bookingschedule/",methods=["POST"])
+def bookingSchedule():
+	result = {}
+	if request.method == "POST":
+		data = request.get_json()
+		attractionId = data["attractionId"]
+		date = data["date"]
+		time = data["time"]
+		price = data["price"]
+		#將資料寫入字典
+		userBookingData["attractionId"] = attractionId
+		userBookingData["date"] = date
+		userBookingData["time"] = time
+		userBookingData["price"] = price
+	key = request.cookies.get("key") 
+	if key in currentUser:
+		if data != None:
+			result["ok"] = True
+			return result
+		else:
+			result["error"] = True
+			result["message"] = "未正確填寫預定資料"
+			return result
+	else:
+		result["error"] = True
+		result["message"] = "尚未登入會員"
+		return result
+
+
+@app.route("/api/booking/deleteschedule/",methods=["DELETE"])
+def deleteSchedule():
+	result = {}
+	key = request.cookies.get("key")
+	if key in currentUser:
+		#清空當前預定資料
+		bookHistory.clear()
+		userBookingData.clear()
+		result["ok"] = True
+		return result
+	else:
+		result["error"] = True
+		result["message"] = "尚未登入會員"
 
 if __name__=="__main__":
 	app.run(host="0.0.0.0",port=3000,debug=True)

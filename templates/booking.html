@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>預定系統</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <style>
+            @import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC');
+            body{
+                margin:0px;
+                font-family:Noto Sans TC;
+            }
+            .navigation_bar{
+                width:auto;
+                position: sticky ;
+                top:0;
+                z-index:997;
+                background: white;
+            }
+            .navigation_bar>nav{
+                margin:0 auto;
+                width:1200px;
+                padding:8px;
+                display:flex;
+                justify-content: center;
+                align-items: center;
+                background:rgb(255, 255, 255);
+            }
+            nav>.title{
+                flex:auto;
+                font-size:30px;
+                font-weight:bold;
+                color: rgba(68, 136, 153, 1);
+                cursor:pointer;
+            }
+            nav>.item{
+                flex:none;
+                width:75px;
+                text-align:center;
+                font-size:15px;
+                cursor:pointer;
+            }
+            .navigation_bar>.hr1{
+                height:1px;
+                top:56px;
+                position:sticky;
+                background: rgb(226, 217, 217);
+            }
+
+            /*彈出視窗*/
+            .popup_form{
+                z-index: 999;
+                display:none;
+                margin:23px 40%;
+                position:absolute;
+                width:340px;
+                height:275px;
+                text-align: center;
+                border-radius: 0.5em;
+                border:solid;
+                border-width:1.5px;
+                border-color: rgb(196, 189, 189);
+                background: rgb(255, 255, 255);
+            }
+            .popup_form>.title{
+                display:flex;
+                margin-bottom: -10px;
+            }
+            .title>.sign_title{
+                flex:auto;
+                color:rgb(77, 70, 70);
+                font-size: 25px;
+                font-weight: 400;
+            }
+            .title>.cancle:after{
+                position:absolute;
+                content:"\d7";
+                font-size:26px;
+                font-weight:bold;
+                top:18px;
+                left:88%;
+                cursor:pointer;
+                border-radius: 0.5em;
+                color:rgb(150, 138, 138);
+            }
+            form>.account{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.pw{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.btn{
+                cursor:pointer;
+                width:92%;
+                height:42px;
+                font-size: 19px;
+                color:white;
+                border-style: none;
+                border-radius: 0.3em;
+                background: rgba(68, 136, 153, 1);
+            }
+            .popup_form>.sign_in{
+                width:90%;
+                height:38px;
+                color:rgb(128, 118, 118);
+                font-size: 17px;
+                margin-left:22px;
+                line-height: 8px;
+                cursor:pointer;
+            }
+            /*彈出視窗註冊視窗*/
+            .popup_signup_form{
+                z-index: 999;
+                display:none;
+                margin:23px 40%;
+                position:absolute;
+                width:340px;
+                height:320px;
+                text-align: center;
+                border-radius: 0.5em;
+                border:solid;
+                border-width:1.5px;
+                border-color: rgb(196, 189, 189);
+                background: rgb(255, 255, 255);
+            }
+            .popup_signup_form>.title{
+                display:flex;
+                margin-bottom: -10px;
+            }
+            .title>.sign_title{
+                flex:auto;
+                color:rgb(77, 70, 70);
+                font-size: 25px;
+                font-weight: 400;
+            }
+            .title>.cancle:after{
+                position:absolute;
+                content:"\d7";
+                font-size:26px;
+                font-weight:bold;
+                top:18px;
+                left:88%;
+                cursor:pointer;
+                border-radius: 0.5em;
+                color:rgb(150, 138, 138);
+            }
+            form>.name{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.account{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.pw{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.signup_btn{
+                cursor:pointer;
+                width:92%;
+                height:42px;
+                font-size: 19px;
+                color:white;
+                border-style: none;
+                border-radius: 0.3em;
+                background: rgba(68, 136, 153, 1);
+            }
+            .popup_signup_form>.sign_up{
+                width:90%;
+                height:38px;
+                color:rgb(128, 118, 118);
+                font-size: 17px;
+                margin-left:22px;
+                line-height: 8px;
+                cursor:pointer;
+            }
+
+            /*預定地點*/
+            .username_title{
+                margin: 0px auto;
+                margin-top:30px;
+                width:980px;
+                font-size:20px;
+                font-weight:bold;
+                color:rgb(95, 91, 91);
+            }
+            .container{
+                display:flex;
+                flex-wrap:wrap;
+                width:980px;
+                margin: 0 auto;
+                margin-top:20px;
+                font-size:16px;
+                margin-bottom: 35px;
+                position:relative;
+            }
+            .container>img{
+                flex:none;
+                width:266px;
+                height:200px;
+                margin-top:15px;
+                margin-right: 30px;
+                border-radius: 0.5em;
+            }
+            .container>.spot{
+                flex:auto;
+                width:60%;
+                height:auto;
+            }
+            /*景點資訊*/
+            .spot{
+                width:auto;
+                height:250px;
+                align-items: center;
+                font-size:16px;
+            }
+            .spot>.spot_title{
+                display:flex;
+                font-weight:bold;
+                color:rgba(68, 136, 153, 1);
+            }
+            .spot>.spot_date{
+                display:flex;
+                margin-top:-10px;
+            }
+            .spot_date>.date{
+                flex:none;
+                font-weight: bold;
+                color:rgb(95, 91, 91);
+            }
+            .spot_date>.content{
+                flex:none;
+                color:gray;
+                margin-left:5px;
+            }
+            .spot>.spot_time{
+                display:flex;
+                margin-top:-20px;
+            }
+            .spot_time>.time{
+                flex:none;
+                font-weight: bold;
+                color:rgb(95, 91, 91);
+            }
+            .spot_time>.content{
+                flex:none;
+                color:gray;
+                margin-left:5px;
+            }
+            .spot>.spot_fee{
+                display:flex;
+                margin-top:-20px;
+            }
+            .spot_fee>.fee{
+                flex:none;
+                font-weight: bold;
+                color:rgb(95, 91, 91);
+            }
+            .spot_fee>.content{
+                flex:none;
+                color:gray;
+                margin-left:5px;
+            }
+            .spot>.spot_place{
+                display:flex;
+                margin-top:-20px;
+            }
+            .spot_place>.place{
+                flex:none;
+                font-weight: bold;
+                color:rgb(95, 91, 91);
+            }
+            .spot_place>.content{
+                flex:none;
+                color:gray;
+                margin-left:5px;
+            }
+            /*移出當前預定小圖*/
+            .container>.delete_booking{
+                flex:none;
+                width:35px;
+                height:35px;
+            }
+            .hr2{
+                width:1200px;
+                height:1px;
+                background: rgb(223, 213, 213);
+                margin:0 auto;
+            }
+            /*你的連絡資訊*/
+            .contact_message{
+                height:auto;
+                width:980px;
+                margin: 0 auto;
+                color:rgb(95, 91, 91);
+            }
+            .contact_message>.title{
+                margin-top: 35px;
+                font-size:20px;
+                font-weight:bold;
+                color:rgb(95, 91, 91);
+            }
+            .message[type="text"]{
+                width:200px;
+                height:28px;
+                margin-bottom: 12px;
+                border-radius: 0.3em;
+                border-color: rgb(230, 221, 221);
+                border-style: solid;
+                border-width: 1px;
+            }
+            .contact_message>.remind{
+                margin-top:0;
+                font-weight:bold;
+            }
+            .hr3{
+                width:1200px;
+                height:1px;
+                background: rgb(223, 213, 213);
+                margin:0 auto;
+                margin-top:40px;
+            }
+            /*paid message*/
+            .paid_message{
+                height:auto;
+                width:980px;
+                margin: 0 auto;
+                color:rgb(95, 91, 91);
+            }
+            .paid_message>.title{
+                margin-top: 35px;
+                font-size:20px;
+                font-weight:bold;
+                color:rgb(95, 91, 91);
+            }
+            .paid[type="password"]{
+                width:200px;
+                height:28px;
+                margin-bottom: 12px;
+                border-radius: 0.3em;
+                border-color: rgb(230, 221, 221);
+                border-style: solid;
+                border-width: 1px;
+            }
+            .paid[type="text"]{
+                width:200px;
+                height:28px;
+                margin-bottom: 12px;
+                border-radius: 0.3em;
+                border-color: rgb(230, 221, 221);
+                border-style: solid;
+                border-width: 1px;
+            }
+            .hr4{
+                width:1200px;
+                height:1px;
+                background: rgb(223, 213, 213);
+                margin:0 auto;
+                margin-top:20px;
+            }
+            /*comfirm*/
+            .confirm{
+                height:auto;
+                width:980px;
+                margin: 0 auto;
+                position: relative;
+                color:rgb(95, 91, 91);
+            }
+            .confirm>.total_fee{
+                margin-top:40px;
+                font-size: 16px;
+                font-weight: bold;
+                position: absolute;
+                right:0px;
+            }
+            .butt[type="submit"]{
+                position: absolute;
+                right:0px;
+                top:80px;
+                width:150px;
+                height:33px;
+                font-size: 16px;
+                color:white;
+                cursor: pointer;
+                border-radius: 0.5em;
+                border-style:none;
+                background: rgba(68, 136, 153, 1);
+            }
+            /*footer*/
+            footer{
+                margin-top:160px;
+                width:auto;
+                text-align:center;
+                padding:15px;
+                font-size:16px;
+                color:white;
+                background-color: #757575;
+                position:sticky;
+                bottom:0;
+            }
+            .mask{
+                display:none;
+                height:1046px;
+                width:100%;
+                position:absolute;
+                top:0;
+                background: black;
+                opacity:0.3;
+                z-index:998;
+            }
+        </style>
+        <script>
+            function init(){
+                //會員系統
+                menberSys();
+                bookSchedule();
+                getBookingData();
+                deleteCurrentBooking();
+                returnHome();
+            }
+            //當前使用者姓名
+            let myUser = null;
+            //會員系統函式
+            function menberSys(){
+                //(流程1)檢查使用者狀況
+                let signing = document.getElementById("signing");
+                let nav = document.getElementById("nav");
+                let userStatusUrl = "http://3.131.86.32:3000/api/user/userstatus/";
+                fetch(userStatusUrl).then((res)=>res.json())
+                .then((jsonData)=>{
+                    if(jsonData != null){
+                        myUser = jsonData["data"]["name"];
+                        signing.remove();
+                        let newSigning = document.createElement("p");
+                        newSigning.id = "sign_out";
+                        newSigning.className = "item";
+                        newSigning.textContent = "登出系統";
+                        nav.append(newSigning);
+                        //(登出)
+                        let signOutUrl = "http://3.131.86.32:3000/api/user/signout/";
+                        let signout = document.getElementById("sign_out");
+                        signout.addEventListener("click",()=>{
+                            fetch(signOutUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
+                            .then((res)=>res.json()).then((user)=>{
+                                signout.remove();
+                                signing = document.createElement("p");
+                                signing.id = "signing";
+                                signing.className = "item";
+                                signing.textContent = "登入/註冊"
+                                nav.append(signing);
+                                window.setTimeout(()=>{
+                                    location.reload()
+                                },600);
+                            });
+                        });
+                    }else{
+                        window.setTimeout(()=>{
+                            location.href="http://3.131.86.32:3000/";
+                        },200);
+                    }
+                });
+                //(流程2)使者點擊彈出登入視窗
+                let popupSignin = document.querySelector(".popup_form");
+                let mask = document.querySelector(".mask");
+                let signinCancle = document.querySelector(".cancle");
+                signing.addEventListener("click",()=>{
+                    popupSignin.style.display = "block";
+                    mask.style.display = "block";
+                    cancleBox(signinCancle,popupSignin);
+                });
+                //(流程3)使用者完成登入步驟
+                let signinForm = document.getElementById("signin_form");
+                let signinResult = document.getElementById("signin_result");
+                let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
+                signinForm.addEventListener("submit",(e)=>{
+                    e.preventDefault();
+                    let email = document.getElementById("signin_email").value;
+                    let password = document.getElementById("signin_pw").value;
+                    let data = {
+                        "email":email,
+                        "password":password
+                    };
+                    fetch(signinUrl,{method:"PATCH",headers:{"Content-Type":"application/json"}
+                    ,body:JSON.stringify(data)}).then((res)=>res.json())
+                    .then((user)=>{
+                        let ok = user["ok"];
+                        if(ok != null){
+                            signinResult.innerHTML = "登入成功!!";
+                            window.setTimeout(()=>{
+                                location.reload()
+                            },1000);
+                        }else{
+                            let message = user["message"];
+                            signinResult.innerHTML = message;
+                        }
+                    });
+                });
+                //(流程4)使用者尚未註冊
+                let popupSignup = document.querySelector(".popup_signup_form");
+                let signupCancle = document.getElementById("signup_cancle");
+                signinResult.addEventListener("click",()=>{
+                    popupSignin.style.display = "none";
+                    popupSignup.style.display = "block";
+                    cancleBox(signupCancle,popupSignup);
+                });
+                //(流程5)使用者完成註冊
+                let signupForm = document.getElementById("signup_form");
+                let signupResult = document.getElementById("signup_result");
+                let signupUrl = "http://3.131.86.32:3000/api/user/signup/";
+                signupForm.addEventListener("submit",(e)=>{
+                    e.preventDefault();
+                    let name = document.getElementById("signup_name").value;
+                    let email = document.getElementById("signup_email").value;
+                    let password = document.getElementById("signup_password").value;
+                    let data = {
+                        "name":name,
+                        "email":email,
+                        "password":password
+                    }
+                    fetch(signupUrl,{method:"POST",headers:{"Content-Type":"application/json"}
+                    ,body:JSON.stringify(data)}).then((res)=>res.json()).then((user)=>{
+                        let ok = user["ok"];
+                        if(ok != null){
+                            signupResult.innerHTML = "註冊成功!!";
+                        }else{
+                            let message = user["message"];
+                            signupResult.innerHTML = message;
+                        }
+                    });
+                });
+                //(流程6)使用者返回登入視窗
+                signupResult.addEventListener("click",()=>{
+                    popupSignup.style.display = "none";
+                    popupSignin.style.display = "block";
+                });
+                //離開登入及註冊視窗函式
+                function cancleBox(p1,p2){
+                    p1.addEventListener("click",()=>{
+                        p2.style.display = "none";
+                        mask.style.display = "none";
+                    });
+                }
+            }
+            //預定系統函式
+            function bookSchedule(){
+                //(流程1)如果使用者尚未登入點擊後直接進入登入系統。
+                let userStatusUrl = "http://3.131.86.32:3000/api/user/userstatus/"; 
+                let popupSignin = document.querySelector(".popup_form");
+                let mask = document.querySelector(".mask");
+                let signinCancle = document.querySelector(".cancle");
+                let booking = document.getElementById("booking");
+                booking.addEventListener("click",()=>{
+                    fetch(userStatusUrl).then((res)=>res.json())
+                    .then((user)=>{
+                        if(user != null){
+
+                        }else{
+                            popupSignin.style.display = "block";
+                            mask.style.display = "block";
+                            cancleBox(signinCancle,popupSignin);
+                        }
+                    });
+                });
+
+                //離開登入及註冊視窗函式
+                function cancleBox(p1,p2){
+                    p1.addEventListener("click",()=>{
+                        p2.style.display = "none";
+                        mask.style.display = "none";
+                    });
+                }
+            }
+            //取得使用者購物車預定資料
+            function getBookingData(){
+                let bookDataUrl = "http://3.131.86.32:3000/api/booking/bookingcart/";
+                fetch(bookDataUrl).then((res)=>res.json()).then((bookData)=>{
+                    if(bookData!=null){
+                    //已登入即已預定資料
+                        let username = document.getElementById("username");
+                        username.innerHTML =  bookData["name"];
+                        let image = document.getElementById("slide_img");
+                        image.src=bookData["data"]["attraction"]["image"];
+                        let spotname = document.getElementById("spotname");
+                        spotname.innerHTML = bookData["data"]["attraction"]["name"];
+                        let date = document.getElementById("date");
+                        date.innerHTML = bookData["date"];
+                        //判斷時間為早上還是下午
+                        let timeResult = null;
+                        if(bookData["time"] == "morning"){
+                            timeResult = "早上9點至下午4點";
+                        }else{
+                            timeResult = "下午4點至晚上11點";
+                        }
+                        let time = document.getElementById("time");
+                        time.innerHTML = timeResult;
+                        let price = document.getElementById("price");
+                        price.innerHTML = "新台幣"+bookData["price"]+"元";
+                        let place = document.getElementById("place");
+                        place.innerHTML = bookData["data"]["attraction"]["address"];
+                        let totalFee = document.getElementById("total_price");
+                        totalFee.innerHTML = bookData["price"];
+                    }else{
+                    //已登入但無預定資料
+                        let username = document.getElementById("username");
+                        username.innerHTML = myUser;
+                        let nodata = document.createElement("p");
+                        nodata.style.color = "gray";
+                        nodata.textContent = "目前沒有預定任何的行程";
+                        let container = document.querySelector(".container");
+                        container.append(nodata);
+                        let slideImg = document.getElementById("slide_img");
+                        let spot = document.querySelector(".spot");
+                        let deleteBookingImg = document.querySelector(".delete_booking");
+                        let hr2 = document.querySelector(".hr2");
+                        let contactMessage = document.querySelector(".contact_message");
+                        let hr3 = document.querySelector(".hr3");
+                        let paidMessage = document.querySelector(".paid_message");
+                        let hr4 = document.querySelector(".hr4");
+                        let confirm = document.querySelector(".confirm");
+                        slideImg.style.display = "none";
+                        spot.style.display = "none";
+                        deleteBookingImg.style.display = "none";
+                        hr2.style.display = "none";
+                        contactMessage.style.display = "none";
+                        hr3.style.display = "none";
+                        paidMessage.style.display = "none";
+                        hr4.style.display = "none";
+                        confirm.style.display = "none";
+                        let footer = document.getElementById("footer");
+                        footer.style.height = "540px";
+                    }
+                });
+            }
+            //刪除已預定的行程
+            function deleteCurrentBooking(){
+                let deleteBooking = document.querySelector(".delete_booking");
+                let deleteBookingUrl = "http://3.131.86.32:3000/api/booking/deleteschedule/";
+                deleteBooking.addEventListener("click",()=>{
+                    fetch(deleteBookingUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}});
+                    window.setTimeout(()=>{
+                        location.reload();
+                    },500);
+                });
+            }
+            //點擊台北一日遊回到首頁
+            function returnHome(){
+                let home = document.getElementById("backto_home");
+                home.addEventListener("click",()=>{
+                    location.href = "http://3.131.86.32:3000/";
+                });
+            }
+        </script>
+    </head>
+    <body onload="init()" id="body">
+        <div class="navigation_bar">
+            <nav id="nav">
+                <div class="title" id="backto_home">台北一日遊</div>
+                <div class="item" id="booking">預定行程</div>
+                <div class="item" id="signing">登入/註冊</div>
+            </nav>
+            <div class="hr1"></div>
+        </div>
+        <div class="popup_form">
+            <div class="title">
+                <p class="sign_title">登入會員帳號</p>
+                <p class="cancle"></p>
+            </div>
+            <form id="signin_form" method="PATCH">
+                <input class="account" id="signin_email" type="text" placeholder="請輸入電子信箱" required="required">
+                <input class="pw" id="signin_pw" type="password" placeholder="輸入密碼" required="required">
+                <input class="btn" type="submit" value="登入帳號">
+            </form>
+            <p class="sign_in" id="signin_result">還沒有帳戶？點此註冊</p>
+        </div>
+        <div class="popup_signup_form">
+            <div class="title">
+                <p class="sign_title">註冊會員帳號</p> 
+                <p class="cancle" id="signup_cancle"></p>
+            </div>
+            <form id="signup_form" method="POST">
+                <input class="name" id="signup_name" type="text" placeholder="輸入姓名" required="required">
+                <input class="account" id="signup_email" type="text" placeholder="輸入電子信箱" required="required">
+                <input class="pw" id="signup_password" type="password" placeholder="輸入密碼" required="required">
+                <input class="signup_btn" type="submit" value="註冊帳號">
+            </form>
+            <p class="sign_up" id="signup_result">已經有帳戶了？點此登入</p>
+        </div>
+        <div class="username_title">你好，<span id="username"></span>，待預定的行程如下：</div>
+        <div class="container">
+            <img id="slide_img">
+            <div class="spot">
+                <div class="spot_title">
+                    <p class="title">台北一日遊：</p>
+                    <p class="content" id="spotname"></p>
+                </div>
+                <div class="spot_date">
+                    <p class="date">日期：</p>
+                    <p class="content" id="date"></p>
+                </div>
+                <div class="spot_time">
+                    <p class="time">時間：</p>
+                    <p class="content" id="time"></p>
+                </div>
+                <div class="spot_fee">
+                    <p class="fee">費用：</p>
+                    <p class="content" id="price"></p>
+                </div>
+                <div class="spot_place">
+                    <p class="place">地點：</p>
+                    <p class="content" id="place"></p>
+                </div>
+            </div> 
+            <img class="delete_booking" src="https://s3-alpha-sig.figma.com/img/5537/1303/f31984c7c73c46aaed1a7a1c9003277f?Expires=1622419200&Signature=Q4roAebZiGCxzV7hzfXvwlfcEcwG5TakvQIf8L2TPtad~PGBImPJE9WOvfa6DAN-EzvyA8daSNHLFV7MHGeMwxox67a7qceZb00B8k9wkK80EjPNf1NLlVxU8E4SCd5yU7Vz38qiEkE~0uqYVD7yaB5jrFcP6jJ~OpSNEYwarQIxmz9sWXgeRAil~Hy30PbTMTOdOJrp8tHIBUDb3JiX6IxjOccFKA6YdvfTuj36fxlwkzuO7Lr7Gvrfm4oAtXtny~3bOTVWqL9qE3KATZcaXtWXYX4iv6cqfM39eSmAsp1l-EDFxHIrcUn-h~sZYqTuVgtWko2hrH7S2nDJ0vc5pQ__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA">
+        </div>
+        <div class="hr2"></div>
+        <div class="contact_message">
+            <p class="title">你的連絡資訊</p>
+            <form>
+                聯絡姓名：<input class="message" type="text">
+                </br>
+                聯絡信箱：<input class="message" type="text">
+                </br>
+                手機號碼：<input class="message" type="text">
+            </form>
+            <p class="remind">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</p>
+        </div>
+        <div class="hr3"></div>
+        <div class="paid_message">
+            <p class="title">信用卡付款資訊</p>
+            <form>
+                卡片號碼：<input class="paid" type="password" placeholder="**** **** **** ****">
+                </br>
+                過期時間：<input class="paid" type="text" placeholder="ＭＭ／ＹＹ">
+                </br>
+                驗證密碼：<input class="paid" type="text" placeholder="ＣＶＶ">
+            </form>
+        </div>
+        <div class="hr4"></div>
+        <div class="confirm">
+            <p class="total_fee">總價：新台幣<span id="total_price"></span>元</p>
+            <input class="butt" type="submit" value="確認訂購並付款"></input>
+        </div>
+        <footer id="footer">COPYRIGHT © 2021 台北一日遊</footer>
+        <div class="mask"></div>
+    </body>
+</html>
