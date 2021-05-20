@@ -1,4 +1,3 @@
-from types import MethodDescriptorType
 from flask import *
 #匯入Flask_Cors(在不同源的情況下瀏覽器會將以收到的request拒絕Javascript存取，須設定路由的response規則)
 from flask_cors import CORS
