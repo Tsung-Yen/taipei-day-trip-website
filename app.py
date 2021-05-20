@@ -26,8 +26,6 @@ app.config["TEMPLATES_AUTO_RELOAD"]=True
 currentUser={}
 #創造一個字典存放使用者當前預定景點資訊
 userBookingData = {}
-#創造一個字典紀錄當前使用者名稱
-user = {}
 #創造一個字典提供購物車API存取資料及清空資料
 bookHistory = {}
 # Pages
@@ -390,8 +388,6 @@ def signin():
 	mydata = mycursor.fetchone()
 
 	if mydata:
-		#紀錄當前使用者名稱提供其他api展示用(無關此api)
-		user["username"] = mydata[1]
 		#當前api
 		userStatus["ok"] = True
 		response = make_response(userStatus)
@@ -446,7 +442,7 @@ def bookingCart():
 			bookHistory["date"] = userBookingData["date"]
 			bookHistory["time"] = userBookingData["time"]
 			bookHistory["price"] = userBookingData["price"]
-			bookHistory["name"] = user["username"]
+			bookHistory["name"] = currentUser[key]["name"]
 			return bookHistory
 		else:
 			return "null"

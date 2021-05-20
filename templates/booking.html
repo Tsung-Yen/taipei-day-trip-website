@@ -217,6 +217,11 @@
                 font-weight:bold;
                 color:rgb(95, 91, 91);
             }
+            .nodata_message{
+                display:none;
+                font-size:16px;
+                color:rgb(95, 91, 91);
+            }
             .container{
                 display:flex;
                 flex-wrap:wrap;
@@ -227,21 +232,19 @@
                 margin-bottom: 35px;
                 position:relative;
             }
-            .container>img{
+            .container>#slide_img{
                 flex:none;
-                width:266px;
-                height:200px;
+                width: 266px;
+                height:220px;
                 margin-top:15px;
                 margin-right: 30px;
                 border-radius: 0.5em;
             }
+            /*景點資訊*/
             .container>.spot{
                 flex:auto;
                 width:60%;
                 height:auto;
-            }
-            /*景點資訊*/
-            .spot{
                 width:auto;
                 height:250px;
                 align-items: center;
@@ -315,7 +318,7 @@
                 height:35px;
             }
             .hr2{
-                width:1200px;
+                max-width: 1200px;
                 height:1px;
                 background: rgb(223, 213, 213);
                 margin:0 auto;
@@ -347,7 +350,7 @@
                 font-weight:bold;
             }
             .hr3{
-                width:1200px;
+                max-width: 1200px;
                 height:1px;
                 background: rgb(223, 213, 213);
                 margin:0 auto;
@@ -385,7 +388,7 @@
                 border-width: 1px;
             }
             .hr4{
-                width:1200px;
+                max-width: 1200px;
                 height:1px;
                 background: rgb(223, 213, 213);
                 margin:0 auto;
@@ -441,12 +444,62 @@
                 opacity:0.3;
                 z-index:998;
             }
+            /*RWD*/
+            @media(max-width:1200px){
+                .navigation_bar>nav{
+                    width:92%;
+                }
+                .popup_form{
+                    margin: 23px 35%;
+                }
+                .popup_signup_form{
+                    margin: 23px 35%;
+                }
+                .username_title{
+                    width:295px;
+                    margin-left: 4%;
+                }
+                .nodata_message{
+                    width:260px;
+                    margin-left: 4%;
+                }
+                .container{
+                    width:92%;
+                    height:auto;
+                }
+                .container>.slide_img{
+                    height:auto;
+                }
+                .contact_message{
+                    width:90%;
+                }
+                .paid_message{
+                    width:90%;
+                }
+                .confirm{
+                    width:80%;
+                }
+            }
+            @media(max-width:650px){
+                .container>#slide_img{
+                    width:105%;
+                    margin-left: -3%;
+                    height:20%;
+                }
+                .container>.spot{
+                    width:110%;
+                }
+                .container>.delete_booking{
+                    position: absolute;
+                    top:95%;
+                    right:10px;
+                }
+            }
         </style>
         <script>
             function init(){
                 //會員系統
                 menberSys();
-                bookSchedule();
                 getBookingData();
                 deleteCurrentBooking();
                 returnHome();
@@ -487,9 +540,10 @@
                             });
                         });
                     }else{
+                        //如果使用者為登出狀態直接導回首頁
                         window.setTimeout(()=>{
                             location.href="http://3.131.86.32:3000/";
-                        },200);
+                        },300);
                     }
                 });
                 //(流程2)使者點擊彈出登入視窗
@@ -574,35 +628,6 @@
                     });
                 }
             }
-            //預定系統函式
-            function bookSchedule(){
-                //(流程1)如果使用者尚未登入點擊後直接進入登入系統。
-                let userStatusUrl = "http://3.131.86.32:3000/api/user/userstatus/"; 
-                let popupSignin = document.querySelector(".popup_form");
-                let mask = document.querySelector(".mask");
-                let signinCancle = document.querySelector(".cancle");
-                let booking = document.getElementById("booking");
-                booking.addEventListener("click",()=>{
-                    fetch(userStatusUrl).then((res)=>res.json())
-                    .then((user)=>{
-                        if(user != null){
-
-                        }else{
-                            popupSignin.style.display = "block";
-                            mask.style.display = "block";
-                            cancleBox(signinCancle,popupSignin);
-                        }
-                    });
-                });
-
-                //離開登入及註冊視窗函式
-                function cancleBox(p1,p2){
-                    p1.addEventListener("click",()=>{
-                        p2.style.display = "none";
-                        mask.style.display = "none";
-                    });
-                }
-            }
             //取得使用者購物車預定資料
             function getBookingData(){
                 let bookDataUrl = "http://3.131.86.32:3000/api/booking/bookingcart/";
@@ -636,11 +661,6 @@
                     //已登入但無預定資料
                         let username = document.getElementById("username");
                         username.innerHTML = myUser;
-                        let nodata = document.createElement("p");
-                        nodata.style.color = "gray";
-                        nodata.textContent = "目前沒有預定任何的行程";
-                        let container = document.querySelector(".container");
-                        container.append(nodata);
                         let slideImg = document.getElementById("slide_img");
                         let spot = document.querySelector(".spot");
                         let deleteBookingImg = document.querySelector(".delete_booking");
@@ -659,6 +679,8 @@
                         paidMessage.style.display = "none";
                         hr4.style.display = "none";
                         confirm.style.display = "none";
+                        let nodata = document.getElementById("nodata");
+                        nodata.style.display = "block";
                         let footer = document.getElementById("footer");
                         footer.style.height = "540px";
                     }
@@ -719,6 +741,7 @@
             <p class="sign_up" id="signup_result">已經有帳戶了？點此登入</p>
         </div>
         <div class="username_title">你好，<span id="username"></span>，待預定的行程如下：</div>
+        <p class="nodata_message" id="nodata">目前沒有預定任何的行程</p>
         <div class="container">
             <img id="slide_img">
             <div class="spot">
