@@ -599,7 +599,6 @@
                     fetch(userstatusUrl).then((res)=>res.json())
                     .then((jsonData)=>{
                         if(jsonData != null){
-                            
                             //使用者已登入
                             sign.remove();
                             var newSign = document.createElement("p");
@@ -608,7 +607,8 @@
                             newSign.textContent = "登出系統";
                             let nav = document.getElementById("nav");
                             nav.append(newSign);
-
+                            //登入狀態點擊預定行程，導入/booking:
+                            bookingschedule();
                             //使用者點擊登出系統
                             let signOut = document.getElementById("newsign");
                             signOut.addEventListener("click" ,()=>{
@@ -624,11 +624,23 @@
                                     location.reload();
                                 },500);      
 
-                        });
+                            });
+                        }else{
+                            //未登入點擊預定行程，跳出登入視窗
+                            let booking = document.getElementById("booking");
+                            let popupForm = document.querySelector(".popup_form");
+                            let mask = document.querySelector(".mask");
+                            let signinCancle = document.getElementById("signin_cancle") 
+                            booking.addEventListener("click" , ()=>{
+                                popupForm.style.display = "block";
+                                mask.style.display = "block";
+                                cancleBox(signinCancle,popupForm);
+                            });
+                        
                         }
                     });
                 }
-                
+            //登入視窗部分:
                 //test(操作1:點擊彈出登入框)
                 let popupForm = document.querySelector(".popup_form");
                 let mask = document.querySelector(".mask");
@@ -712,8 +724,14 @@
                     });
                 }
             }
-
-            //Debounce function
+            //預定行程按鈕
+            function bookingschedule(){
+                let booking = document.getElementById("booking");
+                booking.addEventListener("click",()=>{
+                    location.href="http://3.131.86.32:3000/booking";
+                });
+            }
+            //Debounce function(用於限制連續呼叫API)
             let debounce=(fn,delay)=>{
                 let timer;
                 return function(){
@@ -758,7 +776,7 @@
         <div class="upper">  
             <nav id ="nav">
                 <div class="title" onclick="location.href='http://3.131.86.32:3000/'">台北一日遊</div>
-                <div class="item">預定行程</div>
+                <div class="item" id="booking">預定行程</div>
                 <div class="item" id="sign">登入/註冊</div>
             </nav>
         </div>

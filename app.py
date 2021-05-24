@@ -21,8 +21,24 @@ app.config["JSON_AS_ASCII"]=False
 app.config['JSON_SORT_KEYS'] = False
 app.config["TEMPLATES_AUTO_RELOAD"]=True
 
-#創造一個字典存放使用者名稱
+#創造一個字典存放使用者名稱key
 currentUser={}
+#創造一個字典提供購物車API存取資料及清空資料
+bookHistory = {}
+#存放已預訂行程使用者姓名
+usernameList = []
+testUser1 = {}
+testUser2 = {}
+testUser3 = {}
+testUser1["username"] = "test"
+testUser2["username"] = "yo"
+testUser3["username"] = "ya"
+testUser1["tt"] = "test"
+testUser2["tt"] = "test"
+testUser3["tt"] = "test"
+usernameList.append(testUser1)
+usernameList.append(testUser2)
+usernameList.append(testUser3)
 # Pages
 @app.route("/")
 def index():
@@ -322,6 +338,7 @@ def attractionId(attractionId):
 			}
 		response = make_response(errorData,500)
 		return response
+#以下4個路由為(1.使用者狀態，2.註冊，3.登入，4.登出)
 @app.route("/api/user/userstatus/",methods=["GET"])  #取得當前登入的使用者資訊
 def status():
 	userStatus= {}
@@ -330,7 +347,6 @@ def status():
 		id = currentUser[key]["id"]
 		name = currentUser[key]["name"]
 		email = currentUser[key]["email"]
-		print(id,name,email)
 		data = {}
 		data["id"] = id
 		data["name"] = name
@@ -340,7 +356,6 @@ def status():
 	else:
 		return "null"
 	
-
 @app.route("/api/user/signup/",methods=["POST"])
 def signup():
 	if request.method == "POST":
@@ -370,10 +385,6 @@ def signup():
 		userStatus["message"] = "伺服器錯誤"
 		return userStatus
 		
-	
-
-
-
 @app.route("/api/user/signin/",methods=["PATCH"])
 def signin():
 	userStatus = {}
@@ -387,6 +398,7 @@ def signin():
 	mydata = mycursor.fetchone()
 
 	if mydata:
+		#當前api
 		userStatus["ok"] = True
 		response = make_response(userStatus)
 		id = mydata[0]
@@ -412,6 +424,104 @@ def signout():
 	outResponse = make_response(userStatus)
 	outResponse.set_cookie(key="key" , value="" , expires=0)
 	return outResponse
+
+#以下三個路由為(1.使用者取得未確認下單的行程，2.建立新的預定行程，3.刪除預定行程)
+@app.route("/api/booking/bookingcart/" , methods=["GET"])
+def bookingCart():
+	result = {}	#回傳預定的結果
+	noData = {}	#尚未預定
+	key = request.cookies.get("key")
+	if key in currentUser:
+		returnData = {}
+		data = {}
+		attraction = {}
+		for i in range(len(usernameList)):
+			if currentUser[key]["name"] == usernameList[i]["username"]:
+				#將景點資料從資料庫撈出
+				attractionId = usernameList[i]["attractionId"]
+				sql = f"select id,name,address,images from spot where id = '{attractionId}' limit 1"
+				mycursor.execute(sql)
+				mydata = mycursor.fetchone()
+				# 先將圖片處理成一張
+				imageData = mydata[3].split(",")
+				image = imageData[0]
+				#將資料寫入字典
+				attraction["id"] = mydata[0]
+				attraction["name"] = mydata[1]
+				attraction["address"] = mydata[2]
+				attraction["image"] = image
+				data["attraction"] = attraction
+				returnData["data"] = data
+				returnData["date"] = usernameList[i]["date"]
+				returnData["time"] = usernameList[i]["time"]
+				returnData["price"] = usernameList[i]["price"]
+				returnData["username"] = currentUser[key]["name"]
+				result = returnData
+			else:
+				noData["username"] = currentUser[key]["name"]
+				noData["message"] = "null"
+		#如果使用者已預定，將上一筆資料除
+		for x in range(len(usernameList)-1):
+			if usernameList[x]["username"] == usernameList[-1]["username"]:
+				usernameList.remove(usernameList[x])
+				print(usernameList)
+		#回傳結果
+		if result:
+			return result
+		else:
+			return noData
+	else:
+		result["error"] = True
+		result["message"] = "尚未登入會員"
+		return result
+
+@app.route("/api/booking/bookingschedule/",methods=["POST"])
+def bookingSchedule():
+	result = {}
+	key = request.cookies.get("key") 
+	if key in currentUser:
+		data = request.get_json()
+		attractionId = data["attractionId"]
+		date = data["date"]
+		time = data["time"]
+		price = data["price"]
+		#將資料抓回來後寫入字典
+		#創造一個字典存放使用者當前預定景點資訊
+		userBookingData = {}
+		userBookingData["username"] = currentUser[key]["name"]
+		userBookingData["attractionId"] = attractionId
+		userBookingData["date"] = date
+		userBookingData["time"] = time
+		userBookingData["price"] = price
+		usernameList.append(userBookingData)
+		if data != None:
+			result["ok"] = True
+			return result
+		else:
+			result["error"] = True
+			result["message"] = "未正確填寫預定資料"
+			return result
+	else:
+		result["error"] = True
+		result["message"] = "尚未登入會員"
+		return result
+
+
+@app.route("/api/booking/deleteschedule/",methods=["DELETE"])
+def deleteSchedule():
+	result = {}
+	key = request.cookies.get("key")
+	if key in currentUser:
+		#清空當前預定資料
+		for i in range(len(usernameList)):
+			if usernameList[i]["username"] == currentUser[key]["name"]:
+				usernameList.remove(usernameList[i])
+		result["ok"] = True
+		return result
+	else:
+		result["error"] = True
+		result["message"] = "尚未登入會員"
+		return result
 
 if __name__=="__main__":
 	app.run(host="0.0.0.0",port=3000,debug=True)
