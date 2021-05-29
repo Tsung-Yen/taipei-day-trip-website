@@ -1,15 +1,18 @@
+from typing import Type
 from flask import *
 #匯入Flask_Cors(在不同源的情況下瀏覽器會將以收到的request拒絕Javascript存取，須設定路由的response規則)
 from flask_cors import CORS
 import json
 import hashlib
 import mysql.connector
+from werkzeug.datastructures import Headers
+
 
 mydb = mysql.connector.connect(
 	host="localhost",
 	#此處為連接instance遠端mysql的帳號密碼
 	user="root",
-	password="Gtio556$",
+	password="root",
 	database="tripdata"
 )
 mycursor=mydb.cursor()
@@ -25,20 +28,26 @@ app.config["TEMPLATES_AUTO_RELOAD"]=True
 currentUser={}
 #創造一個字典提供購物車API存取資料及清空資料
 bookHistory = {}
+#訂單編號為當前日期及時間，放入response當中
+from datetime import datetime
+now = datetime.today().strftime('%Y-%m-%d %H:%M')
+now = str(now)
+now = now.replace("-","").replace(" ","").replace(":","")
+now = int(now+"00")
 #存放已預訂行程使用者姓名
 usernameList = []
+#測試資料
+paidmessage = {}
 testUser1 = {}
-testUser2 = {}
-testUser3 = {}
 testUser1["username"] = "test"
-testUser2["username"] = "yo"
-testUser3["username"] = "ya"
 testUser1["tt"] = "test"
-testUser2["tt"] = "test"
-testUser3["tt"] = "test"
+paidmessage["number"] = now
+testUser1["paid_message"] = paidmessage
 usernameList.append(testUser1)
-usernameList.append(testUser2)
-usernameList.append(testUser3)
+
+
+
+
 # Pages
 @app.route("/")
 def index():
@@ -460,11 +469,10 @@ def bookingCart():
 			else:
 				noData["username"] = currentUser[key]["name"]
 				noData["message"] = "null"
-		#如果使用者已預定，將上一筆資料除
+		#如果使用者已預定，將上一筆資料預定的整筆資料移除
 		for x in range(len(usernameList)-1):
 			if usernameList[x]["username"] == usernameList[-1]["username"]:
 				usernameList.remove(usernameList[x])
-				print(usernameList)
 		#回傳結果
 		if result:
 			return result
@@ -476,6 +484,7 @@ def bookingCart():
 		return result
 
 @app.route("/api/booking/bookingschedule/",methods=["POST"])
+#此路由使用者預定行程，並在此將使用者預定資料放入陣列userNameList之中(陣列中存放已預訂未付款的所有使用者資訊)
 def bookingSchedule():
 	result = {}
 	key = request.cookies.get("key") 
@@ -485,15 +494,35 @@ def bookingSchedule():
 		date = data["date"]
 		time = data["time"]
 		price = data["price"]
-		#將資料抓回來後寫入字典
+		#從資料庫撈出資料
+		sql = f"select name , address , images from spot where id = '{attractionId}' limit 1"
+		mycursor.execute(sql)
+		mydata = mycursor.fetchone()
 		#創造一個字典存放使用者當前預定景點資訊
+		imageData = mydata[2].split(",")
+		image = imageData[0]
+		attraction = {}
+		attraction["id"] = attractionId
+		attraction["spotname"] = mydata[0]
+		attraction["address"] = mydata[1]
+		attraction["image"] = image
 		userBookingData = {}
 		userBookingData["username"] = currentUser[key]["name"]
-		userBookingData["attractionId"] = attractionId
+		userBookingData["attraction"] = attraction
+		# userBookingData["spotname"] = mydata[0]
+		# userBookingData["address"] = mydata[1]
 		userBookingData["date"] = date
 		userBookingData["time"] = time
 		userBookingData["price"] = price
+		paidMessage = {}
+		paidMessage["status"] = "未付款"
+		paidMessage["number"] = 0
+		userBookingData["paid_message"] = paidMessage 
 		usernameList.append(userBookingData)
+		#更新使用者訂單編號(訂單預定時就創建，因此無論付款成敗，皆為同一訂單)
+		for i in range(len(usernameList)):
+			if usernameList[i]["paid_message"]["number"] <= usernameList[i-1]["paid_message"]["number"]:
+				usernameList[i]["paid_message"]["number"] = usernameList[i-1]["paid_message"]["number"]+1
 		if data != None:
 			result["ok"] = True
 			return result
@@ -522,6 +551,148 @@ def deleteSchedule():
 		result["error"] = True
 		result["message"] = "尚未登入會員"
 		return result
+
+@app.route("/api/orders",methods=["POST"])
+def orders():
+	if request.method == "POST":
+		key = request.cookies.get("key")
+		if key in currentUser:
+			data = request.get_json()
+			#將資料寫進當前使用者資料字典
+			contact = {
+				"name":data["cardholder"]["name"],
+				"email":data["cardholder"]["email"],
+				"phone":data["cardholder"]["phone_number"]
+			}
+			contact = json.dumps(contact)
+			for i in range(len(usernameList)):
+				if usernameList[i]["username"] == currentUser[key]["name"]:
+					usernameList[i]["contact"] = contact
+			#步驟1:將資料整理成TapPay所接受的json格式，使用POST方法連上TapPay api送出資料
+			postData = {
+				"prime":data["prime"],
+				"partner_key":"partner_OW51M5WdvM0sc2HZeM4IYwYigPTa1A3645TnU95oKbMj0HkX00nT91MD",
+				"merchant_id":"Yanyan_TAISHIN",
+				"details":"Test TapPay",
+				"amount":data["amount"],
+				"cardholder":{
+					"phone_number":data["cardholder"]["phone_number"],
+					"name":data["cardholder"]["name"],
+					"email":data["cardholder"]["email"]
+				},
+				"remember":True
+			}
+			#步驟2:將資料按照TapPay規定格式用post方發送出，連上TapPay server(結束後TapPay會回傳response)
+			postData = json.dumps(postData)
+			tapPayUrl = "https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime"
+			import requests
+			headers = {
+				"Content-Type":"application/json",
+				"x-api-key":"partner_OW51M5WdvM0sc2HZeM4IYwYigPTa1A3645TnU95oKbMj0HkX00nT91MD"
+			}
+			r = requests.post(tapPayUrl,data=postData,headers=headers)
+			response = r.json()
+			
+			#TapPAy api 回傳狀態等於0為成功
+			if response["status"] == 0:
+				for i in range(len(usernameList)):
+					#將已下單的會員付款狀態更改為已付款
+					if usernameList[i]["username"] == currentUser[key]["name"]:
+						usernameList[i]["paid_message"]["status"] = "已付款"
+						number = usernameList[i]["paid_message"]["number"]
+				result = {
+					"data":{
+						"number":number,
+						"payment":{
+							"status":0,
+							"message":"付款成功"
+						}
+					}
+				}
+			else:
+				for i in range(len(usernameList)):
+					#將已下單的會員付款狀態更改為已付款
+					if usernameList[i]["username"] == currentUser[key]["name"]:
+						number = usernameList[i]["paid_message"]["number"]
+				result = {
+					"number":number,
+					"error":True,
+					"message":"付款失敗"
+				}
+			print(usernameList)
+			result = json.dumps(result)
+			return result
+		else:
+			signYetResult = {}
+			signYetResult["error"] = True
+			signYetResult["message"] = "尚未登入會員"
+			return signYetResult
+	else:
+		serverResult = {}
+		serverResult["error"] = True
+		serverResult["message"] = "伺服器錯誤"
+		return serverResult
+
+@app.route("/api/order/<orderNumber>")
+def orderResult(orderNumber):
+	assert orderNumber == request.view_args["orderNumber"]
+	key = request.cookies.get("key")
+	if key in currentUser:
+		#取得當前使用者訂單編號
+		for i in range(len(usernameList)):
+			if usernameList[i]["username"] == currentUser[key]["name"]:
+				#訂單編號及價格
+				number = usernameList[i]["paid_message"]["number"]
+				price = usernameList[i]["price"]
+				#預定資訊
+				attractionId = usernameList[i]["attracrion"]["id"]
+				spotname = usernameList[i]["attraction"]["spotname"]
+				address = usernameList[i]["attraction"]["address"]
+				image = usernameList[i]["attraction"]["image"]
+				#預定日期及時間
+				date = usernameList[i]["date"]
+				time = usernameList[i]["time"]
+				#聯絡資訊
+				name = usernameList[i]["contact"]["name"]
+				email = usernameList[i]["contact"]["email"]
+				phone = usernameList[i]["contact"]["phone"]
+				#付款狀態
+				status = usernameList[i]["paid_message"]["status"]
+				if status == "已付款":
+					status = 0
+				else:
+					status = 1
+		result = {
+			"data":{
+				"number":number,
+				"price":price,
+				"trip":{
+					"attraction":{
+						"id":attractionId,
+						"name":spotname,
+						"address":address,
+						"image":image
+					},
+					"date":date,
+					"time":time
+				},
+				"contact":{
+					"name":name,
+					"email":email,
+					"phone":phone
+				},
+				"status":status
+			}
+		}
+		returnData = json.dumps(result)
+		return returnData
+	else:
+		result = {
+			"error":True,
+			"message":"尚未登入會員"
+		}
+		return result
+	
 
 if __name__=="__main__":
 	app.run(host="0.0.0.0",port=3000,debug=True)

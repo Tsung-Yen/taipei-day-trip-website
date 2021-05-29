@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charser="utf-8">
+        <title>感謝頁面</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC');
+            body{
+                margin:0px;
+                font-family:Noto Sans TC;
+            }
+            .navigation_bar{
+                width:auto;
+                position: sticky ;
+                top:0;
+                z-index:997;
+                background: white;
+            }
+            .navigation_bar>nav{
+                margin:0 auto;
+                width:1200px;
+                padding:8px;
+                display:flex;
+                justify-content: center;
+                align-items: center;
+                background:rgb(255, 255, 255);
+            }
+            nav>.title{
+                flex:auto;
+                font-size:30px;
+                font-weight:bold;
+                color: rgba(68, 136, 153, 1);
+                cursor:pointer;
+            }
+            nav>.item{
+                flex:none;
+                width:75px;
+                text-align:center;
+                font-size:15px;
+                cursor:pointer;
+            }
+            .navigation_bar>.hr1{
+                height:1px;
+                top:56px;
+                position:sticky;
+                background: rgb(226, 217, 217);
+            }
+            /*footer*/
+            footer{
+                margin-top:160px;
+                width:auto;
+                text-align:center;
+                padding:15px;
+                font-size:16px;
+                color:white;
+                background-color: #757575;
+                position:sticky;
+                bottom:0;
+            }
+        </style>
+        <script>
+            function init(){
+                returnHome();
+            }
+            function returnHome(){
+                let title = document.getElementById("backto_home");
+                title.addEventListener("click",()=>{
+                    location.href = "http://127.0.0.1:3000/";
+                });
+            }
+            function getData(){
+                let url = "http://127.0.0.1:3000/api/order"
+            }
+        </script>
+    </head>
+    <body onload="init();">
+        <div class="navigation_bar">
+            <nav id="nav">
+                <div class="title" id="backto_home">台北一日遊</div>
+                <div class="item" id="booking">預定行程</div>
+                <div class="item" id="signing">登入/註冊</div>
+            </nav>
+            <div class="hr1"></div>
+        </div>
+        <h3>您已付款成功!!</h3>
+        <footer id="footer">COPYRIGHT © 2021 台北一日遊</footer>
+    </body>
+</html>
