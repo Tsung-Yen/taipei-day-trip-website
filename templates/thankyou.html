@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charser="utf-8">
+        <title>感謝頁面</title>
+        <style>
+            @import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC');
+            body{
+                margin:0px;
+                font-family:Noto Sans TC;
+            }
+            .navigation_bar{
+                width:auto;
+                position: sticky ;
+                top:0;
+                z-index:997;
+                background: white;
+            }
+            .navigation_bar>nav{
+                margin:0 auto;
+                width:1200px;
+                padding:8px;
+                display:flex;
+                justify-content: center;
+                align-items: center;
+                background:rgb(255, 255, 255);
+            }
+            nav>.title{
+                flex:auto;
+                font-size:30px;
+                font-weight:bold;
+                color: rgba(68, 136, 153, 1);
+                cursor:pointer;
+            }
+            nav>.item{
+                flex:none;
+                width:75px;
+                text-align:center;
+                font-size:15px;
+                cursor:pointer;
+            }
+            .navigation_bar>.hr1{
+                height:1px;
+                top:56px;
+                position:sticky;
+                background: rgb(226, 217, 217);
+            }
+            /*彈出視窗*/
+            .popup_form{
+                z-index: 999;
+                display:none;
+                margin:23px 40%;
+                position:absolute;
+                width:340px;
+                height:275px;
+                text-align: center;
+                border-radius: 0.5em;
+                border:solid;
+                border-width:1.5px;
+                border-color: rgb(196, 189, 189);
+                background: rgb(255, 255, 255);
+            }
+            .popup_form>.title{
+                display:flex;
+                margin-bottom: -10px;
+            }
+            .title>.sign_title{
+                flex:auto;
+                color:rgb(77, 70, 70);
+                font-size: 25px;
+                font-weight: 400;
+            }
+            .title>.cancle:after{
+                position:absolute;
+                content:"\d7";
+                font-size:26px;
+                font-weight:bold;
+                top:18px;
+                left:88%;
+                cursor:pointer;
+                border-radius: 0.5em;
+                color:rgb(150, 138, 138);
+            }
+            form>.account{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.pw{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.btn{
+                cursor:pointer;
+                width:92%;
+                height:42px;
+                font-size: 19px;
+                color:white;
+                border-style: none;
+                border-radius: 0.3em;
+                background: rgba(68, 136, 153, 1);
+            }
+            .popup_form>.sign_in{
+                width:90%;
+                height:38px;
+                color:rgb(128, 118, 118);
+                font-size: 17px;
+                margin-left:22px;
+                line-height: 8px;
+                cursor:pointer;
+            }
+            /*彈出視窗註冊視窗*/
+            .popup_signup_form{
+                z-index: 999;
+                display:none;
+                margin:23px 40%;
+                position:absolute;
+                width:340px;
+                height:320px;
+                text-align: center;
+                border-radius: 0.5em;
+                border:solid;
+                border-width:1.5px;
+                border-color: rgb(196, 189, 189);
+                background: rgb(255, 255, 255);
+            }
+            .popup_signup_form>.title{
+                display:flex;
+                margin-bottom: -10px;
+            }
+            .title>.sign_title{
+                flex:auto;
+                color:rgb(77, 70, 70);
+                font-size: 25px;
+                font-weight: 400;
+            }
+            .title>.cancle:after{
+                position:absolute;
+                content:"\d7";
+                font-size:26px;
+                font-weight:bold;
+                top:18px;
+                left:88%;
+                cursor:pointer;
+                border-radius: 0.5em;
+                color:rgb(150, 138, 138);
+            }
+            form>.name{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.account{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.pw{
+                width:90%;
+                height:38px;
+                font-size: 16px;
+                margin-bottom: 10px;
+                border-radius: 0.3em;
+                border-color: rgb(150, 142, 142);
+                border-style: solid;
+                border-width: 1.5px;
+            }
+            form>.signup_btn{
+                cursor:pointer;
+                width:92%;
+                height:42px;
+                font-size: 19px;
+                color:white;
+                border-style: none;
+                border-radius: 0.3em;
+                background: rgba(68, 136, 153, 1);
+            }
+            .popup_signup_form>.sign_up{
+                width:90%;
+                height:38px;
+                color:rgb(128, 118, 118);
+                font-size: 17px;
+                margin-left:22px;
+                line-height: 8px;
+                cursor:pointer;
+            }
+            .order_title{
+                width:1200px;
+                margin:0 auto;
+                font-weight: bold;
+                color:rgb(95, 91, 91);
+                margin-top: 30px;
+                margin-bottom: 40px;
+            }
+            .order_number{
+                display: flex;
+                width:1100px;
+                margin:0 auto;
+                font-size: 16px;
+                font-weight: bold;
+                color:rgb(95, 91, 91);
+                margin-bottom: 20px;
+            }
+            .order_number>.title{
+                flex:none;
+            }
+            .order_number>.content{
+                flex:none;
+                width:300px;
+                color:rgb(44, 190, 76);
+            }
+            .order_result{
+                display: flex;
+                font-size: 16px;
+                width:1100px;
+                margin:0 auto;
+                font-weight: bold;
+                color:rgb(95, 91, 91);
+            }
+            .order_result>.title{
+                flex:none;
+            }
+            .order_result>.content{
+                flex:none;
+                width:300px;
+                color:rgb(221, 155, 33);
+            }
+            .container{
+                width:auto;
+                height:490px;
+            }
+            /*footer*/
+            footer{
+                margin-top:160px;
+                width:auto;
+                text-align:center;
+                padding:15px;
+                font-size:16px;
+                color:white;
+                background-color: #757575;
+                position:sticky;
+                bottom:0;
+            }
+            @media(max-width:1200px){
+                .navigation_bar>nav{
+                    width:92%;
+                }
+                .popup_form{
+                    margin: 23px 35%;
+                }
+                .popup_signup_form{
+                    margin: 23px 35%;
+                }
+                .order_title{
+                    width:92%;
+                }
+                .order_number{
+                    width:70%;
+                }
+                .order_result{
+                    width:70%;
+                }
+                .container{
+                    width:92%;
+                }
+            }
+            @media(max-width:400px){
+                .container{
+                    width:92%;
+                    height:auto;
+                }
+            }
+        </style>
+        <script>
+            function init(){
+                returnHome();
+                getData();
+                menberSys();
+            }
+            function returnHome(){
+                let title = document.getElementById("backto_home");
+                title.addEventListener("click",()=>{
+                    location.href = "http://3.131.86.32:3000/";
+                });
+            }
+            function getorderNumber(){
+                let url = location.href;
+                let urlParam = new URL(url);
+                let number = urlParam.searchParams.get("number");
+                return number;
+            }
+            function getData(){
+                let number = getorderNumber();
+                url = "http://3.131.86.32:3000/api/order/"+number;
+                fetch(url).then((res)=>res.json()).then((result)=>{
+                    let error = result["error"];
+                    if(error != true){
+                        let num = document.getElementById("order_num");
+                        num.innerHTML = result["data"]["number"];
+                        let paidresult = document.getElementById("order_paid");
+                        if(result["data"]["status"] == 1){
+                            paidresult.innerHTML = "付款成功!!";
+                        }else{
+                            paidresult.innerHTML = "付款失敗!!";
+                        }
+                    }else{
+                        location.href = "http://3.131.86.32:3000/";
+                    }
+                });
+            }
+            //會員系統函式
+            function menberSys(){
+                //(流程1)檢查使用者狀況
+                let signing = document.getElementById("signing");
+                let nav = document.getElementById("nav");
+                let userStatusUrl = "http:///3.131.86.32:3000/api/user/userstatus/";
+                fetch(userStatusUrl).then((res)=>res.json())
+                .then((jsonData)=>{
+                    if(jsonData != null){
+                        myUser = jsonData["data"]["name"];
+                        signing.remove();
+                        let newSigning = document.createElement("p");
+                        newSigning.id = "sign_out";
+                        newSigning.className = "item";
+                        newSigning.textContent = "登出系統";
+                        nav.append(newSigning);
+
+                        //(登出)
+                        let signOutUrl = "http:///3.131.86.32:3000/api/user/signout/";
+                        let signout = document.getElementById("sign_out");
+                        signout.addEventListener("click",()=>{
+                            fetch(signOutUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
+                            .then((res)=>res.json()).then((user)=>{
+                                signout.remove();
+                                signing = document.createElement("p");
+                                signing.id = "signing";
+                                signing.className = "item";
+                                signing.textContent = "登入/註冊"
+                                nav.append(signing);
+                                window.setTimeout(()=>{
+                                    location.reload()
+                                },600);
+                            });
+                        });
+                    }else{
+                        //如果使用者為登出狀態直接導回首頁
+                        window.setTimeout(()=>{
+                            location.href="http:///3.131.86.32:3000/";
+                        },100);
+                    }
+                });
+                //(流程2)使者點擊彈出登入視窗
+                let popupSignin = document.querySelector(".popup_form");
+                let mask = document.querySelector(".mask");
+                let signinCancle = document.querySelector(".cancle");
+                signing.addEventListener("click",()=>{
+                    popupSignin.style.display = "block";
+                    mask.style.display = "block";
+                    cancleBox(signinCancle,popupSignin);
+                });
+                //(流程3)使用者完成登入步驟
+                let signinForm = document.getElementById("signin_form");
+                let signinResult = document.getElementById("signin_result");
+                let signinUrl = "http:///3.131.86.32:3000/api/user/signin/";
+                signinForm.addEventListener("submit",(e)=>{
+                    e.preventDefault();
+                    let email = document.getElementById("signin_email").value;
+                    let password = document.getElementById("signin_pw").value;
+                    let data = {
+                        "email":email,
+                        "password":password
+                    };
+                    fetch(signinUrl,{method:"PATCH",headers:{"Content-Type":"application/json"}
+                    ,body:JSON.stringify(data)}).then((res)=>res.json())
+                    .then((user)=>{
+                        let ok = user["ok"];
+                        if(ok != null){
+                            signinResult.innerHTML = "登入成功!!";
+                            window.setTimeout(()=>{
+                                location.reload()
+                            },1000);
+                        }else{
+                            let message = user["message"];
+                            signinResult.innerHTML = message;
+                        }
+                    });
+                });
+                //(流程4)使用者尚未註冊
+                let popupSignup = document.querySelector(".popup_signup_form");
+                let signupCancle = document.getElementById("signup_cancle");
+                signinResult.addEventListener("click",()=>{
+                    popupSignin.style.display = "none";
+                    popupSignup.style.display = "block";
+                    cancleBox(signupCancle,popupSignup);
+                });
+                //(流程5)使用者完成註冊
+                let signupForm = document.getElementById("signup_form");
+                let signupResult = document.getElementById("signup_result");
+                let signupUrl = "http:///3.131.86.32:3000/api/user/signup/";
+                signupForm.addEventListener("submit",(e)=>{
+                    e.preventDefault();
+                    let name = document.getElementById("signup_name").value;
+                    let email = document.getElementById("signup_email").value;
+                    let password = document.getElementById("signup_password").value;
+                    let data = {
+                        "name":name,
+                        "email":email,
+                        "password":password
+                    }
+                    fetch(signupUrl,{method:"POST",headers:{"Content-Type":"application/json"}
+                    ,body:JSON.stringify(data)}).then((res)=>res.json()).then((user)=>{
+                        let ok = user["ok"];
+                        if(ok != null){
+                            signupResult.innerHTML = "註冊成功!!";
+                        }else{
+                            let message = user["message"];
+                            signupResult.innerHTML = message;
+                        }
+                    });
+                });
+                //(流程6)使用者返回登入視窗
+                signupResult.addEventListener("click",()=>{
+                    popupSignup.style.display = "none";
+                    popupSignin.style.display = "block";
+                });
+                //離開登入及註冊視窗函式
+                function cancleBox(p1,p2){
+                    p1.addEventListener("click",()=>{
+                        p2.style.display = "none";
+                        mask.style.display = "none";
+                    });
+                }
+            }
+
+        </script>
+    </head>
+    <body onload="init();">
+        <div class="navigation_bar">
+            <nav id="nav">
+                <div class="title" id="backto_home">台北一日遊</div>
+                <div class="item" id="booking">預定行程</div>
+                <div class="item" id="signing">登入/註冊</div>
+            </nav>
+            <div class="hr1"></div>
+        </div>
+        <div class="popup_form">
+            <div class="title">
+                <p class="sign_title">登入會員帳號</p>
+                <p class="cancle"></p>
+            </div>
+            <form id="signin_form" method="PATCH">
+                <input class="account" id="signin_email" type="text" placeholder="請輸入電子信箱" required="required">
+                <input class="pw" id="signin_pw" type="password" placeholder="輸入密碼" required="required">
+                <input class="btn" type="submit" value="登入帳號">
+            </form>
+            <p class="sign_in" id="signin_result">還沒有帳戶？點此註冊</p>
+        </div>
+        <div class="popup_signup_form">
+            <div class="title">
+                <p class="sign_title">註冊會員帳號</p> 
+                <p class="cancle" id="signup_cancle"></p>
+            </div>
+            <form id="signup_form" method="POST">
+                <input class="name" id="signup_name" type="text" placeholder="輸入姓名" required="required">
+                <input class="account" id="signup_email" type="text" placeholder="輸入電子信箱" required="required">
+                <input class="pw" id="signup_password" type="password" placeholder="輸入密碼" required="required">
+                <input class="signup_btn" type="submit" value="註冊帳號">
+            </form>
+            <p class="sign_up" id="signup_result">已經有帳戶了？點此登入</p>
+        </div>
+        <h3 class="order_title">訂單資訊：</h3>
+        <div class="order_number">
+            <div class="title">訂單編號：</div>
+            <div class="content" id="order_num"></div>
+        </div>
+        <div class="order_result">
+            <div class="title">付款狀態：</div>
+            <div class="content" id="order_paid">成功</div>
+        </div>
+        <div class="container">
+
+        </div>
+        <footer id="footer">COPYRIGHT © 2021 台北一日遊</footer>
+    </body>
+</html>

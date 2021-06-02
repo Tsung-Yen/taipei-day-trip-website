@@ -1,9 +1,13 @@
+from typing import Type
 from flask import *
 #匯入Flask_Cors(在不同源的情況下瀏覽器會將以收到的request拒絕Javascript存取，須設定路由的response規則)
 from flask_cors import CORS
 import json
 import hashlib
 import mysql.connector
+from mysql.connector import errors
+from werkzeug.datastructures import Headers
+
 
 mydb = mysql.connector.connect(
 	host="localhost",
@@ -23,22 +27,17 @@ app.config["TEMPLATES_AUTO_RELOAD"]=True
 
 #創造一個字典存放使用者名稱key
 currentUser={}
-#創造一個字典提供購物車API存取資料及清空資料
-bookHistory = {}
-#存放已預訂行程使用者姓名
-usernameList = []
-testUser1 = {}
-testUser2 = {}
-testUser3 = {}
-testUser1["username"] = "test"
-testUser2["username"] = "yo"
-testUser3["username"] = "ya"
-testUser1["tt"] = "test"
-testUser2["tt"] = "test"
-testUser3["tt"] = "test"
-usernameList.append(testUser1)
-usernameList.append(testUser2)
-usernameList.append(testUser3)
+
+#訂單編號為當前日期及時間，放入response當中
+from datetime import datetime
+now = datetime.today().strftime('%Y-%m-%d %H:%M')
+now = str(now)
+now = now.replace("-","").replace(" ","").replace(":","")
+now = int(now+"00")
+num = 1
+currentNumber = []
+lastNumList = []
+lastNumList.append(0)
 # Pages
 @app.route("/")
 def index():
@@ -428,100 +427,276 @@ def signout():
 #以下三個路由為(1.使用者取得未確認下單的行程，2.建立新的預定行程，3.刪除預定行程)
 @app.route("/api/booking/bookingcart/" , methods=["GET"])
 def bookingCart():
-	result = {}	#回傳預定的結果
-	noData = {}	#尚未預定
-	key = request.cookies.get("key")
-	if key in currentUser:
-		returnData = {}
-		data = {}
-		attraction = {}
-		for i in range(len(usernameList)):
-			if currentUser[key]["name"] == usernameList[i]["username"]:
-				#將景點資料從資料庫撈出
-				attractionId = usernameList[i]["attractionId"]
-				sql = f"select id,name,address,images from spot where id = '{attractionId}' limit 1"
-				mycursor.execute(sql)
-				mydata = mycursor.fetchone()
-				# 先將圖片處理成一張
-				imageData = mydata[3].split(",")
-				image = imageData[0]
-				#將資料寫入字典
-				attraction["id"] = mydata[0]
-				attraction["name"] = mydata[1]
-				attraction["address"] = mydata[2]
-				attraction["image"] = image
-				data["attraction"] = attraction
-				returnData["data"] = data
-				returnData["date"] = usernameList[i]["date"]
-				returnData["time"] = usernameList[i]["time"]
-				returnData["price"] = usernameList[i]["price"]
-				returnData["username"] = currentUser[key]["name"]
-				result = returnData
-			else:
-				noData["username"] = currentUser[key]["name"]
-				noData["message"] = "null"
-		#如果使用者已預定，將上一筆資料除
-		for x in range(len(usernameList)-1):
-			if usernameList[x]["username"] == usernameList[-1]["username"]:
-				usernameList.remove(usernameList[x])
-				print(usernameList)
-		#回傳結果
-		if result:
-			return result
-		else:
-			return noData
-	else:
-		result["error"] = True
-		result["message"] = "尚未登入會員"
-		return result
-
-@app.route("/api/booking/bookingschedule/",methods=["POST"])
-def bookingSchedule():
 	result = {}
-	key = request.cookies.get("key") 
-	if key in currentUser:
-		data = request.get_json()
-		attractionId = data["attractionId"]
-		date = data["date"]
-		time = data["time"]
-		price = data["price"]
-		#將資料抓回來後寫入字典
-		#創造一個字典存放使用者當前預定景點資訊
-		userBookingData = {}
-		userBookingData["username"] = currentUser[key]["name"]
-		userBookingData["attractionId"] = attractionId
-		userBookingData["date"] = date
-		userBookingData["time"] = time
-		userBookingData["price"] = price
-		usernameList.append(userBookingData)
-		if data != None:
-			result["ok"] = True
-			return result
+	if request.method == "GET":
+		key = request.cookies.get("key")
+		if key in currentUser:
+			#將當前使用者預定資料從資料庫拿出
+			username = currentUser[key]["name"]
+			sql = f"select attractionid,date,booktime,price from bookingdataunpaid where username = '{username}' limit 1"
+			mycursor.execute(sql)
+			mydata = mycursor.fetchone() 
+			if mydata:
+				attractionId = mydata[0]
+				date = mydata[1]
+				time = mydata[2]
+				price = mydata[3]
+				#透過id將預訂景點資訊從資料庫拿出
+				tripsql = f"select name,address,images from spot where id = '{attractionId}' limit 1"
+				mycursor.execute(tripsql)
+				tripdata = mycursor.fetchone()
+				if tripdata:
+					image = tripdata[2].split(",")
+					image = image[0]
+					returndata= {
+						"data":{
+							"attraction":{
+								"id":attractionId,
+								"name":tripdata[0],
+								"address":tripdata[1],
+								"image":image
+							},
+							"date":date,
+							"time":time,
+							"price":price,
+							"username":username
+						}
+					}
+					returndata = json.dumps(returndata)
+					return returndata
+			#沒有預定任何資料
+			else:
+				result["message"] = "null"
+				result["username"] = username	
+				return result
 		else:
 			result["error"] = True
-			result["message"] = "未正確填寫預定資料"
+			result["message"] = "尚未登入會員"
 			return result
 	else:
 		result["error"] = True
-		result["message"] = "尚未登入會員"
-		return result
+		result["message"] = "伺服器錯誤"
+		return result,400
+
+@app.route("/api/booking/bookingschedule/",methods=["POST"])
+#此路由使用者預定行程，將已預訂未付款的所有使用者資訊寫入資料庫
+def bookingSchedule():
+	result = {}
+	if request.method == "POST":
+		key = request.cookies.get("key") 
+		if key in currentUser:
+			username = currentUser[key]["name"]
+			data = request.get_json()
+			attractionId = data["attractionId"]
+			date = data["date"]
+			time = data["time"]
+			price = data["price"]
+			if date!=None and time!=None:
+				#先檢查使用者是否已預訂過行程，如果有直接更新資料
+				sql = f"select attractionid,date,booktime,price,number from bookingdataunpaid where username = '{username}' limit 1"
+				mycursor.execute(sql)
+				mydata = mycursor.fetchone()
+				if mydata:
+					lastNum = int(mydata[4])
+					x = lastNum// 10**0 % 10
+					y = lastNum// 10**1 % 10
+					last = int(str(x)+str(y))
+					if lastNumList[0] <= last:
+						lastNumList[0] = last
+
+					updatesql = f"update bookingdataunpaid set attractionid = '{attractionId}',date = '{date}', booktime = '{time}', price = '{price}' where username = '{username}'"
+					mycursor.execute(updatesql)
+					mydb.commit()
+					result["status"] = "update booking"
+				else:
+				#新的訂單	
+					#處理訂單編號
+					if not lastNumList:
+						number = now+1
+					else:
+						# n1 = currentNumber[-1]// 10**0 % 10
+						# strn1 = str(n1)
+						# n2 = currentNumber[-1]// 10**1 % 10
+						# strn2 = str(n2)
+						num = lastNumList[0]+1
+						lastNumList[0] = num
+						number = now+num
+						
+					#第一次預定資料，將使用者預定資料(未付款資料)寫入資料庫
+					newsql = """insert into bookingdataunpaid(username,attractionid,date,booktime,price,contactname,contactemail,
+					contactphone,paidstatus,number) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+					newvalues = (username,attractionId,date,time,price," "," "," ","未付款",number) 
+					mycursor.execute(newsql,newvalues)
+					mydb.commit()
+					result["status"] = "first booking"
+				#預定行程建立成功，回傳成功訊息
+				result["ok"] = True
+				return result
+			else:
+				result["error"] = True
+				result["message"] = "未正確輸入預定訊息"
+				return result
+		else:
+			result["error"] = True
+			result["message"] = "尚未登入會員"
+			return result
+	else:
+		result["error"]	= True
+		result["message"] = "伺服器錯誤"
+		return result , 400
 
 
 @app.route("/api/booking/deleteschedule/",methods=["DELETE"])
 def deleteSchedule():
 	result = {}
-	key = request.cookies.get("key")
-	if key in currentUser:
-		#清空當前預定資料
-		for i in range(len(usernameList)):
-			if usernameList[i]["username"] == currentUser[key]["name"]:
-				usernameList.remove(usernameList[i])
-		result["ok"] = True
+	if request.method == "DELETE":
+		key = request.cookies.get("key")
+		if key in currentUser:
+			username = currentUser[key]["name"]
+			sql = f"delete from bookingdataunpaid where username ='{username}'"
+			mycursor.execute(sql)
+			mydb.commit()
+			result["ok"] = True
+		else:
+			result["error"] = True
+			result["message"] = "尚未登入會員"
 		return result
 	else:
 		result["error"] = True
-		result["message"] = "尚未登入會員"
-		return result
+		result["message"] = "伺服器錯誤"
+		return result,400
+
+@app.route("/api/orders",methods=["POST"])
+def orders():
+	if request.method == "POST":
+		key = request.cookies.get("key")
+		if key in currentUser:
+			data = request.get_json()
+			#步驟1:聯絡資料寫入字典
+			postData = {
+				"prime":data["prime"],
+				"partner_key":"partner_OW51M5WdvM0sc2HZeM4IYwYigPTa1A3645TnU95oKbMj0HkX00nT91MD",
+				"merchant_id":"Yanyan_TAISHIN",
+				"details":"Test TapPay",
+				"amount":data["order"]["price"],
+				"cardholder":{
+					"phone_number":data["order"]["contact"]["phone"],
+					"name":data["order"]["contact"]["name"],
+					"email":data["order"]["contact"]["email"]
+				},
+				"remember":True
+			}
+			#步驟2:將資料按照TapPay規定格式用post方發送出，連上TapPay server(結束後TapPay會回傳response)
+			postData = json.dumps(postData)
+			tapPayUrl = "https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime"
+			import requests
+			headers = {
+				"Content-Type":"application/json",
+				"x-api-key":"partner_OW51M5WdvM0sc2HZeM4IYwYigPTa1A3645TnU95oKbMj0HkX00nT91MD"
+			}
+			r = requests.post(tapPayUrl,data=postData,headers=headers)
+			response = r.json()
+			#TapPAy api 回傳狀態等於0為成功
+			username = currentUser[key]["name"]
+			if response["status"] == 0:
+				#先將使用者狀態更新為已付款
+				updatesql = f"""update bookingdataunpaid set contactname = '{data["order"]["contact"]["name"]}'
+				,contactemail = '{data["order"]["contact"]["email"]}',contactphone = '{data["order"]["contact"]["phone"]}',paidstatus = '已付款' 
+				where username = '{username}'""" 
+				mycursor.execute(updatesql)
+				mydb.commit()
+				#再將訂單狀態從資料表取出
+				sql = f"select number from bookingdataunpaid where username = '{username}' limit 1"
+				mycursor.execute(sql)
+				mydata = mycursor.fetchone()
+				if mydata:
+					number = mydata[0]
+				result = {
+					"data":{
+						"number":number,
+						"payment":{
+							"status":0,
+							"message":"付款成功"
+						}
+					}
+				}
+			else:
+				errorsql = f"select number from bookingdataunpaid where username = '{username}' limit 1"
+				mycursor.execute(errorsql)
+				mydata = mycursor.fetchone()
+				if mydata:
+					number = mydata[0]
+				result = {
+					"number":number,
+					"error":True,
+					"message":"付款失敗"
+				}
+			returndata = json.dumps(result)
+			return returndata
+		else:
+			signYetResult = {}
+			signYetResult["error"] = True
+			signYetResult["message"] = "尚未登入會員"
+			return signYetResult
+		
+	else:
+		serverResult = {}
+		serverResult["error"] = True
+		serverResult["message"] = "伺服器錯誤"
+		return serverResult,400
+
+@app.route("/api/order/<orderNumber>")
+def orderResult(orderNumber):
+	assert orderNumber == request.view_args["orderNumber"]
+	key = request.cookies.get("key")
+	if orderNumber != None:
+		if key in currentUser:
+			sql = f"""select price,attractionid,date,booktime,contactname,contactemail,
+			contactphone,paidstatus from bookingdataunpaid where number = 
+			'{orderNumber}' limit 1"""
+			mycursor.execute(sql)
+			paidstatus = mycursor.fetchone()
+			if paidstatus:
+				attractionId = paidstatus[1]
+				tripsql = f"select name,address,images from spot where id = '{attractionId}' limit 1"
+				mycursor.execute(tripsql)
+				mydata = mycursor.fetchone()
+				if mydata:
+					images = mydata[2].split(",")
+					image = images[0]
+					if paidstatus[7] == "已付款":
+						status = 1
+					else:
+						status = 0
+					result = {
+						"data":{
+							"number":orderNumber,
+							"price":paidstatus[0],
+							"trip":{
+								"attraction":{
+									"id":attractionId,
+									"name":mydata[0],
+									"address":mydata[1],
+									"image":image
+								},
+								"date":paidstatus[2],
+								"time":paidstatus[3]
+							},
+							"contact":{
+								"name":paidstatus[4],
+								"email":paidstatus[5],
+								"phone":paidstatus[6]
+							},
+							"status":status
+						}
+					}
+					returnData = json.dumps(result)
+					return returnData	 
+		else:
+			result = {}
+			result["error"] = True
+			result["message"] = "尚未登入會員"
+			return result
 
 if __name__=="__main__":
 	app.run(host="0.0.0.0",port=3000,debug=True)

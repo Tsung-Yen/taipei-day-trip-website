@@ -372,7 +372,18 @@
                 font-weight:bold;
                 color:rgb(95, 91, 91);
             }
-            .paid[type="password"]{
+            /*Tappay Field*/
+            .paid_message>.card_num{
+                display: flex;
+            }
+            .paid_message>.card_exp_date{
+                display: flex;
+            }
+            .paid_message>.card_ccv{
+                display: flex;
+            }
+            .card_num>.tpfield{
+                flex:none;
                 width:200px;
                 height:28px;
                 margin-bottom: 12px;
@@ -381,7 +392,16 @@
                 border-style: solid;
                 border-width: 1px;
             }
-            .paid[type="text"]{
+            .card_exp_date>.tpfield{
+                width:200px;
+                height:28px;
+                margin-bottom: 12px;
+                border-radius: 0.3em;
+                border-color: rgb(230, 221, 221);
+                border-style: solid;
+                border-width: 1px;
+            }
+            .card_ccv>.tpfield{
                 width:200px;
                 height:28px;
                 margin-bottom: 12px;
@@ -502,12 +522,14 @@
                 }
             }
         </style>
+        <script src="https://js.tappaysdk.com/tpdirect/v5.7.0"></script>
         <script>
             function init(){
                 //會員系統
                 menberSys();
                 deleteCurrentBooking();
                 returnHome();
+                setUpSDK();
             }
             //當前使用者姓名
             let myUser = null;
@@ -516,7 +538,7 @@
                 //(流程1)檢查使用者狀況
                 let signing = document.getElementById("signing");
                 let nav = document.getElementById("nav");
-                let userStatusUrl = "http://3.131.86.32:3000/api/user/userstatus/";
+                let userStatusUrl = "http:///3.131.86.32:3000/api/user/userstatus/";
                 fetch(userStatusUrl).then((res)=>res.json())
                 .then((jsonData)=>{
                     if(jsonData != null){
@@ -531,7 +553,7 @@
                         getBookingData();
 
                         //(登出)
-                        let signOutUrl = "http://3.131.86.32:3000/api/user/signout/";
+                        let signOutUrl = "http:///3.131.86.32:3000/api/user/signout/";
                         let signout = document.getElementById("sign_out");
                         signout.addEventListener("click",()=>{
                             fetch(signOutUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
@@ -550,8 +572,8 @@
                     }else{
                         //如果使用者為登出狀態直接導回首頁
                         window.setTimeout(()=>{
-                            location.href="http://3.131.86.32:3000/";
-                        },300);
+                            location.href="http:///3.131.86.32:3000/";
+                        },100);
                     }
                 });
                 //(流程2)使者點擊彈出登入視窗
@@ -566,7 +588,7 @@
                 //(流程3)使用者完成登入步驟
                 let signinForm = document.getElementById("signin_form");
                 let signinResult = document.getElementById("signin_result");
-                let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
+                let signinUrl = "http:///3.131.86.32:3000/api/user/signin/";
                 signinForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
                     let email = document.getElementById("signin_email").value;
@@ -601,7 +623,7 @@
                 //(流程5)使用者完成註冊
                 let signupForm = document.getElementById("signup_form");
                 let signupResult = document.getElementById("signup_result");
-                let signupUrl = "http://3.131.86.32:3000/api/user/signup/";
+                let signupUrl = "http:///3.131.86.32:3000/api/user/signup/";
                 signupForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
                     let name = document.getElementById("signup_name").value;
@@ -637,36 +659,52 @@
                 }
             }
             //取得使用者購物車預定資料
+            let amountPrice = null; //參數記錄使用者付款價格
+            let attractionDict = {} //記錄使用者行程資料供付款時確認資料
             function getBookingData(){
-                let bookDataUrl = "http://3.131.86.32:3000/api/booking/bookingcart/";
+                let bookDataUrl = "http:///3.131.86.32:3000/api/booking/bookingcart/";
                 fetch(bookDataUrl).then((res)=>res.json()).then((bookData)=>{
                     //使用者已登入會員
                     if(bookData["error"] != true){
                         if(bookData["message"] != "null"){
+                            //景點id
+                            attractionDict["id"] = bookData["data"]["attraction"]["id"];
                             //使用者名稱
                             let username = document.getElementById("username");
-                            username.innerHTML = bookData["username"];
+                            username.innerHTML = bookData["data"]["username"];
                             //景點圖片
                             let image = document.getElementById("slide_img");
                             image.src = bookData["data"]["attraction"]["image"];
+                            attractionDict["image"] = bookData["data"]["attraction"]["image"];
                             //景點名稱
                             let spotname = document.getElementById("spotname");
                             spotname.innerHTML = bookData["data"]["attraction"]["name"];
+                            attractionDict["name"] = bookData["data"]["attraction"]["name"];
                             //預定日期
                             let date = document.getElementById("date");
-                            date.innerHTML = bookData["date"];
+                            date.innerHTML = bookData["data"]["date"];
+                            attractionDict["date"] = bookData["data"]["date"];
                             //預定時間
-                            let time = document.getElementById("time");
-                            time.innerHTML = bookData["time"];
+                            let showtime = document.getElementById("time");
+                            let time = bookData["data"]["time"];
+                            if(time == "morning"){
+                                showtime.innerHTML = "早上9點到下午4點";
+                                attractionDict["time"] = "morning";
+                            }else{
+                                showtime.innerHTML = "下午2點到晚上9點";
+                                attractionDict["time"] = "afternoon";
+                            };
                             //預定費用
                             let price = document.getElementById("price");
-                            price.innerHTML = bookData["price"];
+                            price.innerHTML = "新台幣"+bookData["data"]["price"]+"元";
+                            attractionDict["price"] = bookData["data"]["price"]; 
                             //景點地址
                             let address = document.getElementById("place");
                             address.innerHTML = bookData["data"]["attraction"]["address"];
+                            attractionDict["address"] = bookData["data"]["attraction"]["address"];
                             //確認付款
                             let totalPrice = document.getElementById("total_price");
-                            totalPrice.innerHTML = bookData["price"];
+                            totalPrice.innerHTML = bookData["data"]["price"];
                         }else{
                             let container = document.querySelector(".container");
                             container.style.display = "none";
@@ -700,21 +738,115 @@
             //刪除已預定的行程
             function deleteCurrentBooking(){
                 let deleteBooking = document.querySelector(".delete_booking");
-                let deleteBookingUrl = "http://3.131.86.32:3000/api/booking/deleteschedule/";
+                let deleteBookingUrl = "http:///3.131.86.32:3000/api/booking/deleteschedule/";
                 deleteBooking.addEventListener("click",()=>{
-                    fetch(deleteBookingUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}});
-                    window.setTimeout(()=>{
-                        location.reload();
-                    },500);
+                    fetch(deleteBookingUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
+                    .then((res)=>res.json()).then((bookStatus)=>{
+                        console.log(bookStatus);
+                        window.setTimeout(()=>{
+                            location.reload();
+                        },200);
+                    });
                 });
             }
             //點擊台北一日遊回到首頁
             function returnHome(){
                 let home = document.getElementById("backto_home");
                 home.addEventListener("click",()=>{
-                    location.href = "http://3.131.86.32:3000/";
+                    location.href = "http:///3.131.86.32:3000/";
                 });
             }
+            //TapPay setupSDK
+            function setUpSDK(){
+                TPDirect.setupSDK(20437,"app_3xNskPzPUaYioKPxBq1wN5on3otD9ZavOSh1N3yFG6MU3PuHvqIAylKwzeIi",'sandbox');
+                // Display ccv field
+                let fields = {
+                    number: {
+                        // css selector
+                        element: '#card-number',
+                        placeholder: '**** **** **** ****'
+                    },
+                    expirationDate: {
+                        // DOM object
+                        element: document.getElementById('card-expiration-date'),
+                        placeholder: 'MM / YY'
+                    },
+                    ccv: {
+                        element: '#card-ccv',
+                        placeholder: 'ccv'
+                    }
+                };
+                TPDirect.card.setup({
+                    fields: fields,
+                    styles: {
+                        'input': {
+                            'color': 'gray'
+                        },
+                        // style valid state
+                        '.valid': {
+                            'color': 'green'
+                        },
+                        // style invalid state
+                        '.invalid': {
+                            'color': 'red'
+                        },
+                        // Media queries
+                        // Note that these apply to the iframe, not the root window.
+                        '@media screen and (max-width: 400px)': {
+                            'input': {
+                                'color': 'orange'
+                            }
+                        }
+                    }
+                });
+            }
+            function onClick(){
+                let name = document.getElementById("contact-name").value;
+                let email = document.getElementById("contact-email").value;
+                let phone = document.getElementById("contact-phone").value;
+                TPDirect.card.getPrime((result)=>{
+                    if(result.status !== 0){
+                        return
+                    }
+                    let prime = result.card.prime;
+                    //將資料傳入後端
+                    let post_data = {
+                        "prime":prime,
+                        "order":{
+                            "price":attractionDict["price"],
+                            "trip":{
+                                "attraction":{
+                                    "id":attractionDict["id"],
+                                    "name":attractionDict["name"],
+                                    "address":attractionDict["address"],
+                                    "image":attractionDict["image"]
+                                },
+                                "date":attractionDict["date"],
+                                "time":attractionDict["time"]
+                            },
+                            "contact":{
+                                "name":name,
+                                "email":email,
+                                "phone":phone
+                            }
+                        }
+                    }
+                    let ordersUrl = "http://3.131.86.32:3000/api/orders";
+                    fetch(ordersUrl,{method:"POST",headers:{"Content-Type":"application/json"}
+                    ,body:JSON.stringify(post_data)})
+                    .then((res)=>res.json()).then((jsonData)=>{
+                        let error = jsonData["error"];
+                        if(error!=true){
+                            let number = jsonData["data"]["number"];
+                            //將編號傳至api/order/
+                            //付款成功後將使用者導至感謝頁面
+                            window.setTimeout(()=>{
+                                location.href = "http://3.131.86.32:3000/thankyou?number="+number;
+                            },100);
+                        }
+                    });
+                });
+            };
         </script>
     </head>
     <body onload="init()" id="body">
@@ -777,35 +909,47 @@
                     <p class="content" id="place"></p>
                 </div>
             </div> 
-            <img class="delete_booking" src="https://s3-alpha-sig.figma.com/img/5537/1303/f31984c7c73c46aaed1a7a1c9003277f?Expires=1622419200&Signature=Q4roAebZiGCxzV7hzfXvwlfcEcwG5TakvQIf8L2TPtad~PGBImPJE9WOvfa6DAN-EzvyA8daSNHLFV7MHGeMwxox67a7qceZb00B8k9wkK80EjPNf1NLlVxU8E4SCd5yU7Vz38qiEkE~0uqYVD7yaB5jrFcP6jJ~OpSNEYwarQIxmz9sWXgeRAil~Hy30PbTMTOdOJrp8tHIBUDb3JiX6IxjOccFKA6YdvfTuj36fxlwkzuO7Lr7Gvrfm4oAtXtny~3bOTVWqL9qE3KATZcaXtWXYX4iv6cqfM39eSmAsp1l-EDFxHIrcUn-h~sZYqTuVgtWko2hrH7S2nDJ0vc5pQ__&Key-Pair-Id=APKAINTVSUGEWH5XD5UA">
+            <img class="delete_booking" src="https://i.ibb.co/yXPdySC/icon-delete.png" >
         </div>
         <div class="hr2"></div>
         <div class="contact_message">
             <p class="title">你的連絡資訊</p>
             <form>
-                聯絡姓名：<input class="message" type="text">
+                聯絡姓名：<input class="message" type="text" id="contact-name">
                 </br>
-                聯絡信箱：<input class="message" type="text">
+                聯絡信箱：<input class="message" type="text" id="contact-email">
                 </br>
-                手機號碼：<input class="message" type="text">
+                手機號碼：<input class="message" type="text" id="contact-phone">
             </form>
             <p class="remind">請保持手機暢通，準時到達，導覽人員將用手機與您聯繫，務必留下正確的聯絡方式。</p>
         </div>
         <div class="hr3"></div>
         <div class="paid_message">
             <p class="title">信用卡付款資訊</p>
-            <form>
+            <!-- <form>
                 卡片號碼：<input class="paid" type="password" placeholder="**** **** **** ****">
                 </br>
                 過期時間：<input class="paid" type="text" placeholder="ＭＭ／ＹＹ">
                 </br>
                 驗證密碼：<input class="paid" type="text" placeholder="ＣＶＶ">
-            </form>
+            </form> -->
+            <div class="card_num">
+                <div>卡片號碼：</div>
+            <div class="tpfield" id="card-number"></div>
+            </div>
+            <div class="card_exp_date">
+                <div>過期時間：</div>
+                <div class="tpfield" id="card-expiration-date"></div>
+            </div>
+            <div class="card_ccv">
+                <div>驗證密碼：</div>
+                <div class="tpfield" id="card-ccv"></div>
+            </div>
         </div>
         <div class="hr4"></div>
         <div class="confirm">
             <p class="total_fee">總價：新台幣<span id="total_price"></span>元</p>
-            <input class="butt" type="submit" value="確認訂購並付款"></input>
+            <input class="butt" id="confirm-pay" type="submit" value="確認訂購並付款" onclick="onClick();"></input>
         </div>
         <footer id="footer">COPYRIGHT © 2021 台北一日遊</footer>
         <div class="mask"></div>
