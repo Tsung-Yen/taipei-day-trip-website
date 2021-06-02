@@ -372,7 +372,18 @@
                 font-weight:bold;
                 color:rgb(95, 91, 91);
             }
-            /* .paid[type="password"]{
+            /*Tappay Field*/
+            .paid_message>.card_num{
+                display: flex;
+            }
+            .paid_message>.card_exp_date{
+                display: flex;
+            }
+            .paid_message>.card_ccv{
+                display: flex;
+            }
+            .card_num>.tpfield{
+                flex:none;
                 width:200px;
                 height:28px;
                 margin-bottom: 12px;
@@ -381,7 +392,7 @@
                 border-style: solid;
                 border-width: 1px;
             }
-            .paid[type="text"]{
+            .card_exp_date>.tpfield{
                 width:200px;
                 height:28px;
                 margin-bottom: 12px;
@@ -389,9 +400,8 @@
                 border-color: rgb(230, 221, 221);
                 border-style: solid;
                 border-width: 1px;
-            } */
-            /*Tappay Field*/
-            .paid_message>.tpfield{
+            }
+            .card_ccv>.tpfield{
                 width:200px;
                 height:28px;
                 margin-bottom: 12px;
@@ -528,7 +538,7 @@
                 //(流程1)檢查使用者狀況
                 let signing = document.getElementById("signing");
                 let nav = document.getElementById("nav");
-                let userStatusUrl = "http:///127.0.0.1:3000/api/user/userstatus/";
+                let userStatusUrl = "http:///3.131.86.32:3000/api/user/userstatus/";
                 fetch(userStatusUrl).then((res)=>res.json())
                 .then((jsonData)=>{
                     if(jsonData != null){
@@ -543,7 +553,7 @@
                         getBookingData();
 
                         //(登出)
-                        let signOutUrl = "http:///127.0.0.1:3000/api/user/signout/";
+                        let signOutUrl = "http:///3.131.86.32:3000/api/user/signout/";
                         let signout = document.getElementById("sign_out");
                         signout.addEventListener("click",()=>{
                             fetch(signOutUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
@@ -562,7 +572,7 @@
                     }else{
                         //如果使用者為登出狀態直接導回首頁
                         window.setTimeout(()=>{
-                            location.href="http:///127.0.0.1:3000/";
+                            location.href="http:///3.131.86.32:3000/";
                         },100);
                     }
                 });
@@ -578,7 +588,7 @@
                 //(流程3)使用者完成登入步驟
                 let signinForm = document.getElementById("signin_form");
                 let signinResult = document.getElementById("signin_result");
-                let signinUrl = "http:///127.0.0.1:3000/api/user/signin/";
+                let signinUrl = "http:///3.131.86.32:3000/api/user/signin/";
                 signinForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
                     let email = document.getElementById("signin_email").value;
@@ -613,7 +623,7 @@
                 //(流程5)使用者完成註冊
                 let signupForm = document.getElementById("signup_form");
                 let signupResult = document.getElementById("signup_result");
-                let signupUrl = "http:///127.0.0.1:3000/api/user/signup/";
+                let signupUrl = "http:///3.131.86.32:3000/api/user/signup/";
                 signupForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
                     let name = document.getElementById("signup_name").value;
@@ -650,9 +660,9 @@
             }
             //取得使用者購物車預定資料
             let amountPrice = null; //參數記錄使用者付款價格
-            let attractionDict = {} //記錄使用者形成資料供付款時確認資料
+            let attractionDict = {} //記錄使用者行程資料供付款時確認資料
             function getBookingData(){
-                let bookDataUrl = "http:///127.0.0.1:3000/api/booking/bookingcart/";
+                let bookDataUrl = "http:///3.131.86.32:3000/api/booking/bookingcart/";
                 fetch(bookDataUrl).then((res)=>res.json()).then((bookData)=>{
                     //使用者已登入會員
                     if(bookData["error"] != true){
@@ -661,7 +671,7 @@
                             attractionDict["id"] = bookData["data"]["attraction"]["id"];
                             //使用者名稱
                             let username = document.getElementById("username");
-                            username.innerHTML = bookData["username"];
+                            username.innerHTML = bookData["data"]["username"];
                             //景點圖片
                             let image = document.getElementById("slide_img");
                             image.src = bookData["data"]["attraction"]["image"];
@@ -672,11 +682,11 @@
                             attractionDict["name"] = bookData["data"]["attraction"]["name"];
                             //預定日期
                             let date = document.getElementById("date");
-                            date.innerHTML = bookData["date"];
-                            attractionDict["date"] = bookData["date"];
+                            date.innerHTML = bookData["data"]["date"];
+                            attractionDict["date"] = bookData["data"]["date"];
                             //預定時間
                             let showtime = document.getElementById("time");
-                            let time = bookData["time"];
+                            let time = bookData["data"]["time"];
                             if(time == "morning"){
                                 showtime.innerHTML = "早上9點到下午4點";
                                 attractionDict["time"] = "morning";
@@ -686,15 +696,15 @@
                             };
                             //預定費用
                             let price = document.getElementById("price");
-                            price.innerHTML = "新台幣"+bookData["price"]+"元";
+                            price.innerHTML = "新台幣"+bookData["data"]["price"]+"元";
+                            attractionDict["price"] = bookData["data"]["price"]; 
                             //景點地址
                             let address = document.getElementById("place");
                             address.innerHTML = bookData["data"]["attraction"]["address"];
                             attractionDict["address"] = bookData["data"]["attraction"]["address"];
                             //確認付款
                             let totalPrice = document.getElementById("total_price");
-                            totalPrice.innerHTML = bookData["price"];
-                            amountPrice = bookData["price"];
+                            totalPrice.innerHTML = bookData["data"]["price"];
                         }else{
                             let container = document.querySelector(".container");
                             container.style.display = "none";
@@ -728,26 +738,28 @@
             //刪除已預定的行程
             function deleteCurrentBooking(){
                 let deleteBooking = document.querySelector(".delete_booking");
-                let deleteBookingUrl = "http:///127.0.0.1:3000/api/booking/deleteschedule/";
+                let deleteBookingUrl = "http:///3.131.86.32:3000/api/booking/deleteschedule/";
                 deleteBooking.addEventListener("click",()=>{
-                    fetch(deleteBookingUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}});
-                    window.setTimeout(()=>{
-                        location.reload();
-                    },500);
+                    fetch(deleteBookingUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
+                    .then((res)=>res.json()).then((bookStatus)=>{
+                        console.log(bookStatus);
+                        window.setTimeout(()=>{
+                            location.reload();
+                        },200);
+                    });
                 });
             }
             //點擊台北一日遊回到首頁
             function returnHome(){
                 let home = document.getElementById("backto_home");
                 home.addEventListener("click",()=>{
-                    location.href = "http:///127.0.0.1:3000/";
+                    location.href = "http:///3.131.86.32:3000/";
                 });
             }
             //TapPay setupSDK
             function setUpSDK(){
                 TPDirect.setupSDK(20437,"app_3xNskPzPUaYioKPxBq1wN5on3otD9ZavOSh1N3yFG6MU3PuHvqIAylKwzeIi",'sandbox');
-                
-                    // Display ccv field
+                // Display ccv field
                 let fields = {
                     number: {
                         // css selector
@@ -800,24 +812,39 @@
                     //將資料傳入後端
                     let post_data = {
                         "prime":prime,
-                        "amount":amountPrice,
-                        "cardholder":{
-                            "phone_number":phone,
-                            "name":name,
-                            "email":email,
-                        },
-                        "attractiondata":attractionDict
+                        "order":{
+                            "price":attractionDict["price"],
+                            "trip":{
+                                "attraction":{
+                                    "id":attractionDict["id"],
+                                    "name":attractionDict["name"],
+                                    "address":attractionDict["address"],
+                                    "image":attractionDict["image"]
+                                },
+                                "date":attractionDict["date"],
+                                "time":attractionDict["time"]
+                            },
+                            "contact":{
+                                "name":name,
+                                "email":email,
+                                "phone":phone
+                            }
+                        }
                     }
-                    let ordersUrl = "http://127.0.0.1:3000/api/orders";
+                    let ordersUrl = "http://3.131.86.32:3000/api/orders";
                     fetch(ordersUrl,{method:"POST",headers:{"Content-Type":"application/json"}
                     ,body:JSON.stringify(post_data)})
                     .then((res)=>res.json()).then((jsonData)=>{
-                        console.log(jsonData);
+                        let error = jsonData["error"];
+                        if(error!=true){
+                            let number = jsonData["data"]["number"];
+                            //將編號傳至api/order/
+                            //付款成功後將使用者導至感謝頁面
+                            window.setTimeout(()=>{
+                                location.href = "http://3.131.86.32:3000/thankyou?number="+number;
+                            },100);
+                        }
                     });
-                    //付款成功後將使用者導至感謝頁面
-                    window.setTimeout(()=>{
-                        location.href = "http://127.0.0.1:3000/thankyou";
-                    },100)
                 });
             };
         </script>
@@ -906,9 +933,18 @@
                 </br>
                 驗證密碼：<input class="paid" type="text" placeholder="ＣＶＶ">
             </form> -->
-            卡片號碼：<div class="tpfield" id="card-number"></div>
-            過期時間：<div class="tpfield" id="card-expiration-date"></div>
-            驗證密碼：<div class="tpfield" id="card-ccv"></div>
+            <div class="card_num">
+                <div>卡片號碼：</div>
+            <div class="tpfield" id="card-number"></div>
+            </div>
+            <div class="card_exp_date">
+                <div>過期時間：</div>
+                <div class="tpfield" id="card-expiration-date"></div>
+            </div>
+            <div class="card_ccv">
+                <div>驗證密碼：</div>
+                <div class="tpfield" id="card-ccv"></div>
+            </div>
         </div>
         <div class="hr4"></div>
         <div class="confirm">
