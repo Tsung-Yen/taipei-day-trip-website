@@ -14,7 +14,7 @@ dbconfig = {
 	"host":"localhost",
 	"port":"3306",
 	"user":"root",
-	"password":"root",
+	"password":"Gtio556$",
 	"database":"tripdata"
 }
 class MySQLPool(object):
