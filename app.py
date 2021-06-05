@@ -13,7 +13,7 @@ mydb = mysql.connector.connect(
 	host="localhost",
 	#此處為連接instance遠端mysql的帳號密碼
 	user="root",
-	password="Gtio556$",
+	password="root",
 	database="tripdata"
 )
 mycursor=mydb.cursor()
@@ -134,155 +134,157 @@ def attractions():
 			sql = f"select * from spot where name like '%{keyword}%'"
 			mycursor.execute(sql)
 			mydata = mycursor.fetchall()
-		#判斷資料數量來分類頁數
-			#處理小於12筆的資料
-			if len(mydata)/12 <= 1 and count == 0:
-				jsonData["nextPage"] = "null"
-				for i in range(len(mydata)):
-					#開一個字典提供給資料庫資料
-					listData ={}
-					#將資料庫資料使用迴圈一一放入data列表中的變數
-					listData["id"] = mydata[i][0]
-					listData["name"] = mydata[i][1]
-					listData["category"] = mydata[i][2]
-					listData["description"] = mydata[i][3]
-					listData["address"] = mydata[i][4]
-					listData["transport"] = mydata[i][5]
-					listData["mrt"] = mydata[i][6]
-					listData["latitude"] = mydata[i][7]
-					listData["longitude"] = mydata[i][8]
-					listData["images"] = mydata[i][9]
-					#把這圈的資料apppend進jsonData之中
-					jsonData["data"].append(listData)
-				return jsonData
+			if mydata:
+			#判斷資料數量來分類頁數
+				#處理小於12筆的資料
+				if len(mydata)/12 <= 1 and count == 0:
+					jsonData["nextPage"] = "null"
+					for i in range(len(mydata)):
+						#開一個字典提供給資料庫資料
+						listData ={}
+						#將資料庫資料使用迴圈一一放入data列表中的變數
+						listData["id"] = mydata[i][0]
+						listData["name"] = mydata[i][1]
+						listData["category"] = mydata[i][2]
+						listData["description"] = mydata[i][3]
+						listData["address"] = mydata[i][4]
+						listData["transport"] = mydata[i][5]
+						listData["mrt"] = mydata[i][6]
+						listData["latitude"] = mydata[i][7]
+						listData["longitude"] = mydata[i][8]
+						listData["images"] = mydata[i][9]
+						#把這圈的資料apppend進jsonData之中
+						jsonData["data"].append(listData)
+					return jsonData
 
-			#關鍵字搜尋結果超過12筆資料(0,1,2,3...頁的處理)
-			elif len(mydata)/12 > 1:
-				#將第一輪剩下數字存起來供第二輪迴圈做篩選
-				leftData = len(mydata)
-				#關鍵字搜尋展示第一輪資料共12筆
-				if count == 0:
-					jsonData["nextPage"] = 1
-					for i in range(12):
-						listData = {}
-						listData["id"] = mydata[i][0]
-						listData["name"] = mydata[i][1]
-						listData["category"] = mydata[i][2]
-						listData["description"] = mydata[i][3]
-						listData["address"] = mydata[i][4]
-						listData["transport"] = mydata[i][5]
-						listData["mrt"] = mydata[i][6]
-						listData["latitude"] = mydata[i][7]
-						listData["longitude"] = mydata[i][8]
-						listData["images"] = mydata[i][9]
-						jsonData["data"].append(listData)
-					return jsonData
-				elif count == 1:
-					#判斷還剩幾筆資料如果超過放到下一頁
-					if leftData <= 23:
-						num = leftData
-						jsonData["nextPage"] = "null"
+				#關鍵字搜尋結果超過12筆資料(0,1,2,3...頁的處理)
+				elif len(mydata)/12 > 1:
+					#將第一輪剩下數字存起來供第二輪迴圈做篩選
+					leftData = len(mydata)
+					#關鍵字搜尋展示第一輪資料共12筆
+					if count == 0:
+						jsonData["nextPage"] = 1
+						for i in range(12):
+							listData = {}
+							listData["id"] = mydata[i][0]
+							listData["name"] = mydata[i][1]
+							listData["category"] = mydata[i][2]
+							listData["description"] = mydata[i][3]
+							listData["address"] = mydata[i][4]
+							listData["transport"] = mydata[i][5]
+							listData["mrt"] = mydata[i][6]
+							listData["latitude"] = mydata[i][7]
+							listData["longitude"] = mydata[i][8]
+							listData["images"] = mydata[i][9]
+							jsonData["data"].append(listData)
+						return jsonData
+					elif count == 1:
+						#判斷還剩幾筆資料如果超過放到下一頁
+						if leftData <= 23:
+							num = leftData
+							jsonData["nextPage"] = "null"
+						else:
+							num = 24
+							jsonData["nextPage"] = count+1
+						for i in range(12,num):
+							listData = {}
+							listData["id"] = mydata[i][0]
+							listData["name"] = mydata[i][1]
+							listData["category"] = mydata[i][2]
+							listData["description"] = mydata[i][3]
+							listData["address"] = mydata[i][4]
+							listData["transport"] = mydata[i][5]
+							listData["mrt"] = mydata[i][6]
+							listData["latitude"] = mydata[i][7]
+							listData["longitude"] = mydata[i][8]
+							listData["images"] = mydata[i][9]
+							jsonData["data"].append(listData)
+						return jsonData
+					elif count == 2:
+						if leftData <= 35:
+							num = leftData
+							jsonData["nextPage"] = "null"
+						else:
+							num = 36
+							jsonData["nextPage"] = 3
+						for i in range(24,num):
+							listData = {}
+							listData["id"] = mydata[i][0]
+							listData["name"] = mydata[i][1]
+							listData["category"] = mydata[i][2]
+							listData["description"] = mydata[i][3]
+							listData["address"] = mydata[i][4]
+							listData["transport"] = mydata[i][5]
+							listData["mrt"] = mydata[i][6]
+							listData["latitude"] = mydata[i][7]
+							listData["longitude"] = mydata[i][8]
+							listData["images"] = mydata[i][9]
+							jsonData["data"].append(listData)
+						return jsonData
+					elif count == 3:
+						if leftData <= 47:
+							num = leftData
+							jsonData["nextPage"] = "null"
+						else:
+							num = 48
+							jsonData["nextPage"] = 4
+						for i in range(36,num):
+							listData = {}
+							listData["id"] = mydata[i][0]
+							listData["name"] = mydata[i][1]
+							listData["category"] = mydata[i][2]
+							listData["description"] = mydata[i][3]
+							listData["address"] = mydata[i][4]
+							listData["transport"] = mydata[i][5]
+							listData["mrt"] = mydata[i][6]
+							listData["latitude"] = mydata[i][7]
+							listData["longitude"] = mydata[i][8]
+							listData["images"] = mydata[i][9]
+							jsonData["data"].append(listData)
+						return jsonData
+					elif count == 4:
+						if leftData <= 59:
+							num = leftData
+							jsonData["nextPage"] = "null"
+						else:
+							num = 60
+							jsonData["nextPage"] = 5
+						for i in range(48,num):
+							listData = {}
+							listData["id"] = mydata[i][0]
+							listData["name"] = mydata[i][1]
+							listData["category"] = mydata[i][2]
+							listData["description"] = mydata[i][3]
+							listData["address"] = mydata[i][4]
+							listData["transport"] = mydata[i][5]
+							listData["mrt"] = mydata[i][6]
+							listData["latitude"] = mydata[i][7]
+							listData["longitude"] = mydata[i][8]
+							listData["images"] = mydata[i][9]
+							jsonData["data"].append(listData)
+						return jsonData
+					#使用者將關鍵字所有頁面看完，並且超過了頁數
 					else:
-						num = 24
-						jsonData["nextPage"] = count+1
-					for i in range(12,num):
-						listData = {}
-						listData["id"] = mydata[i][0]
-						listData["name"] = mydata[i][1]
-						listData["category"] = mydata[i][2]
-						listData["description"] = mydata[i][3]
-						listData["address"] = mydata[i][4]
-						listData["transport"] = mydata[i][5]
-						listData["mrt"] = mydata[i][6]
-						listData["latitude"] = mydata[i][7]
-						listData["longitude"] = mydata[i][8]
-						listData["images"] = mydata[i][9]
-						jsonData["data"].append(listData)
-					return jsonData
-				elif count == 2:
-					if leftData <= 35:
-						num = leftData
-						jsonData["nextPage"] = "null"
-					else:
-						num = 36
-						jsonData["nextPage"] = 3
-					for i in range(24,num):
-						listData = {}
-						listData["id"] = mydata[i][0]
-						listData["name"] = mydata[i][1]
-						listData["category"] = mydata[i][2]
-						listData["description"] = mydata[i][3]
-						listData["address"] = mydata[i][4]
-						listData["transport"] = mydata[i][5]
-						listData["mrt"] = mydata[i][6]
-						listData["latitude"] = mydata[i][7]
-						listData["longitude"] = mydata[i][8]
-						listData["images"] = mydata[i][9]
-						jsonData["data"].append(listData)
-					return jsonData
-				elif count == 3:
-					if leftData <= 47:
-						num = leftData
-						jsonData["nextPage"] = "null"
-					else:
-						num = 48
-						jsonData["nextPage"] = 4
-					for i in range(36,num):
-						listData = {}
-						listData["id"] = mydata[i][0]
-						listData["name"] = mydata[i][1]
-						listData["category"] = mydata[i][2]
-						listData["description"] = mydata[i][3]
-						listData["address"] = mydata[i][4]
-						listData["transport"] = mydata[i][5]
-						listData["mrt"] = mydata[i][6]
-						listData["latitude"] = mydata[i][7]
-						listData["longitude"] = mydata[i][8]
-						listData["images"] = mydata[i][9]
-						jsonData["data"].append(listData)
-					return jsonData
-				elif count == 4:
-					if leftData <= 59:
-						num = leftData
-						jsonData["nextPage"] = "null"
-					else:
-						num = 60
-						jsonData["nextPage"] = 5
-					for i in range(48,num):
-						listData = {}
-						listData["id"] = mydata[i][0]
-						listData["name"] = mydata[i][1]
-						listData["category"] = mydata[i][2]
-						listData["description"] = mydata[i][3]
-						listData["address"] = mydata[i][4]
-						listData["transport"] = mydata[i][5]
-						listData["mrt"] = mydata[i][6]
-						listData["latitude"] = mydata[i][7]
-						listData["longitude"] = mydata[i][8]
-						listData["images"] = mydata[i][9]
-						jsonData["data"].append(listData)
-					return jsonData
-				#使用者將關鍵字所有頁面看完，並且超過了頁數
+						errorData = {
+								"error":True,
+								"message":"已顯示完所有資料"
+						}
+						return errorData
+				#使用者搜尋頁數超過
 				else:
 					errorData = {
-							"error":True,
-							"message":"已顯示完所有資料"
-					}
+								"error":True,
+								"message":"已超出頁數"
+						}
 					return errorData
-			#使用者搜尋頁數超過
 			else:
-				errorData = {
-							"error":True,
-							"message":"已超出頁數"
-					}
-				return errorData
-		#使用者輸入鍵字並不存在
-		else:
-			errorData = {
-							"error":True,
-							"message":"輸入頁面或關鍵字不存在"
-			}
-			return errorData
+				#使用者輸入鍵字並不存在
+				result = {
+					"error":True,
+					"message":"很抱歉，您輸入的關鍵字不存在"
+				}
+				result = json.dumps(result)
+				return result
 	#伺服器壞掉回傳錯誤訊息(輸入格式錯誤)
 	else:
 		errorData = {
@@ -363,27 +365,36 @@ def signup():
 		email = data["email"]
 		password = data["password"]
 		userStatus = {}
-	#write user data in mysql
-	sql = f"select * from user where email = '{email}' limit 1"
-	mycursor.execute(sql)
-	mydata = mycursor.fetchone()
+		if name and email and password:
+			print(name,email,password)
+			#write user data in mysql
+			sql = f"select * from user where email = '{email}' limit 1"
+			mycursor.execute(sql)
+			mydata = mycursor.fetchone()
 
-	if mydata:
-		userStatus["error"] = True
-		userStatus["message"] = "信箱已被註冊，請重新輸入"
-		return userStatus
-	elif  not mydata:
-		sql = "insert into user(name,email,password) values(%s,%s,%s)"
-		val = (name , email , password)
-		mycursor.execute(sql,val)
-		mydb.commit()
-		userStatus["ok"] = True
-		return userStatus
+			if mydata:
+				userStatus["error"] = True
+				userStatus["message"] = "信箱已被註冊，請重新輸入"
+				return userStatus
+			elif not mydata:
+				sql = "insert into user(name,email,password) values(%s,%s,%s)"
+				val = (name , email , password)
+				mycursor.execute(sql,val)
+				mydb.commit()
+				userStatus["ok"] = True
+				return userStatus
+		else:
+			result = {}
+			result["error"] = True
+			result["message"] = "未正確輸入資料"
+			return result
 	else:
-		userStatus["error"] = True
-		userStatus["message"] = "伺服器錯誤"
-		return userStatus
-		
+		result = {}
+		result["error"] = True
+		result["message"] = "伺服器錯誤"
+		return result
+	
+
 @app.route("/api/user/signin/",methods=["PATCH"])
 def signin():
 	userStatus = {}
@@ -391,30 +402,35 @@ def signin():
 	data = request.get_json()
 	email = data["email"]
 	password = data["password"]
-	#使用者輸入資料和db比對
-	sql = f"select * from user where email = '{email}' and password = '{password}' limit 1"
-	mycursor.execute(sql)
-	mydata = mycursor.fetchone()
-
-	if mydata:
-		#當前api
-		userStatus["ok"] = True
-		response = make_response(userStatus)
-		id = mydata[0]
-		name = mydata[1]
-		email = mydata[2]
-		key = hashlib.sha256((name+"afdaadasdda").encode("utf-8")).hexdigest()
-		currentUser[key]={
-			"id":id,
-			"name":name,
-			"email":email
-		}
-		response.set_cookie(key="key" , value=key)
-		return response
+	if email and password:
+		#使用者輸入資料和db比對
+		sql = f"select * from user where email = '{email}' and password = '{password}' limit 1"
+		mycursor.execute(sql)
+		mydata = mycursor.fetchone()
+		if mydata:
+			#當前api
+			userStatus["ok"] = True
+			response = make_response(userStatus)
+			id = mydata[0]
+			name = mydata[1]
+			email = mydata[2]
+			key = hashlib.sha256((name+"afdaadasdda").encode("utf-8")).hexdigest()
+			currentUser[key]={
+				"id":id,
+				"name":name,
+				"email":email
+			}
+			response.set_cookie(key="key" , value=key)
+			return response
+		else:
+			userStatus["error"] = True
+			userStatus["message"] = "輸入信箱或密碼錯誤"
+			return userStatus
 	else:
-		userStatus["error"] = True
-		userStatus["message"] = "輸入信箱或密碼錯誤"
-		return userStatus
+		result = {}
+		result["error"] = True
+		result["message"] = "未正確輸入資料"
+		return result
 
 @app.route("/api/user/signout/",methods=["DELETE"])
 def signout():
@@ -491,47 +507,60 @@ def bookingSchedule():
 			date = data["date"]
 			time = data["time"]
 			price = data["price"]
-			if date!=None and time!=None:
-				#先檢查使用者是否已預訂過行程，如果有直接更新資料
-				sql = f"select attractionid,date,booktime,price,number from bookingdataunpaid where username = '{username}' limit 1"
-				mycursor.execute(sql)
-				mydata = mycursor.fetchone()
-				if mydata:
-					lastNum = int(mydata[4])
-					x = lastNum// 10**0 % 10
-					y = lastNum// 10**1 % 10
-					last = int(str(x)+str(y))
-					if lastNumList[0] <= last:
-						lastNumList[0] = last
-
-					updatesql = f"update bookingdataunpaid set attractionid = '{attractionId}',date = '{date}', booktime = '{time}', price = '{price}' where username = '{username}'"
-					mycursor.execute(updatesql)
-					mydb.commit()
-					result["status"] = "update booking"
+			if date and time and price:
+				dateInt = date.replace("-","").replace(" ","")
+				if time == "morning":
+					timedata = "140000"
+					dateInt = int(dateInt+timedata)
 				else:
-				#新的訂單	
-					#處理訂單編號
-					if not lastNumList:
-						number = now+1
+					timedata = "210000"
+					dateInt = int(dateInt+timedata)
+				if  dateInt > now:
+					#先檢查使用者是否已預訂過行程，如果有直接更新資料
+					sql = f"select attractionid,date,booktime,price,number from bookingdataunpaid where username = '{username}' limit 1"
+					mycursor.execute(sql)
+					mydata = mycursor.fetchone()
+					if mydata:
+						lastNum = int(mydata[4])
+						x = lastNum// 10**0 % 10
+						y = lastNum// 10**1 % 10
+						last = int(str(x)+str(y))
+						if lastNumList[0] <= last:
+							lastNumList[0] = last
+
+						updatesql = f"update bookingdataunpaid set attractionid = '{attractionId}',date = '{date}', booktime = '{time}', price = '{price}' where username = '{username}'"
+						mycursor.execute(updatesql)
+						mydb.commit()
+						result["status"] = "update booking"
 					else:
-						# n1 = currentNumber[-1]// 10**0 % 10
-						# strn1 = str(n1)
-						# n2 = currentNumber[-1]// 10**1 % 10
-						# strn2 = str(n2)
-						num = lastNumList[0]+1
-						lastNumList[0] = num
-						number = now+num
-						
-					#第一次預定資料，將使用者預定資料(未付款資料)寫入資料庫
-					newsql = """insert into bookingdataunpaid(username,attractionid,date,booktime,price,contactname,contactemail,
-					contactphone,paidstatus,number) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-					newvalues = (username,attractionId,date,time,price," "," "," ","未付款",number) 
-					mycursor.execute(newsql,newvalues)
-					mydb.commit()
-					result["status"] = "first booking"
-				#預定行程建立成功，回傳成功訊息
-				result["ok"] = True
-				return result
+					#新的訂單	
+						#處理訂單編號
+						if not lastNumList:
+							number = now+1
+						else:
+							# n1 = currentNumber[-1]// 10**0 % 10
+							# strn1 = str(n1)
+							# n2 = currentNumber[-1]// 10**1 % 10
+							# strn2 = str(n2)
+							num = lastNumList[0]+1
+							lastNumList[0] = num
+							number = now+num
+							
+						#第一次預定資料，將使用者預定資料(未付款資料)寫入資料庫
+						newsql = """insert into bookingdataunpaid(username,attractionid,date,booktime,price,contactname,contactemail,
+						contactphone,paidstatus,number) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+						newvalues = (username,attractionId,date,time,price," "," "," ","未付款",number) 
+						mycursor.execute(newsql,newvalues)
+						mydb.commit()
+						result["status"] = "first booking"
+					#預定行程建立成功，回傳成功訊息
+					result["ok"] = True
+					return result
+				else:
+					result = {}
+					result["error"] = True
+					result["message"] = "選定時間已過期"
+					return result
 			else:
 				result["error"] = True
 				result["message"] = "未正確輸入預定訊息"
@@ -572,67 +601,79 @@ def orders():
 		key = request.cookies.get("key")
 		if key in currentUser:
 			data = request.get_json()
-			#步驟1:聯絡資料寫入字典
-			postData = {
-				"prime":data["prime"],
-				"partner_key":"partner_OW51M5WdvM0sc2HZeM4IYwYigPTa1A3645TnU95oKbMj0HkX00nT91MD",
-				"merchant_id":"Yanyan_TAISHIN",
-				"details":"Test TapPay",
-				"amount":data["order"]["price"],
-				"cardholder":{
-					"phone_number":data["order"]["contact"]["phone"],
-					"name":data["order"]["contact"]["name"],
-					"email":data["order"]["contact"]["email"]
-				},
-				"remember":True
-			}
-			#步驟2:將資料按照TapPay規定格式用post方發送出，連上TapPay server(結束後TapPay會回傳response)
-			postData = json.dumps(postData)
-			tapPayUrl = "https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime"
-			import requests
-			headers = {
-				"Content-Type":"application/json",
-				"x-api-key":"partner_OW51M5WdvM0sc2HZeM4IYwYigPTa1A3645TnU95oKbMj0HkX00nT91MD"
-			}
-			r = requests.post(tapPayUrl,data=postData,headers=headers)
-			response = r.json()
-			#TapPAy api 回傳狀態等於0為成功
-			username = currentUser[key]["name"]
-			if response["status"] == 0:
-				#先將使用者狀態更新為已付款
-				updatesql = f"""update bookingdataunpaid set contactname = '{data["order"]["contact"]["name"]}'
-				,contactemail = '{data["order"]["contact"]["email"]}',contactphone = '{data["order"]["contact"]["phone"]}',paidstatus = '已付款' 
-				where username = '{username}'""" 
-				mycursor.execute(updatesql)
-				mydb.commit()
-				#再將訂單狀態從資料表取出
-				sql = f"select number from bookingdataunpaid where username = '{username}' limit 1"
-				mycursor.execute(sql)
-				mydata = mycursor.fetchone()
-				if mydata:
-					number = mydata[0]
-				result = {
-					"data":{
-						"number":number,
-						"payment":{
-							"status":0,
-							"message":"付款成功"
+			prime = data["prime"]
+			contactname = data["order"]["contact"]["name"]
+			contactemail = data["order"]["contact"]["email"]
+			contactphone = data["order"]["contact"]["phone"]
+			if prime and contactname and contactemail and contactphone:
+				#步驟1:聯絡資料寫入字典
+				postData = {
+					"prime":prime,
+					"partner_key":"partner_OW51M5WdvM0sc2HZeM4IYwYigPTa1A3645TnU95oKbMj0HkX00nT91MD",
+					"merchant_id":"Yanyan_TAISHIN",
+					"details":"Test TapPay",
+					"amount":data["order"]["price"],
+					"cardholder":{
+						"phone_number":contactname,
+						"name":contactemail,
+						"email":contactphone
+					},
+					"remember":True
+				}
+				#步驟2:將資料按照TapPay規定格式用post方發送出，連上TapPay server(結束後TapPay會回傳response)
+				postData = json.dumps(postData)
+				tapPayUrl = "https://sandbox.tappaysdk.com/tpc/payment/pay-by-prime"
+				import requests
+				headers = {
+					"Content-Type":"application/json",
+					"x-api-key":"partner_OW51M5WdvM0sc2HZeM4IYwYigPTa1A3645TnU95oKbMj0HkX00nT91MD"
+				}
+				r = requests.post(tapPayUrl,data=postData,headers=headers)
+				response = r.json()
+				#TapPAy api 回傳狀態等於0為成功
+				username = currentUser[key]["name"]
+				if response["status"] == 0:
+					#先將使用者狀態更新為已付款
+					updatesql = f"""update bookingdataunpaid set contactname = '{data["order"]["contact"]["name"]}'
+					,contactemail = '{data["order"]["contact"]["email"]}',contactphone = '{data["order"]["contact"]["phone"]}',paidstatus = '已付款' 
+					where username = '{username}'""" 
+					mycursor.execute(updatesql)
+					mydb.commit()
+					#再將訂單狀態從資料表取出
+					sql = f"select number from bookingdataunpaid where username = '{username}' limit 1"
+					mycursor.execute(sql)
+					mydata = mycursor.fetchone()
+					if mydata:
+						number = mydata[0]
+					result = {
+						"data":{
+							"number":number,
+							"payment":{
+								"status":0,
+								"message":"付款成功"
+							}
 						}
 					}
-				}
+				else:
+					errorsql = f"select number from bookingdataunpaid where username = '{username}' limit 1"
+					mycursor.execute(errorsql)
+					mydata = mycursor.fetchone()
+					if mydata:
+						number = mydata[0]
+					result = {
+						"number":number,
+						"error":True,
+						"message":"付款失敗"
+					}
+				returndata = json.dumps(result)
+				return returndata
 			else:
-				errorsql = f"select number from bookingdataunpaid where username = '{username}' limit 1"
-				mycursor.execute(errorsql)
-				mydata = mycursor.fetchone()
-				if mydata:
-					number = mydata[0]
 				result = {
-					"number":number,
 					"error":True,
-					"message":"付款失敗"
+					"message" : "未正確填寫資料"
 				}
-			returndata = json.dumps(result)
-			return returndata
+				result = json.dumps(result)
+				return result
 		else:
 			signYetResult = {}
 			signYetResult["error"] = True
@@ -697,6 +738,6 @@ def orderResult(orderNumber):
 			result["error"] = True
 			result["message"] = "尚未登入會員"
 			return result
-
+	
 if __name__=="__main__":
 	app.run(host="0.0.0.0",port=3000,debug=True)

@@ -34,11 +34,13 @@
                 cursor:pointer;
             }
             nav>.item{
+                cursor:pointer;
                 flex:none;
+                font-size:15px;
                 width:75px;
                 text-align:center;
-                font-size:15px;
-                cursor:pointer;
+                color:rgb(88, 85, 85);
+                font-weight:400;
             }
             .navigation_bar>.hr1{
                 height:1px;
@@ -319,6 +321,7 @@
                 flex:none;
                 width:35px;
                 height:35px;
+                cursor:pointer;
             }
             .hr2{
                 max-width: 1200px;
@@ -538,7 +541,7 @@
                 //(流程1)檢查使用者狀況
                 let signing = document.getElementById("signing");
                 let nav = document.getElementById("nav");
-                let userStatusUrl = "http:///3.131.86.32:3000/api/user/userstatus/";
+                let userStatusUrl = "http:///127.0.0.1:3000/api/user/userstatus/";
                 fetch(userStatusUrl).then((res)=>res.json())
                 .then((jsonData)=>{
                     if(jsonData != null){
@@ -553,7 +556,7 @@
                         getBookingData();
 
                         //(登出)
-                        let signOutUrl = "http:///3.131.86.32:3000/api/user/signout/";
+                        let signOutUrl = "http:///127.0.0.1:3000/api/user/signout/";
                         let signout = document.getElementById("sign_out");
                         signout.addEventListener("click",()=>{
                             fetch(signOutUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
@@ -572,7 +575,7 @@
                     }else{
                         //如果使用者為登出狀態直接導回首頁
                         window.setTimeout(()=>{
-                            location.href="http:///3.131.86.32:3000/";
+                            location.href="http:///127.0.0.1:3000/";
                         },100);
                     }
                 });
@@ -588,7 +591,7 @@
                 //(流程3)使用者完成登入步驟
                 let signinForm = document.getElementById("signin_form");
                 let signinResult = document.getElementById("signin_result");
-                let signinUrl = "http:///3.131.86.32:3000/api/user/signin/";
+                let signinUrl = "http:///127.0.0.1:3000/api/user/signin/";
                 signinForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
                     let email = document.getElementById("signin_email").value;
@@ -623,7 +626,7 @@
                 //(流程5)使用者完成註冊
                 let signupForm = document.getElementById("signup_form");
                 let signupResult = document.getElementById("signup_result");
-                let signupUrl = "http:///3.131.86.32:3000/api/user/signup/";
+                let signupUrl = "http:///127.0.0.1:3000/api/user/signup/";
                 signupForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
                     let name = document.getElementById("signup_name").value;
@@ -662,7 +665,7 @@
             let amountPrice = null; //參數記錄使用者付款價格
             let attractionDict = {} //記錄使用者行程資料供付款時確認資料
             function getBookingData(){
-                let bookDataUrl = "http:///3.131.86.32:3000/api/booking/bookingcart/";
+                let bookDataUrl = "http:///127.0.0.1:3000/api/booking/bookingcart/";
                 fetch(bookDataUrl).then((res)=>res.json()).then((bookData)=>{
                     //使用者已登入會員
                     if(bookData["error"] != true){
@@ -738,14 +741,14 @@
             //刪除已預定的行程
             function deleteCurrentBooking(){
                 let deleteBooking = document.querySelector(".delete_booking");
-                let deleteBookingUrl = "http:///3.131.86.32:3000/api/booking/deleteschedule/";
+                let deleteBookingUrl = "http:///127.0.0.1:3000/api/booking/deleteschedule/";
                 deleteBooking.addEventListener("click",()=>{
                     fetch(deleteBookingUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
                     .then((res)=>res.json()).then((bookStatus)=>{
                         console.log(bookStatus);
                         window.setTimeout(()=>{
                             location.reload();
-                        },200);
+                        },100);
                     });
                 });
             }
@@ -753,7 +756,7 @@
             function returnHome(){
                 let home = document.getElementById("backto_home");
                 home.addEventListener("click",()=>{
-                    location.href = "http:///3.131.86.32:3000/";
+                    location.href = "http:///127.0.0.1:3000/";
                 });
             }
             //TapPay setupSDK
@@ -831,18 +834,21 @@
                             }
                         }
                     }
-                    let ordersUrl = "http://3.131.86.32:3000/api/orders";
+                    let ordersUrl = "http://127.0.0.1:3000/api/orders";
                     fetch(ordersUrl,{method:"POST",headers:{"Content-Type":"application/json"}
                     ,body:JSON.stringify(post_data)})
                     .then((res)=>res.json()).then((jsonData)=>{
                         let error = jsonData["error"];
+                        let message = jsonData["message"];
                         if(error!=true){
                             let number = jsonData["data"]["number"];
                             //將編號傳至api/order/
                             //付款成功後將使用者導至感謝頁面
                             window.setTimeout(()=>{
-                                location.href = "http://3.131.86.32:3000/thankyou?number="+number;
+                                location.href = "http://127.0.0.1:3000/thankyou?number="+number;
                             },100);
+                        }else if(message == "未正確填寫資料"){
+                            alert(message);
                         }
                     });
                 });
