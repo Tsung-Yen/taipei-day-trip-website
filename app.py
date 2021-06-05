@@ -8,15 +8,111 @@ import mysql.connector
 from mysql.connector import errors
 from werkzeug.datastructures import Headers
 
+#test
+import mysql.connector.pooling
+dbconfig = {
+	"host":"localhost",
+	"port":"3306",
+	"user":"root",
+	"password":"root",
+	"database":"tripdata"
+}
+class MySQLPool(object):
+    """
+    create a pool when connect mysql, which will decrease the time spent in 
+    request connection, create connection and close connection.
+    """
+    def __init__(self, host="localhost", port="3306", user="root",
+				password="root", database="tripdata", pool_name="mypool",
+				pool_size=3):
+        res = {}
+        self._host = host
+        self._port = port
+        self._user = user
+        self._password = password
+        self._database = database
 
-mydb = mysql.connector.connect(
-	host="localhost",
-	#此處為連接instance遠端mysql的帳號密碼
-	user="root",
-	password="root",
-	database="tripdata"
-)
-mycursor=mydb.cursor()
+        res["host"] = self._host
+        res["port"] = self._port
+        res["user"] = self._user
+        res["password"] = self._password
+        res["database"] = self._database
+        self.dbconfig = res
+        self.pool = self.create_pool(pool_name=pool_name, pool_size=pool_size)
+
+    def create_pool(self, pool_name="mypool", pool_size=3):
+        """
+        Create a connection pool, after created, the request of connecting 
+        MySQL could get a connection from this pool instead of request to 
+        create a connection.
+        :param pool_name: the name of pool, default is "mypool"
+        :param pool_size: the size of pool, default is 3
+        :return: connection pool
+        """
+        pool = mysql.connector.pooling.MySQLConnectionPool(
+            pool_name=pool_name,
+            pool_size=pool_size,
+            pool_reset_session=True,
+            **self.dbconfig)
+        return pool
+
+    def close(self, conn, cursor):
+        """
+        A method used to close connection of mysql.
+        :param conn: 
+        :param cursor: 
+        :return: 
+        """
+        cursor.close()
+        conn.close()
+
+    def execute(self, sql, args=None, commit=False):
+        """
+        Execute a sql, it could be with args and with out args. The usage is 
+        similar with execute() function in module pymysql.
+        :param sql: sql clause
+        :param args: args need by sql clause
+        :param commit: whether to commit
+        :return: if commit, return None, else, return result
+        """
+        # get connection form connection pool instead of create one.
+        conn = self.pool.get_connection()
+        cursor = conn.cursor()
+        if args:
+            cursor.execute(sql, args)
+        else:
+            cursor.execute(sql)
+        if commit is True:
+            conn.commit()
+            self.close(conn, cursor)
+            return None
+        else:
+            res = cursor.fetchall()
+            self.close(conn, cursor)
+            return res
+
+    def executemany(self, sql, args, commit=False):
+        """
+        Execute with many args. Similar with executemany() function in pymysql.
+        args should be a sequence.
+        :param sql: sql clause
+        :param args: args
+        :param commit: commit or not.
+        :return: if commit, return None, else, return result
+        """
+        # get connection form connection pool instead of create one.
+        conn = self.pool.get_connection()
+        cursor = conn.cursor()
+        cursor.executemany(sql, args)
+        if commit is True:
+            conn.commit()
+            self.close(conn, cursor)
+            return None
+        else:
+            res = cursor.fetchall()
+            self.close(conn, cursor)
+            return res
+
 
 app=Flask(__name__)
 #只要來自此路由底下的request都允許存取
@@ -72,9 +168,9 @@ def attractions():
 			count1 = count+0
 			count2 = count+12
 			#抓取資料庫檔案
+			pool = MySQLPool(**dbconfig)
 			sql = f"select * from spot where id > '{count1}' and id <= '{count2}'"
-			mycursor.execute(sql)
-			mydata = mycursor.fetchall()
+			mydata = pool.execute(sql)
 			if  mydata:
 				#將下一頁資料放入字典nextPage
 				jsonData["nextPage"] = count+1
@@ -100,9 +196,9 @@ def attractions():
 			jsonData["data"].clear()
 			count1 = count*12
 			count2 = count1+12
+			pool = MySQLPool(**dbconfig)
 			sql = f"select * from spot where id > '{count1}' and id <= '{count2}'"
-			mycursor.execute(sql)
-			mydata = mycursor.fetchall()
+			mydata = pool.execute(sql)
 			if count < 26:
 				jsonData["nextPage"] = count+1
 			else:
@@ -131,9 +227,9 @@ def attractions():
 			page = str(page)
 			count = int(page)
 			#將使用者輸入的關鍵字放入資料庫做篩選
+			pool = MySQLPool(**dbconfig)
 			sql = f"select * from spot where name like '%{keyword}%'"
-			mycursor.execute(sql)
-			mydata = mycursor.fetchall()
+			mydata = pool.execute(sql)
 			if mydata:
 			#判斷資料數量來分類頁數
 				#處理小於12筆的資料
@@ -304,23 +400,23 @@ def attractionId(attractionId):
 		jsonData = {}
 		jsonData.clear()
 		#根據資料庫id篩選資料
+		pool = MySQLPool(**dbconfig)
 		sql = f"select * from spot where id = '{attractionId}' limit 1"
-		mycursor.execute(sql)
-		mydata = mycursor.fetchone()
+		mydata = pool.execute(sql)
 		if mydata:
 			#開一個dict字典放入資料庫資料
 			dictData ={}
 			#將資料庫資料使用迴圈一一放入data列表中的變數
-			dictData["id"] = mydata[0]
-			dictData["name"] = mydata[1]
-			dictData["category"] = mydata[2]
-			dictData["description"] = mydata[3]
-			dictData["address"] = mydata[4]
-			dictData["transport"] = mydata[5]
-			dictData["mrt"] = mydata[6]
-			dictData["latitude"] = mydata[7]
-			dictData["longitude"] = mydata[8]
-			dictData["images"] = mydata[9]
+			dictData["id"] = mydata[0][0]
+			dictData["name"] = mydata[0][1]
+			dictData["category"] = mydata[0][2]
+			dictData["description"] = mydata[0][3]
+			dictData["address"] = mydata[0][4]
+			dictData["transport"] = mydata[0][5]
+			dictData["mrt"] = mydata[0][6]
+			dictData["latitude"] = mydata[0][7]
+			dictData["longitude"] = mydata[0][8]
+			dictData["images"] = mydata[0][9]
 			#將dictData dict 放入 jsonData中
 			jsonData.update(dictData)
 			return jsonData
@@ -367,20 +463,20 @@ def signup():
 		userStatus = {}
 		if name and email and password:
 			print(name,email,password)
-			#write user data in mysql
+			#check user data in mysql
+			pool = MySQLPool(**dbconfig)
 			sql = f"select * from user where email = '{email}' limit 1"
-			mycursor.execute(sql)
-			mydata = mycursor.fetchone()
+			mydata = pool.execute(sql)
 
 			if mydata:
 				userStatus["error"] = True
 				userStatus["message"] = "信箱已被註冊，請重新輸入"
 				return userStatus
 			elif not mydata:
+				pool = MySQLPool(**dbconfig)
 				sql = "insert into user(name,email,password) values(%s,%s,%s)"
 				val = (name , email , password)
-				mycursor.execute(sql,val)
-				mydb.commit()
+				mydata = pool.execute(sql,val,commit=True)
 				userStatus["ok"] = True
 				return userStatus
 		else:
@@ -404,16 +500,16 @@ def signin():
 	password = data["password"]
 	if email and password:
 		#使用者輸入資料和db比對
+		pool = MySQLPool(**dbconfig)
 		sql = f"select * from user where email = '{email}' and password = '{password}' limit 1"
-		mycursor.execute(sql)
-		mydata = mycursor.fetchone()
+		mydata = pool.execute(sql)
 		if mydata:
 			#當前api
 			userStatus["ok"] = True
 			response = make_response(userStatus)
-			id = mydata[0]
-			name = mydata[1]
-			email = mydata[2]
+			id = mydata[0][0]
+			name = mydata[0][1]
+			email = mydata[0][2]
 			key = hashlib.sha256((name+"afdaadasdda").encode("utf-8")).hexdigest()
 			currentUser[key]={
 				"id":id,
@@ -449,27 +545,26 @@ def bookingCart():
 		if key in currentUser:
 			#將當前使用者預定資料從資料庫拿出
 			username = currentUser[key]["name"]
+			pool = MySQLPool(**dbconfig)
 			sql = f"select attractionid,date,booktime,price from bookingdataunpaid where username = '{username}' limit 1"
-			mycursor.execute(sql)
-			mydata = mycursor.fetchone() 
+			mydata = pool.execute(sql)
 			if mydata:
-				attractionId = mydata[0]
-				date = mydata[1]
-				time = mydata[2]
-				price = mydata[3]
+				attractionId = mydata[0][0]
+				date = mydata[0][1]
+				time = mydata[0][2]
+				price = mydata[0][3]
 				#透過id將預訂景點資訊從資料庫拿出
 				tripsql = f"select name,address,images from spot where id = '{attractionId}' limit 1"
-				mycursor.execute(tripsql)
-				tripdata = mycursor.fetchone()
+				tripdata = pool.execute(tripsql)
 				if tripdata:
-					image = tripdata[2].split(",")
+					image = tripdata[0][2].split(",")
 					image = image[0]
 					returndata= {
 						"data":{
 							"attraction":{
 								"id":attractionId,
-								"name":tripdata[0],
-								"address":tripdata[1],
+								"name":tripdata[0][0],
+								"address":tripdata[0][1],
 								"image":image
 							},
 							"date":date,
@@ -517,11 +612,11 @@ def bookingSchedule():
 					dateInt = int(dateInt+timedata)
 				if  dateInt > now:
 					#先檢查使用者是否已預訂過行程，如果有直接更新資料
+					pool = MySQLPool(**dbconfig)
 					sql = f"select attractionid,date,booktime,price,number from bookingdataunpaid where username = '{username}' limit 1"
-					mycursor.execute(sql)
-					mydata = mycursor.fetchone()
+					mydata = pool.execute(sql)
 					if mydata:
-						lastNum = int(mydata[4])
+						lastNum = int(mydata[0][4])
 						x = lastNum// 10**0 % 10
 						y = lastNum// 10**1 % 10
 						last = int(str(x)+str(y))
@@ -529,8 +624,7 @@ def bookingSchedule():
 							lastNumList[0] = last
 
 						updatesql = f"update bookingdataunpaid set attractionid = '{attractionId}',date = '{date}', booktime = '{time}', price = '{price}' where username = '{username}'"
-						mycursor.execute(updatesql)
-						mydb.commit()
+						pool.execute(updatesql,commit=True)
 						result["status"] = "update booking"
 					else:
 					#新的訂單	
@@ -547,11 +641,11 @@ def bookingSchedule():
 							number = now+num
 							
 						#第一次預定資料，將使用者預定資料(未付款資料)寫入資料庫
+						pool = MySQLPool(**dbconfig)
 						newsql = """insert into bookingdataunpaid(username,attractionid,date,booktime,price,contactname,contactemail,
 						contactphone,paidstatus,number) values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 						newvalues = (username,attractionId,date,time,price," "," "," ","未付款",number) 
-						mycursor.execute(newsql,newvalues)
-						mydb.commit()
+						pool.execute(newsql,newvalues,commit=True)
 						result["status"] = "first booking"
 					#預定行程建立成功，回傳成功訊息
 					result["ok"] = True
@@ -582,9 +676,9 @@ def deleteSchedule():
 		key = request.cookies.get("key")
 		if key in currentUser:
 			username = currentUser[key]["name"]
+			pool = MySQLPool(**dbconfig)
 			sql = f"delete from bookingdataunpaid where username ='{username}'"
-			mycursor.execute(sql)
-			mydb.commit()
+			pool.execute(sql,commit=True)
 			result["ok"] = True
 		else:
 			result["error"] = True
@@ -634,17 +728,16 @@ def orders():
 				username = currentUser[key]["name"]
 				if response["status"] == 0:
 					#先將使用者狀態更新為已付款
+					pool = MySQLPool(**dbconfig)
 					updatesql = f"""update bookingdataunpaid set contactname = '{data["order"]["contact"]["name"]}'
 					,contactemail = '{data["order"]["contact"]["email"]}',contactphone = '{data["order"]["contact"]["phone"]}',paidstatus = '已付款' 
 					where username = '{username}'""" 
-					mycursor.execute(updatesql)
-					mydb.commit()
+					pool.execute(updatesql,commit=True)
 					#再將訂單狀態從資料表取出
 					sql = f"select number from bookingdataunpaid where username = '{username}' limit 1"
-					mycursor.execute(sql)
-					mydata = mycursor.fetchone()
+					mydata = pool.execute(sql)
 					if mydata:
-						number = mydata[0]
+						number = mydata[0][0]
 					result = {
 						"data":{
 							"number":number,
@@ -655,11 +748,11 @@ def orders():
 						}
 					}
 				else:
+					pool = MySQLPool(**dbconfig)
 					errorsql = f"select number from bookingdataunpaid where username = '{username}' limit 1"
-					mycursor.execute(errorsql)
-					mydata = mycursor.fetchone()
+					mydata = pool.execute(errorsql)
 					if mydata:
-						number = mydata[0]
+						number = mydata[0][0]
 					result = {
 						"number":number,
 						"error":True,
@@ -692,41 +785,40 @@ def orderResult(orderNumber):
 	key = request.cookies.get("key")
 	if orderNumber != None:
 		if key in currentUser:
+			pool = MySQLPool(**dbconfig)
 			sql = f"""select price,attractionid,date,booktime,contactname,contactemail,
 			contactphone,paidstatus from bookingdataunpaid where number = 
 			'{orderNumber}' limit 1"""
-			mycursor.execute(sql)
-			paidstatus = mycursor.fetchone()
+			paidstatus = pool.execute(sql)
 			if paidstatus:
-				attractionId = paidstatus[1]
+				attractionId = paidstatus[0][1]
 				tripsql = f"select name,address,images from spot where id = '{attractionId}' limit 1"
-				mycursor.execute(tripsql)
-				mydata = mycursor.fetchone()
+				mydata = pool.execute(tripsql)
 				if mydata:
-					images = mydata[2].split(",")
+					images = mydata[0][2].split(",")
 					image = images[0]
-					if paidstatus[7] == "已付款":
+					if paidstatus[0][7] == "已付款":
 						status = 1
 					else:
 						status = 0
 					result = {
 						"data":{
 							"number":orderNumber,
-							"price":paidstatus[0],
+							"price":paidstatus[0][0],
 							"trip":{
 								"attraction":{
 									"id":attractionId,
-									"name":mydata[0],
-									"address":mydata[1],
+									"name":mydata[0][0],
+									"address":mydata[0][1],
 									"image":image
 								},
-								"date":paidstatus[2],
-								"time":paidstatus[3]
+								"date":paidstatus[0][2],
+								"time":paidstatus[0][3]
 							},
 							"contact":{
-								"name":paidstatus[4],
-								"email":paidstatus[5],
-								"phone":paidstatus[6]
+								"name":paidstatus[0][4],
+								"email":paidstatus[0][5],
+								"phone":paidstatus[0][6]
 							},
 							"status":status
 						}
