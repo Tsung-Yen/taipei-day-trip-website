@@ -342,10 +342,12 @@
                 color:rgb(156, 150, 150);
                 font-weight:400;
             }
+
             .load_container{
                 position: relative;
-                width:800px;
-                height:700px;
+                margin: 0 auto;
+                width:1200px;
+                height:200px;
                 display: flex;
                 justify-content: center;
             }
@@ -456,9 +458,11 @@
                 fetch(openUrl).then(res=>res.json())
                 .then((jsonData)=>{
                     if(jsonData!=null){
-                        //連線完成後先將GIF移除
-                        let load = document.querySelector(".load_container");
-                        load.remove();
+                        window.setTimeout(()=>{
+                            //連線完成後先將GIF移除
+                            let load = document.querySelector(".load_container");
+                            load.remove();
+                        },600);
                     }
                     nextPage = jsonData["nextPage"];
                     let pageDataLen = jsonData["data"].length
@@ -523,13 +527,15 @@
                     }
                 });
                 //載入頁面GIF
-                let cont = document.querySelector(".container");
-                let loadImg = document.createElement("img");
-                let loadDiv = document.createElement("div");
-                loadDiv.className = "load_container";
-                loadImg.src = "https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif";
-                loadDiv.append(loadImg);
-                cont.append(loadDiv);
+                if(pagenum>0){
+                    let partDiv = document.querySelector(".part");
+                    let loadImg = document.createElement("img");
+                    let loadDiv = document.createElement("div");
+                    loadDiv.className = "load_container";
+                    loadImg.src = "https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif";
+                    loadDiv.append(loadImg);
+                    partDiv.append(loadDiv);
+                }
             }
             function clearDiv(){
                 //將預先秀出的資料移除(移出div並在將原本的容器div命名玩className放回去)
