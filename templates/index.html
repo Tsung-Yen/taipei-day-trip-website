@@ -455,7 +455,7 @@
                 let openUrl = "http://3.131.86.32:3000/api/attractions?page="+pagenum;
                 fetch(openUrl).then(res=>res.json())
                 .then((jsonData)=>{
-                    if(pagenum>0 || jsonData!=null){
+                    if(pagenum>0 && jsonData!=null){
                         //連線完成後先將GIF移除
                         let load = document.querySelector(".load_container");
                         load.remove();
@@ -657,7 +657,7 @@
                 checkUser();
                 let sign = document.getElementById("sign");
                 function checkUser(){
-                    let userstatusUrl = "http://127.0.0.1:3000/api/user/userstatus/"
+                    let userstatusUrl = "http://3.131.86.32:3000/api/user/userstatus/"
                     fetch(userstatusUrl).then((res)=>res.json())
                     .then((jsonData)=>{
                         if(jsonData != null){
@@ -674,7 +674,7 @@
                             //使用者點擊登出系統
                             let signOut = document.getElementById("newsign");
                             signOut.addEventListener("click" ,()=>{
-                                let signoutUrl = "http://127.0.0.1:3000/api/user/signout/";
+                                let signoutUrl = "http://3.131.86.32:3000/api/user/signout/";
                                 fetch(signoutUrl,{method:"DELETE", "Content-Type":"application/json"})
                                 signOut.remove();
                                 sign = document.createElement("p");
@@ -717,7 +717,7 @@
                 let signinResult = document.getElementById("signin_result");
                 signinForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
-                    let signinUrl = "http://127.0.0.1:3000/api/user/signin/";
+                    let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
                     let email = document.getElementById("signin_email").value;
                     let password = document.getElementById("signin_password").value;
                     let data = {
@@ -749,7 +749,7 @@
                 });
                 //(操作4:使用者註冊完畢送出)
                 let signupForm = document.getElementById("signup_form");
-                let signupUrl = "http://127.0.0.1:3000/api/user/signup/";
+                let signupUrl = "http://3.131.86.32:3000/api/user/signup/";
                 let signupResult = document.getElementById("signup_result");
                 signupForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
@@ -790,7 +790,7 @@
             function bookingschedule(){
                 let booking = document.getElementById("booking");
                 booking.addEventListener("click",()=>{
-                    location.href="http://127.0.0.1:3000/booking";
+                    location.href="http://3.131.86.32:3000/booking";
                 });
             }
             //Debounce function(用於限制連續呼叫API)
