@@ -452,23 +452,24 @@
             var nexPage = null;
             //完成連線
             function getPageData(pagenum){
+                if(pagenum>0){
+                    //載入頁面GIF
+                    let partcont = document.querySelector(".part");
+                    let loadImg = document.createElement("img");
+                    let loadDiv = document.createElement("div");
+                    loadImg.src = "https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif";
+                    loadDiv.className = "load_container";
+                    loadDiv.append(loadImg);
+                    partcont.append(loadDiv);
+                    break;
+                }
                 let openUrl = "http://3.131.86.32:3000/api/attractions?page="+pagenum;
                 fetch(openUrl).then(res=>res.json())
                 .then((jsonData)=>{
-                    if(jsonData==null && pagenum>0){
-                        //載入頁面GIF
-                        let partcont = document.querySelector(".part");
-                        let loadImg = document.createElement("img");
-                        let loadDiv = document.createElement("div");
-                        loadImg.src = "https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif";
-                        loadDiv.className = "load_container";
-                        loadDiv.append(loadImg);
-                        partcont.append(loadDiv);
-                        if(jsonData!=null){
-                            //連線完成後先將GIF移除
-                            let load = document.querySelector(".load_container");
-                            load.remove();
-                        }
+                    if(jsonData!=null && pagenum>0){
+                        //連線完成後先將GIF移除
+                        let load = document.querySelector(".load_container");
+                        load.remove();
                     }
                     nextPage = jsonData["nextPage"];
                     let pageDataLen = jsonData["data"].length
