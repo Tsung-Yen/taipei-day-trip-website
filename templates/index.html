@@ -276,6 +276,19 @@
                 border-top-right-radius:0.5em;
                 border-bottom-right-radius: 0.5em;
             }
+            /*GIF*/
+            .load_spot{
+                width:auto;
+                height:900px;
+                background:linear-gradient(rgb(255, 255, 255), rgb(139, 139, 137));
+                display: flex;
+                justify-content: center;align-items: center;
+            }
+            .load_gif{
+                flex: none;
+                width:50px;
+                height:50px;
+            }
 
             /* 圖片方格(圖片加上文字資訊外框) */
             .container{
@@ -457,12 +470,10 @@
                 let openUrl = "http://3.131.86.32:3000/api/attractions?page="+pagenum;
                 fetch(openUrl).then(res=>res.json())
                 .then((jsonData)=>{
+                    //當資料載入成功後將GIF移除
                     if(jsonData!=null){
-                        window.setTimeout(()=>{
-                            //連線完成後先將GIF移除
-                            let load = document.querySelector(".load_container");
-                            load.remove();
-                        },600);
+                        let loadImg = document.querySelector(".load_spot");
+                        loadImg.style.display = "none";
                     }
                     nextPage = jsonData["nextPage"];
                     let pageDataLen = jsonData["data"].length
@@ -526,16 +537,6 @@
                         catP.append(catText);
                     }
                 });
-                //載入頁面GIF
-                if(pagenum>0){
-                    let partDiv = document.querySelector(".part");
-                    let loadImg = document.createElement("img");
-                    let loadDiv = document.createElement("div");
-                    loadDiv.className = "load_container";
-                    loadImg.src = "https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif";
-                    loadDiv.append(loadImg);
-                    partDiv.append(loadDiv);
-                }
             }
             function clearDiv(){
                 //將預先秀出的資料移除(移出div並在將原本的容器div命名玩className放回去)
@@ -892,6 +893,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="load_spot">
+            <img class="load_gif" src="https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif">
         </div>
         <div class="container">
             <div class="part"></div>

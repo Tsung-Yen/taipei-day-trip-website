@@ -7,15 +7,23 @@ import hashlib
 import mysql.connector
 from mysql.connector import errors
 from werkzeug.datastructures import Headers
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 #test
+dbhost = os.getenv("DBHOST")
+dbport = os.getenv("DBPORT")
+dbuser = os.getenv("DBUSER")
+dbpw = os.getenv("DBPASSWORD")
+dbname = os.getenv("DBNAME")
 import mysql.connector.pooling
 dbconfig = {
-	"host":"localhost",
-	"port":"3306",
-	"user":"root",
-	"password":"Gtio556$",
-	"database":"tripdata"
+	"host":dbhost,
+	"port":dbport,
+	"user":dbuser,
+	"password":dbpw,
+	"database":dbname
 }
 class MySQLPool(object):
     """
@@ -703,7 +711,7 @@ def orders():
 				#步驟1:聯絡資料寫入字典
 				postData = {
 					"prime":prime,
-					"partner_key":"partner_OW51M5WdvM0sc2HZeM4IYwYigPTa1A3645TnU95oKbMj0HkX00nT91MD",
+					"partner_key":os.getenv("PartnerKey"),
 					"merchant_id":"Yanyan_TAISHIN",
 					"details":"Test TapPay",
 					"amount":data["order"]["price"],
@@ -720,7 +728,7 @@ def orders():
 				import requests
 				headers = {
 					"Content-Type":"application/json",
-					"x-api-key":"partner_OW51M5WdvM0sc2HZeM4IYwYigPTa1A3645TnU95oKbMj0HkX00nT91MD"
+					"x-api-key":os.getenv("PartnerKey")
 				}
 				r = requests.post(tapPayUrl,data=postData,headers=headers)
 				response = r.json()
