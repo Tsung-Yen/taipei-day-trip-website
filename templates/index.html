@@ -345,7 +345,7 @@
             .load_container{
                 position: relative;
                 width:800px;
-                height:300px;
+                height:700px;
                 display: flex;
                 justify-content: center;
             }
@@ -452,20 +452,10 @@
             var nexPage = null;
             //完成連線
             function getPageData(pagenum){
-                if(pagenum>0){
-                    //載入頁面GIF
-                    let partcont = document.querySelector(".part");
-                    let loadImg = document.createElement("img");
-                    let loadDiv = document.createElement("div");
-                    loadImg.src = "https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif";
-                    loadDiv.className = "load_container";
-                    loadDiv.append(loadImg);
-                    partcont.append(loadDiv);
-                }
                 let openUrl = "http://3.131.86.32:3000/api/attractions?page="+pagenum;
                 fetch(openUrl).then(res=>res.json())
                 .then((jsonData)=>{
-                    //連線結束後先將GIF移除
+                    //連線完成後先將GIF移除
                     if(pagenum > 0){
                         let loadDiv = document.querySelector(".load_container");
                         loadDiv.remove();
@@ -667,7 +657,7 @@
                 checkUser();
                 let sign = document.getElementById("sign");
                 function checkUser(){
-                    let userstatusUrl = "http://3.131.86.32:3000/api/user/userstatus/"
+                    let userstatusUrl = "http://127.0.0.1:3000/api/user/userstatus/"
                     fetch(userstatusUrl).then((res)=>res.json())
                     .then((jsonData)=>{
                         if(jsonData != null){
@@ -684,7 +674,7 @@
                             //使用者點擊登出系統
                             let signOut = document.getElementById("newsign");
                             signOut.addEventListener("click" ,()=>{
-                                let signoutUrl = "http://3.131.86.32:3000/api/user/signout/";
+                                let signoutUrl = "http://127.0.0.1:3000/api/user/signout/";
                                 fetch(signoutUrl,{method:"DELETE", "Content-Type":"application/json"})
                                 signOut.remove();
                                 sign = document.createElement("p");
@@ -727,7 +717,7 @@
                 let signinResult = document.getElementById("signin_result");
                 signinForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
-                    let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
+                    let signinUrl = "http://127.0.0.1:3000/api/user/signin/";
                     let email = document.getElementById("signin_email").value;
                     let password = document.getElementById("signin_password").value;
                     let data = {
@@ -759,7 +749,7 @@
                 });
                 //(操作4:使用者註冊完畢送出)
                 let signupForm = document.getElementById("signup_form");
-                let signupUrl = "http://3.131.86.32:3000/api/user/signup/";
+                let signupUrl = "http://127.0.0.1:3000/api/user/signup/";
                 let signupResult = document.getElementById("signup_result");
                 signupForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
@@ -800,7 +790,7 @@
             function bookingschedule(){
                 let booking = document.getElementById("booking");
                 booking.addEventListener("click",()=>{
-                    location.href="http://3.131.86.32:3000/booking";
+                    location.href="http://127.0.0.1:3000/booking";
                 });
             }
             //Debounce function(用於限制連續呼叫API)
@@ -818,9 +808,21 @@
                 if(window.scrollY+window.innerHeight+30 >= document.documentElement.scrollHeight){
                 //如果keyword有被搜尋則不繼續對page提出發送
                     if(keyword == null){
-                        
                         if (nextPage<=26){
-                            getPageData(nextPage);
+                            if(nextPage>=1){
+                                //載入頁面GIF
+                                let partcont = document.querySelector(".part");
+                                let loadImg = document.createElement("img");
+                                let loadDiv = document.createElement("div");
+                                loadImg.src = "https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif";
+                                loadDiv.className = "load_container";
+                                loadDiv.append(loadImg);
+                                partcont.append(loadDiv);
+
+                                getPageData(nextPage);
+                            }else{
+                                getPageData(nextPage);
+                            }
                         }
                     }else{
                         //當使用者關鍵字搜尋滑到底，停止載入
