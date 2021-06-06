@@ -342,6 +342,19 @@
                 color:rgb(156, 150, 150);
                 font-weight:400;
             }
+            .load_container{
+                position: relative;
+                width:800px;
+                height:300px;
+                display: flex;
+                justify-content: center;
+            }
+            .load_container>img{
+                flex:none;
+                margin-top: 15px;
+                width:50px;;
+                height:50px;
+            }
             /*copyright最下半部*/
             footer{
                 margin-top:60px;
@@ -439,9 +452,24 @@
             var nexPage = null;
             //完成連線
             function getPageData(pagenum){
+                if(pagenum>0){
+                    //載入頁面GIF
+                    let partcont = document.querySelector(".part");
+                    let loadImg = document.createElement("img");
+                    let loadDiv = document.createElement("div");
+                    loadImg.src = "https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif";
+                    loadDiv.className = "load_container";
+                    loadDiv.append(loadImg);
+                    partcont.append(loadDiv);
+                }
                 let openUrl = "http://3.131.86.32:3000/api/attractions?page="+pagenum;
                 fetch(openUrl).then(res=>res.json())
                 .then((jsonData)=>{
+                    //連線結束後先將GIF移除
+                    if(pagenum > 0){
+                        let loadDiv = document.querySelector(".load_container");
+                        loadDiv.remove();
+                    }
                     nextPage = jsonData["nextPage"];
                     let pageDataLen = jsonData["data"].length
                     for(let i=0;i<pageDataLen;i++){
@@ -463,7 +491,7 @@
 
                         //add url to spot(1.the first data in spot)
                         let clicklink = document.createElement("a")
-                        clicklink.href = "http:///3.131.86.32:3000/attraction/"+linknum;
+                        clicklink.href = "http://3.131.86.32:3000/attraction/"+linknum;
                         clicklink.className = "link";
                         //add img(put it into <a> will let user can click the bounds inside the img size)
                         let imgImg = document.createElement("img");
@@ -529,7 +557,7 @@
                 }
                 //取得連線
                 keywordhistory = keyword;
-                let url = "http:///3.131.86.32:3000/api/attractions?page="+kypage+"&keyword="+keyword;
+                let url = "http://3.131.86.32:3000/api/attractions?page="+kypage+"&keyword="+keyword;
                 fetch(url).then((res)=>{
                     return res.json()})
                 .then((jsonData)=>{
@@ -639,7 +667,7 @@
                 checkUser();
                 let sign = document.getElementById("sign");
                 function checkUser(){
-                    let userstatusUrl = "http:///3.131.86.32:3000/api/user/userstatus/"
+                    let userstatusUrl = "http://3.131.86.32:3000/api/user/userstatus/"
                     fetch(userstatusUrl).then((res)=>res.json())
                     .then((jsonData)=>{
                         if(jsonData != null){
@@ -656,7 +684,7 @@
                             //使用者點擊登出系統
                             let signOut = document.getElementById("newsign");
                             signOut.addEventListener("click" ,()=>{
-                                let signoutUrl = "http:///3.131.86.32:3000/api/user/signout/";
+                                let signoutUrl = "http://3.131.86.32:3000/api/user/signout/";
                                 fetch(signoutUrl,{method:"DELETE", "Content-Type":"application/json"})
                                 signOut.remove();
                                 sign = document.createElement("p");
@@ -699,7 +727,7 @@
                 let signinResult = document.getElementById("signin_result");
                 signinForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
-                    let signinUrl = "http:///3.131.86.32:3000/api/user/signin/";
+                    let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
                     let email = document.getElementById("signin_email").value;
                     let password = document.getElementById("signin_password").value;
                     let data = {
@@ -731,7 +759,7 @@
                 });
                 //(操作4:使用者註冊完畢送出)
                 let signupForm = document.getElementById("signup_form");
-                let signupUrl = "http:///3.131.86.32:3000/api/user/signup/";
+                let signupUrl = "http://3.131.86.32:3000/api/user/signup/";
                 let signupResult = document.getElementById("signup_result");
                 signupForm.addEventListener("submit",(e)=>{
                     e.preventDefault();
@@ -772,7 +800,7 @@
             function bookingschedule(){
                 let booking = document.getElementById("booking");
                 booking.addEventListener("click",()=>{
-                    location.href="http:///3.131.86.32:3000/booking";
+                    location.href="http://3.131.86.32:3000/booking";
                 });
             }
             //Debounce function(用於限制連續呼叫API)
@@ -809,11 +837,6 @@
             incrementCount = debounce(incrementCount,200);
             window.addEventListener("scroll",incrementCount);
             
-            
-            //實現傳送資料不跳轉
-            function withoutRedirection(){
-                return false;
-            }
         </script>
     </head>
     <body onload="init();" id="body">
