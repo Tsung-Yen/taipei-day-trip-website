@@ -455,6 +455,11 @@
                 let openUrl = "http://3.131.86.32:3000/api/attractions?page="+pagenum;
                 fetch(openUrl).then(res=>res.json())
                 .then((jsonData)=>{
+                    if(pagenum>0 || jsonData!=null){
+                        //連線完成後先將GIF移除
+                        let load = document.querySelector(".load_container");
+                        load.remove();
+                    }
                     nextPage = jsonData["nextPage"];
                     let pageDataLen = jsonData["data"].length
                     for(let i=0;i<pageDataLen;i++){
@@ -815,9 +820,6 @@
                                 partcont.append(loadDiv);
 
                                 getPageData(nextPage);
-                                //連線完成後先將GIF移除
-                                let load = document.querySelector(".load_container");
-                                load.remove();
                             }else{
                                 getPageData(nextPage);
                             }
