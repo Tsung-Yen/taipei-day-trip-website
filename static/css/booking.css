@@ -1,0 +1,534 @@
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans+TC');
+body{
+margin:0px;
+font-family:Noto Sans TC;
+}
+.navigation_bar{
+width:auto;
+position: sticky ;
+top:0;
+z-index:997;
+background: white;
+}
+.navigation_bar>nav{
+margin:0 auto;
+width:1200px;
+padding:8px;
+display:flex;
+justify-content: center;
+align-items: center;
+background:rgb(255, 255, 255);
+}
+nav>.title{
+flex:auto;
+font-size:30px;
+font-weight:bold;
+color: rgba(68, 136, 153, 1);
+cursor:pointer;
+}
+nav>.item{
+cursor:pointer;
+flex:none;
+font-size:15px;
+width:75px;
+text-align:center;
+color:rgb(88, 85, 85);
+font-weight:400;
+}
+.navigation_bar>.hr1{
+height:1px;
+top:56px;
+position:sticky;
+background: rgb(226, 217, 217);
+}
+
+/*彈出視窗*/
+.popup_form{
+z-index: 999;
+display:none;
+margin:23px 40%;
+position:absolute;
+width:340px;
+height:275px;
+text-align: center;
+border-radius: 0.5em;
+border:solid;
+border-width:1.5px;
+border-color: rgb(196, 189, 189);
+background: rgb(255, 255, 255);
+}
+.popup_form>.title{
+display:flex;
+margin-bottom: -10px;
+}
+.title>.sign_title{
+flex:auto;
+color:rgb(77, 70, 70);
+font-size: 25px;
+font-weight: 400;
+}
+.title>.cancle:after{
+position:absolute;
+content:"\d7";
+font-size:26px;
+font-weight:bold;
+top:18px;
+left:88%;
+cursor:pointer;
+border-radius: 0.5em;
+color:rgb(150, 138, 138);
+}
+form>.account{
+width:90%;
+height:38px;
+font-size: 16px;
+margin-bottom: 10px;
+border-radius: 0.3em;
+border-color: rgb(150, 142, 142);
+border-style: solid;
+border-width: 1.5px;
+}
+form>.pw{
+width:90%;
+height:38px;
+font-size: 16px;
+margin-bottom: 10px;
+border-radius: 0.3em;
+border-color: rgb(150, 142, 142);
+border-style: solid;
+border-width: 1.5px;
+}
+form>.btn{
+cursor:pointer;
+width:92%;
+height:42px;
+font-size: 19px;
+color:white;
+border-style: none;
+border-radius: 0.3em;
+background: rgba(68, 136, 153, 1);
+}
+.popup_form>.sign_in{
+width:90%;
+height:38px;
+color:rgb(128, 118, 118);
+font-size: 17px;
+margin-left:22px;
+line-height: 8px;
+cursor:pointer;
+}
+/*彈出視窗註冊視窗*/
+.popup_signup_form{
+z-index: 999;
+display:none;
+margin:23px 40%;
+position:absolute;
+width:340px;
+height:320px;
+text-align: center;
+border-radius: 0.5em;
+border:solid;
+border-width:1.5px;
+border-color: rgb(196, 189, 189);
+background: rgb(255, 255, 255);
+}
+.popup_signup_form>.title{
+display:flex;
+margin-bottom: -10px;
+}
+.title>.sign_title{
+flex:auto;
+color:rgb(77, 70, 70);
+font-size: 25px;
+font-weight: 400;
+}
+.title>.cancle:after{
+position:absolute;
+content:"\d7";
+font-size:26px;
+font-weight:bold;
+top:18px;
+left:88%;
+cursor:pointer;
+border-radius: 0.5em;
+color:rgb(150, 138, 138);
+}
+form>.name{
+width:90%;
+height:38px;
+font-size: 16px;
+margin-bottom: 10px;
+border-radius: 0.3em;
+border-color: rgb(150, 142, 142);
+border-style: solid;
+border-width: 1.5px;
+}
+form>.account{
+width:90%;
+height:38px;
+font-size: 16px;
+margin-bottom: 10px;
+border-radius: 0.3em;
+border-color: rgb(150, 142, 142);
+border-style: solid;
+border-width: 1.5px;
+}
+form>.pw{
+width:90%;
+height:38px;
+font-size: 16px;
+margin-bottom: 10px;
+border-radius: 0.3em;
+border-color: rgb(150, 142, 142);
+border-style: solid;
+border-width: 1.5px;
+}
+form>.signup_btn{
+cursor:pointer;
+width:92%;
+height:42px;
+font-size: 19px;
+color:white;
+border-style: none;
+border-radius: 0.3em;
+background: rgba(68, 136, 153, 1);
+}
+.popup_signup_form>.sign_up{
+width:90%;
+height:38px;
+color:rgb(128, 118, 118);
+font-size: 17px;
+margin-left:22px;
+line-height: 8px;
+cursor:pointer;
+}
+
+/*預定地點*/
+.username_title{
+margin: 0px auto;
+margin-top:30px;
+width:980px;
+font-size:20px;
+font-weight:bold;
+color:rgb(95, 91, 91);
+}
+.nodata_message{
+display:none;
+margin: 0 auto;
+width:980px;
+margin-top: 20px;
+font-size:16px;
+color:rgb(95, 91, 91);
+}
+
+/*GIF*/
+.load_spot{
+width:auto;
+height:900px;
+background:linear-gradient(rgb(255, 255, 255), rgb(139, 139, 137));
+display: flex;
+justify-content: center;align-items: center;
+}
+.load_gif{
+flex: none;
+width:50px;
+height:50px;
+}
+
+.container{
+display:flex;
+flex-wrap:wrap;
+width:980px;
+margin: 0 auto;
+margin-top:20px;
+font-size:16px;
+margin-bottom: 35px;
+position:relative;
+}
+.container>#slide_img{
+flex:none;
+width: 266px;
+height:220px;
+margin-top:15px;
+margin-right: 30px;
+border-radius: 0.5em;
+}
+/*景點資訊*/
+.container>.spot{
+flex:auto;
+width:60%;
+height:auto;
+width:auto;
+height:250px;
+align-items: center;
+font-size:16px;
+}
+.spot>.spot_title{
+display:flex;
+font-weight:bold;
+color:rgba(68, 136, 153, 1);
+}
+.spot>.spot_date{
+display:flex;
+margin-top:-10px;
+}
+.spot_date>.date{
+flex:none;
+font-weight: bold;
+color:rgb(95, 91, 91);
+}
+.spot_date>.content{
+flex:none;
+color:gray;
+margin-left:5px;
+}
+.spot>.spot_time{
+display:flex;
+margin-top:-20px;
+}
+.spot_time>.time{
+flex:none;
+font-weight: bold;
+color:rgb(95, 91, 91);
+}
+.spot_time>.content{
+flex:none;
+color:gray;
+margin-left:5px;
+}
+.spot>.spot_fee{
+display:flex;
+margin-top:-20px;
+}
+.spot_fee>.fee{
+flex:none;
+font-weight: bold;
+color:rgb(95, 91, 91);
+}
+.spot_fee>.content{
+flex:none;
+color:gray;
+margin-left:5px;
+}
+.spot>.spot_place{
+display:flex;
+margin-top:-20px;
+}
+.spot_place>.place{
+flex:none;
+font-weight: bold;
+color:rgb(95, 91, 91);
+}
+.spot_place>.content{
+flex:none;
+color:gray;
+margin-left:5px;
+}
+/*移出當前預定小圖*/
+.container>.delete_booking{
+flex:none;
+width:35px;
+height:35px;
+cursor:pointer;
+}
+.hr2{
+max-width: 1200px;
+height:1px;
+background: rgb(223, 213, 213);
+margin:0 auto;
+}
+/*你的連絡資訊*/
+.contact_message{
+height:auto;
+width:980px;
+margin: 0 auto;
+color:rgb(95, 91, 91);
+}
+.contact_message>.title{
+margin-top: 35px;
+font-size:20px;
+font-weight:bold;
+color:rgb(95, 91, 91);
+}
+.message[type="text"]{
+width:200px;
+height:28px;
+margin-bottom: 12px;
+border-radius: 0.3em;
+border-color: rgb(230, 221, 221);
+border-style: solid;
+border-width: 1px;
+}
+.contact_message>.remind{
+margin-top:0;
+font-weight:bold;
+}
+.hr3{
+max-width: 1200px;
+height:1px;
+background: rgb(223, 213, 213);
+margin:0 auto;
+margin-top:40px;
+}
+/*paid message*/
+.paid_message{
+height:auto;
+width:980px;
+margin: 0 auto;
+color:rgb(95, 91, 91);
+}
+.paid_message>.title{
+margin-top: 35px;
+font-size:20px;
+font-weight:bold;
+color:rgb(95, 91, 91);
+}
+/*Tappay Field*/
+.paid_message>.card_num{
+display: flex;
+}
+.paid_message>.card_exp_date{
+display: flex;
+}
+.paid_message>.card_ccv{
+display: flex;
+}
+.card_num>.tpfield{
+flex:none;
+width:200px;
+height:28px;
+margin-bottom: 12px;
+border-radius: 0.3em;
+border-color: rgb(230, 221, 221);
+border-style: solid;
+border-width: 1px;
+}
+.card_exp_date>.tpfield{
+width:200px;
+height:28px;
+margin-bottom: 12px;
+border-radius: 0.3em;
+border-color: rgb(230, 221, 221);
+border-style: solid;
+border-width: 1px;
+}
+.card_ccv>.tpfield{
+width:200px;
+height:28px;
+margin-bottom: 12px;
+border-radius: 0.3em;
+border-color: rgb(230, 221, 221);
+border-style: solid;
+border-width: 1px;
+}
+.hr4{
+max-width: 1200px;
+height:1px;
+background: rgb(223, 213, 213);
+margin:0 auto;
+margin-top:20px;
+}
+/*comfirm*/
+.confirm{
+height:auto;
+width:980px;
+margin: 0 auto;
+position: relative;
+color:rgb(95, 91, 91);
+}
+.confirm>.total_fee{
+margin-top:40px;
+font-size: 16px;
+font-weight: bold;
+position: absolute;
+right:0px;
+}
+.butt[type="submit"]{
+position: absolute;
+right:0px;
+top:80px;
+width:150px;
+height:33px;
+font-size: 16px;
+color:white;
+cursor: pointer;
+border-radius: 0.5em;
+border-style:none;
+background: rgba(68, 136, 153, 1);
+}
+/*footer*/
+footer{
+margin-top:160px;
+width:auto;
+text-align:center;
+padding:15px;
+font-size:16px;
+color:white;
+background-color: #757575;
+position:sticky;
+bottom:0;
+}
+.mask{
+display:none;
+height:1046px;
+width:100%;
+position:absolute;
+top:0;
+background: black;
+opacity:0.3;
+z-index:998;
+}
+/*RWD*/
+@media(max-width:1200px){
+.navigation_bar>nav{
+    width:92%;
+}
+.popup_form{
+    margin: 23px 35%;
+}
+.popup_signup_form{
+    margin: 23px 35%;
+}
+.username_title{
+    width:295px;
+    margin-left: 4%;
+}
+.nodata_message{
+    width:260px;
+    margin-left: 4%;
+}
+.container{
+    width:92%;
+    height:auto;
+}
+.container>.slide_img{
+    height:auto;
+}
+.contact_message{
+    width:90%;
+}
+.paid_message{
+    width:90%;
+}
+.confirm{
+    width:80%;
+}
+}
+@media(max-width:650px){
+.container>#slide_img{
+    width:105%;
+    margin-left: -3%;
+    height:20%;
+}
+.container>.spot{
+    width:110%;
+}
+.container>.delete_booking{
+    position: absolute;
+    top:95%;
+    right:10px;
+}
+.footer{
+    height:200px;
+}
+}
