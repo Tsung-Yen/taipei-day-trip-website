@@ -13,14 +13,12 @@ load_dotenv()
 
 #test
 dbhost = os.getenv("DBHOST")
-dbport = os.getenv("DBPORT")
 dbuser = os.getenv("DBUSER")
 dbpw = os.getenv("DBPASSWORD")
 dbname = os.getenv("DBNAME")
 import mysql.connector.pooling
 dbconfig = {
 	"host":dbhost,
-	"port":dbport,
 	"user":dbuser,
 	"password":dbpw,
 	"database":dbname
