@@ -414,6 +414,7 @@
                 img{
                     height: 68%;
                     max-height: 370px;
+                    min-height: 230px;
                 }
             }
             @media(max-width:1000px){
@@ -473,9 +474,9 @@
                 .then((jsonData)=>{
                     //當資料載入成功後將GIF移除
                     if(jsonData!=null){
-                        let loadImg = document.querySelector(".load_spot");
+                        let loadImg = document.getElementById("load1");
                         loadImg.style.display = "none";
-                    }
+                    };
                     nextPage = jsonData["nextPage"];
                     let pageDataLen = jsonData["data"].length
                     for(let i=0;i<pageDataLen;i++){
@@ -553,7 +554,7 @@
             let keywordhistory = null;      //如果使用者未滑玩所有頁面再次搜尋，比對上次關鍵字結果不同。將div移除
             let kynextPage = null;
             let kypage = 0;
-            function keywordSearch(){ 
+            function keywordSearch(){
                 keyword = document.querySelector(".insert").value;
                 if(keyword != keywordhistory ){
                     clearDiv();
@@ -895,7 +896,7 @@
                 </div>
             </div>
         </div>
-        <div class="load_spot">
+        <div class="load_spot" id="load1">
             <img class="load_gif" src="https://c.tenor.com/I6kN-6X7nhAAAAAj/loading-buffering.gif">
         </div>
         <div class="container">
