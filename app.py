@@ -714,9 +714,9 @@ def orders():
 					"details":"Test TapPay",
 					"amount":data["order"]["price"],
 					"cardholder":{
-						"phone_number":contactname,
-						"name":contactemail,
-						"email":contactphone
+						"phone_number":contactphone,
+						"name":contactname,
+						"email":contactemail
 					},
 					"remember":True
 				}
