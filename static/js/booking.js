@@ -12,7 +12,7 @@ function menberSys(){
     //(流程1)檢查使用者狀況
     let signing = document.getElementById("signing");
     let nav = document.getElementById("nav");
-    let userStatusUrl = "http://3.131.86.32:3000/api/user/userstatus/";
+    let userStatusUrl = "/api/user/userstatus/";
     fetch(userStatusUrl).then((res)=>res.json())
     .then((jsonData)=>{
         if(jsonData != null){
@@ -27,7 +27,7 @@ function menberSys(){
             getBookingData();
 
             //(登出)
-            let signOutUrl = "http://3.131.86.32:3000/api/user/signout/";
+            let signOutUrl = "/api/user/signout/";
             let signout = document.getElementById("sign_out");
             signout.addEventListener("click",()=>{
                 fetch(signOutUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
@@ -46,7 +46,7 @@ function menberSys(){
         }else{
             //如果使用者為登出狀態直接導回首頁
             window.setTimeout(()=>{
-                location.href="http://3.131.86.32:3000/";
+                location.href="/";
             },100);
         }
     });
@@ -62,7 +62,7 @@ function menberSys(){
     //(流程3)使用者完成登入步驟
     let signinForm = document.getElementById("signin_form");
     let signinResult = document.getElementById("signin_result");
-    let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
+    let signinUrl = "/api/user/signin/";
     signinForm.addEventListener("submit",(e)=>{
         e.preventDefault();
         let email = document.getElementById("signin_email").value;
@@ -97,7 +97,7 @@ function menberSys(){
     //(流程5)使用者完成註冊
     let signupForm = document.getElementById("signup_form");
     let signupResult = document.getElementById("signup_result");
-    let signupUrl = "http://3.131.86.32:3000/api/user/signup/";
+    let signupUrl = "/api/user/signup/";
     signupForm.addEventListener("submit",(e)=>{
         e.preventDefault();
         let name = document.getElementById("signup_name").value;
@@ -136,7 +136,7 @@ function menberSys(){
 let amountPrice = null; //參數記錄使用者付款價格
 let attractionDict = {} //記錄使用者行程資料供付款時確認資料
 function getBookingData(){
-    let bookDataUrl = "http://3.131.86.32:3000/api/booking/bookingcart/";
+    let bookDataUrl = "/api/booking/bookingcart/";
     fetch(bookDataUrl).then((res)=>res.json()).then((bookData)=>{
         if(bookData!=null){
             let loadImg = document.querySelector(".load_spot");
@@ -212,14 +212,13 @@ function getBookingData(){
         //使用者未登入
         }else{
             let message = bookData["message"];
-            console.log(message);
         }
     });
 }
 //刪除已預定的行程
 function deleteCurrentBooking(){
     let deleteBooking = document.querySelector(".delete_booking");
-    let deleteBookingUrl = "http://3.131.86.32:3000/api/booking/deleteschedule/";
+    let deleteBookingUrl = "/api/booking/deleteschedule/";
     deleteBooking.addEventListener("click",()=>{
         fetch(deleteBookingUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
         .then((res)=>res.json()).then((bookStatus)=>{
@@ -234,7 +233,7 @@ function deleteCurrentBooking(){
 function returnHome(){
     let home = document.getElementById("backto_home");
     home.addEventListener("click",()=>{
-        location.href = "http://3.131.86.32:3000/";
+        location.href = "/";
     });
 }
 //TapPay setupSDK
@@ -312,7 +311,7 @@ function onClick(){
                 }
             }
         }
-        let ordersUrl = "http://3.131.86.32:3000/api/orders";
+        let ordersUrl = "/api/orders";
         fetch(ordersUrl,{method:"POST",headers:{"Content-Type":"application/json"}
         ,body:JSON.stringify(post_data)})
         .then((res)=>res.json()).then((jsonData)=>{
@@ -323,7 +322,7 @@ function onClick(){
                 //將編號傳至api/order/
                 //付款成功後將使用者導至感謝頁面
                 window.setTimeout(()=>{
-                    location.href = "http://3.131.86.32:3000/thankyou?number="+number;
+                    location.href = "/thankyou?number="+number;
                 },100);
             }else if(message == "未正確填寫資料"){
                 alert(message);

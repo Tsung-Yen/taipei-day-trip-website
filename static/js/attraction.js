@@ -9,7 +9,7 @@ function init(){
 function menberSys(){
     //偵測使用者狀態
     let sign = document.getElementById("sign");
-    let statusUrl = "http://3.131.86.32:3000/api/user/userstatus/";
+    let statusUrl = "/api/user/userstatus/";
     let nav = document.getElementById("nav");
     fetch(statusUrl).then((res=>res.json()))
     .then((user)=>{
@@ -24,7 +24,7 @@ function menberSys(){
             //(使用者登出，透過method將key清空)
             let signOut = document.getElementById("sign_out");
             signOut.addEventListener("click",()=>{
-                let signOutUrl = "http://3.131.86.32:3000/api/user/signout/";
+                let signOutUrl = "/api/user/signout/";
                 fetch(signOutUrl,{method:"DELETE"},headers={"Content-Type":"application/json"});
                 signOut.remove();
                 sign = document.createElement("p");
@@ -50,7 +50,7 @@ function menberSys(){
     //(操作2:使用者登入)
     let signinForm = document.getElementById("signin_form");
     let signinResult = document.getElementById("signin_result");
-    let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
+    let signinUrl = "/api/user/signin/";
     signinForm.addEventListener("submit",(e)=>{
         e.preventDefault();
         let email = document.getElementById("signin_email").value;
@@ -85,7 +85,7 @@ function menberSys(){
     //(操作4:使用者完成註冊)
     let signupForm = document.getElementById("signup_form");
     let signupResult = document.getElementById("signup_result");
-    let signupUrl = "http://3.131.86.32:3000/api/user/signup/";
+    let signupUrl = "/api/user/signup/";
     signupForm.addEventListener("submit",(e)=>{
         e.preventDefault();
         let name = document.getElementById("signup_name").value;
@@ -151,14 +151,14 @@ function bookSchedule(){
             "price":price
         }
         //將使用者選擇預定時間地點資料傳給後端
-        let newBookingUrl = "http://3.131.86.32:3000/api/booking/bookingschedule/";
+        let newBookingUrl = "/api/booking/bookingschedule/";
         fetch(newBookingUrl,{method:"POST",headers:{"Content-Type":"application/json"}
         ,body:JSON.stringify(data)}).then((res)=>res.json()).then((result)=>{
             let ok = result["ok"];
             if(ok == true){
                 console.log(result);
                 window.setTimeout(()=>{
-                    location.href = "http://3.131.86.32:3000/booking";
+                    location.href = "/booking";
                 },200);
             }else{
                 let message = result["message"];
@@ -189,12 +189,12 @@ function bookSchedule(){
 //查看預定完成後的購物車(使用者點擊預定行程，單純點擊跳轉程序)
 function bookingCart(){
     let booking = document.getElementById("booking");
-    let statusUrl = "http://3.131.86.32:3000/api/user/userstatus/";
+    let statusUrl = "/api/user/userstatus/";
     booking.addEventListener("click",()=>{
         //先檢查使用者狀態(如果尚未登入直接倒回首頁，已登入可進入購物車頁面)
         fetch(statusUrl).then((res)=>res.json()).then((user)=>{
             if(user!=null){
-                location.href = "http://3.131.86.32:3000/booking";
+                location.href = "/booking";
             }else{
                 //使用者尚未登入，登入視窗彈出
                 let popupForm = document.querySelector(".popup_form");
@@ -219,7 +219,7 @@ function bookingCart(){
 function returnHome(){
     let home = document.getElementById("backto_home");
     home.addEventListener("click",()=>{
-        location.href = "http://3.131.86.32:3000/";
+        location.href = "/";
     });
 }
 //connecting to Ajax
@@ -227,7 +227,7 @@ var path = window.location.href;
 var data = path.split("/");
 var pathData = data[4];
 function connect(){
-    url = "http://3.131.86.32:3000/api/attraction/"+pathData;
+    url = "/api/attraction/"+pathData;
     fetch(url).then(res=>res.json())
     .then((jsondata)=>{
         if(jsondata!=null){

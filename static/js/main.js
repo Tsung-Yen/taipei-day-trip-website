@@ -1,7 +1,7 @@
 var nexPage = null;
 //完成連線
 function getPageData(pagenum){
-    let openUrl = "http://3.131.86.32:3000/api/attractions?page="+pagenum;
+    let openUrl = "/api/attractions?page="+pagenum;
     fetch(openUrl).then(res=>res.json())
     .then((jsonData)=>{
         //當資料載入成功後將GIF移除
@@ -30,7 +30,7 @@ function getPageData(pagenum){
 
             //add url to spot(1.the first data in spot)
             let clicklink = document.createElement("a")
-            clicklink.href = "http://3.131.86.32:3000/attraction/"+linknum;
+            clicklink.href = "/attraction/"+linknum;
             clicklink.className = "link";
             //add img(put it into <a> will let user can click the bounds inside the img size)
             let imgImg = document.createElement("img");
@@ -96,7 +96,7 @@ function keywordSearch(){
     }
     //取得連線
     keywordhistory = keyword;
-    let url = "http://3.131.86.32:3000/api/attractions?page="+kypage+"&keyword="+keyword;
+    let url = "/api/attractions?page="+kypage+"&keyword="+keyword;
     fetch(url).then((res)=>{
         return res.json()})
     .then((jsonData)=>{
@@ -116,7 +116,7 @@ function keywordSearch(){
                 let spotDiv = document.createElement("div");
                 spotDiv.className = "spot";
                 let keywordLink = document.createElement("a");
-                keywordLink.href = "http://3.131.86.32:3000/attraction/"+keywordId;
+                keywordLink.href = "/attraction/"+keywordId;
                 let imgImg = document.createElement("img");
                 imgImg.src = images;
                 let nameDiv = document.createElement("div");
@@ -206,7 +206,7 @@ function init(){
     checkUser();
     let sign = document.getElementById("sign");
     function checkUser(){
-        let userstatusUrl = "http://3.131.86.32:3000/api/user/userstatus/"
+        let userstatusUrl = "/api/user/userstatus/"
         fetch(userstatusUrl).then((res)=>res.json())
         .then((jsonData)=>{
             if(jsonData != null){
@@ -223,7 +223,7 @@ function init(){
                 //使用者點擊登出系統
                 let signOut = document.getElementById("newsign");
                 signOut.addEventListener("click" ,()=>{
-                    let signoutUrl = "http://3.131.86.32:3000/api/user/signout/";
+                    let signoutUrl = "/api/user/signout/";
                     fetch(signoutUrl,{method:"DELETE", "Content-Type":"application/json"})
                     signOut.remove();
                     sign = document.createElement("p");
@@ -266,7 +266,7 @@ function init(){
     let signinResult = document.getElementById("signin_result");
     signinForm.addEventListener("submit",(e)=>{
         e.preventDefault();
-        let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
+        let signinUrl = "/api/user/signin/";
         let email = document.getElementById("signin_email").value;
         let password = document.getElementById("signin_password").value;
         let data = {
@@ -298,7 +298,7 @@ function init(){
     });
     //(操作4:使用者註冊完畢送出)
     let signupForm = document.getElementById("signup_form");
-    let signupUrl = "http://3.131.86.32:3000/api/user/signup/";
+    let signupUrl = "/api/user/signup/";
     let signupResult = document.getElementById("signup_result");
     signupForm.addEventListener("submit",(e)=>{
         e.preventDefault();
@@ -339,7 +339,7 @@ function init(){
 function bookingschedule(){
     let booking = document.getElementById("booking");
     booking.addEventListener("click",()=>{
-        location.href="http://3.131.86.32:3000/booking";
+        location.href="/booking";
     });
 }
 //Debounce function(用於限制連續呼叫API)

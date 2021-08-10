@@ -6,7 +6,7 @@ function init(){
 function returnHome(){
     let title = document.getElementById("backto_home");
     title.addEventListener("click",()=>{
-        location.href = "http://3.131.86.32:3000/";
+        location.href = "/";
     });
 }
 function getorderNumber(){
@@ -17,7 +17,7 @@ function getorderNumber(){
 }
 function getData(){
     let number = getorderNumber();
-    url = "http://3.131.86.32:3000/api/order/"+number;
+    url = "/api/order/"+number;
     fetch(url).then((res)=>res.json()).then((result)=>{
         let error = result["error"];
         if(error != true){
@@ -27,21 +27,20 @@ function getData(){
             if(result["data"]["status"] == 1){
                 paidresult.innerHTML = "付款成功!!";
                 //付款成功後將資料庫預定資料移除以免使用者重複付款
-                let deleteBookingdataUrl = "http://3.131.86.32:3000/api/booking/deleteschedule/" ;
+                let deleteBookingdataUrl = "/api/booking/deleteschedule/" ;
                 fetch(deleteBookingdataUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
                 .then((res)=>res.json()).then((result)=>{
                     let ok = result["ok"];
                     if(ok == true){
-                        console.log("成功刪除");
                         let signoutbtn = document.getElementById("sign_out");
                         signoutbtn.addEventListener("click",()=>{
                             window.setTimeout(()=>{
-                                location.href = "http://3.131.86.32:3000/";
+                                location.href = "/";
                             },100);
                         }); 
                     }else{
                         window.setTimeout(()=>{
-                            location.href = "http://3.131.86.32:3000/";
+                            location.href = "/";
                         },100);
                     }
                 });
@@ -49,7 +48,7 @@ function getData(){
                 paidresult.innerHTML = "付款失敗!!";
             }
         }else{
-            location.href = "http://3.131.86.32:3000/";
+            location.href = "/";
         }
     });
 }
@@ -58,7 +57,7 @@ function menberSys(){
     //(流程1)檢查使用者狀況
     let signing = document.getElementById("signing");
     let nav = document.getElementById("nav");
-    let userStatusUrl = "http://3.131.86.32:3000/api/user/userstatus/";
+    let userStatusUrl = "/api/user/userstatus/";
     fetch(userStatusUrl).then((res)=>res.json())
     .then((jsonData)=>{
         if(jsonData != null){
@@ -71,7 +70,7 @@ function menberSys(){
             nav.append(newSigning);
 
             //(登出)
-            let signOutUrl = "http://3.131.86.32:3000/api/user/signout/";
+            let signOutUrl = "/api/user/signout/";
             let signout = document.getElementById("sign_out");
             signout.addEventListener("click",()=>{
                 fetch(signOutUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
@@ -90,7 +89,7 @@ function menberSys(){
         }else{
             //如果使用者為登出狀態直接導回首頁
             window.setTimeout(()=>{
-                location.href="http://3.131.86.32:3000/";
+                location.href="/";
             },100);
         }
     });
@@ -106,7 +105,7 @@ function menberSys(){
     //(流程3)使用者完成登入步驟
     let signinForm = document.getElementById("signin_form");
     let signinResult = document.getElementById("signin_result");
-    let signinUrl = "http://3.131.86.32:3000/api/user/signin/";
+    let signinUrl = "/api/user/signin/";
     signinForm.addEventListener("submit",(e)=>{
         e.preventDefault();
         let email = document.getElementById("signin_email").value;
@@ -141,7 +140,7 @@ function menberSys(){
     //(流程5)使用者完成註冊
     let signupForm = document.getElementById("signup_form");
     let signupResult = document.getElementById("signup_result");
-    let signupUrl = "http://3.131.86.32:3000/api/user/signup/";
+    let signupUrl = "/api/user/signup/";
     signupForm.addEventListener("submit",(e)=>{
         e.preventDefault();
         let name = document.getElementById("signup_name").value;
