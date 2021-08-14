@@ -241,7 +241,7 @@ function connect(){
         let description = jsondata['description'];
         let address = jsondata['address'];
         let transport = jsondata['transport'];
-        let imageData = jsondata['images'].split(",");
+        let imageData = jsondata['images'];
         let image = imageData.slice(0,-1);
         let images = image[0];
         //圖片更換(上半部:圖片輪播及購票資訊)

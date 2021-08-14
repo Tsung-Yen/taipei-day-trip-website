@@ -1,27 +1,26 @@
-var nexPage = null;
+var nextPage = null;
 //完成連線
 function getPageData(pagenum){
     let openUrl = "/api/attractions?page="+pagenum;
     fetch(openUrl).then(res=>res.json())
     .then((jsonData)=>{
         //當資料載入成功後將GIF移除
-        if(jsonData!=null){
+        if(jsonData["error"] != true){
             let loadImg = document.querySelector(".load_spot");
             loadImg.style.display = "none";
         };
-        nextPage = jsonData["nextPage"];
+        
+        nextPage = jsonData["nextpage"];
         let pageDataLen = jsonData["data"].length
         for(let i=0;i<pageDataLen;i++){
             let linknum = jsonData["data"][i]["id"]; //放入link url
             let name = jsonData["data"][i]["name"];
             let mrt = jsonData["data"][i]["mrt"];
             let category = jsonData["data"][i]["category"];
-            let img = jsonData["data"][i]["images"];
-            let images = filtImg(img);
+            let img = jsonData["data"][i]["images"][0];
             //create empty html tag
             let part = document.querySelector(".part");
 
-            //add a div to Dom
             //add single box which contain image&textbox
             let spotDiv = document.createElement("div");
             spotDiv.className = "spot";
@@ -34,7 +33,7 @@ function getPageData(pagenum){
             clicklink.className = "link";
             //add img(put it into <a> will let user can click the bounds inside the img size)
             let imgImg = document.createElement("img");
-            imgImg.src = images;
+            imgImg.src = img;
             
             //add title name(2.sec data in spot)
             let nameP = document.createElement("div");
@@ -85,12 +84,12 @@ function clearDiv(){
 let keyword = null;
 let keywordhistory = null;      //如果使用者未滑玩所有頁面再次搜尋，比對上次關鍵字結果不同。將div移除
 let kynextPage = null;
-let kypage = 0;
+let kypage = 1;
 function keywordSearch(){
     keyword = document.querySelector(".insert").value;
     if(keyword != keywordhistory ){
         clearDiv();
-        kypage = 0;
+        kypage = 1;
     }else if(keyword == null){
         alert("關鍵字不存在")
     }
@@ -104,13 +103,12 @@ function keywordSearch(){
         if(error != true){
             let num = jsonData["data"].length;
             for(let i =0;i<num;i++){
-                kynextPage = jsonData["nextPage"];
+                kynextPage = jsonData["nextpage"];
                 let keywordId = jsonData["data"][i]["id"];
                 let name = jsonData["data"][i]["name"];
                 let mrt = jsonData["data"][i]["mrt"];
                 let category = jsonData["data"][i]["category"];
-                let img = jsonData["data"][i]["images"];
-                let images = filtImg(img);
+                let img = jsonData["data"][i]["images"][0];
                 //抓取標籤並塞入內部資料
                 let container = document.querySelector(".part");
                 let spotDiv = document.createElement("div");
@@ -118,7 +116,7 @@ function keywordSearch(){
                 let keywordLink = document.createElement("a");
                 keywordLink.href = "/attraction/"+keywordId;
                 let imgImg = document.createElement("img");
-                imgImg.src = images;
+                imgImg.src = img;
                 let nameDiv = document.createElement("div");
                 nameDiv.className = "spotname";
                 let nameText = document.createTextNode(name);
@@ -155,45 +153,9 @@ function keywordSearch(){
         
     });
 }
-// //偵測使用者滑動狀況，如果以捲動到底部載入下一頁資料
-// function scrollPos(){
-//     window.addEventListener('scroll',function(){
-//         if(window.scrollY+window.innerHeight+30 >= document.documentElement.scrollHeight){
-//             //如果keyword有被搜尋則不繼續對page提出發送
-//             if(keyword == null){
-                
-//                 if (nextPage<=26){
-//                     getPageData(nextPage);
-//                 }
-//             }else{
-//                 //當使用者關鍵字搜尋滑到底，停止載入
-//                 if(kynextPage!="null"){
-//                     kypage+=1;
-//                     keywordSearch();
-//                 }
-//             }
-//         }
-//         // console.log(document.documentElement.scrollHeight);
-//         // console.log(window.scrollY+window.innerHeight);
-//     });
-// }
 
-//初始化函式:一載入頁面就直接秀出第一頁
-// function initShow(){
-//     getPageData(0);
-//     // scrollPos();
-// }
-// initShow();
-//以上部分為初始化第一頁資料
-
-//過濾圖片函式(將第圖片不乾淨的字元過濾將其分割，並回傳第一張)
-function filtImg(data){
-    //取得第一張圖片
-    let result = data.split(",",1);
-    return result;
-}
 function init(){
-    getPageData(0);
+    getPageData(1);
     //將input&button綁再一起
     let input = document.querySelector(".insert");
     input.addEventListener("keyup", function(event) {
@@ -366,7 +328,7 @@ let incrementCount = ()=>{
             }
         }else{
             //當使用者關鍵字搜尋滑到底，停止載入
-            if(kynextPage!="null"){
+            if(kynextPage!=null){
                 kypage+=1;
                 keywordSearch();
             }

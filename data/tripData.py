@@ -1,12 +1,15 @@
 import json
 from flask import request
 import mysql.connector
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 mydb = mysql.connector.connect(
     host = "localhost",
-    user = "root",
-    password = "Gtio556$",
-    database = "tripdata"
+    user = os.getenv("DBUSER"),
+    password = os.getenv("DBPASSWORD"),
+    database = os.getenv("DBNAME")
 )
 mycursor = mydb.cursor()
 
@@ -15,58 +18,23 @@ mycursor = mydb.cursor()
 with open("taipei-attractions.json" , "r" , encoding="utf-8")as response:
     data = json.load(response)
 
-clist = data["result"]["results"]
-
-testdata=[]
-ans = []
-for i in range(len(clist)):
-    name = clist[i]["stitle"]
-    category = clist[i]["CAT2"]
-    description = clist[i]["xbody"]
-    address = clist[i]["address"]
-    transport = str(clist[i]["info"])
-    mrt = str(clist[i]["MRT"])
-    latitude = clist[i]["latitude"]
-    longitude = clist[i]["longitude"]
-    image = clist[i]["file"]
-    splitHttp = image.split("http")
-
-    # 移除img index[0]的空值
-    splitHttp.remove(splitHttp[0])
-    num = len(splitHttp)
-    #移除資料中包含MP3及FLV的網址
-
-    if "flv" in splitHttp[-1] :
-        splitHttp.remove(splitHttp[-1])
-
-    if "mp3" in splitHttp[-1] :
-        splitHttp.remove(splitHttp[-1])             
-        
-    #將http一一加回網址中
-    # num = len(splitHttp)
-    # # print(num)
-    # for j in range(num):
-    #     data = "http"+splitHttp[j]
-    #     testImg.append(data)
-    # newImg = str(testImg)
-    # ans.append(newImg)
-    # testImg.clear()
-
-    #處理完的IMG
-    # images = ans[i]
-    # print(images)
-    test = []
-    for j in range(len(splitHttp)):
-        img = "http"+splitHttp[j]+","
-        test.append(img)
-    testdata.append(test)
-    # print(testdata[i])
-    testimages = testdata[i]
-    images = ''.join(testimages)
-    
-
+for dict in data["result"]["results"]:
+    name = dict["stitle"]
+    category = dict["CAT2"]
+    description = dict["xbody"]
+    address = dict["address"]
+    transport = dict["info"]
+    mrt = dict["MRT"]
+    latitude = dict["latitude"]
+    longitude = dict["longitude"]
+    images = dict["file"]
+    imageList = images.split("http://")
+    filtImage = ["http://"+image for image in imageList if image!= ""]
+    filtImage = [file for file in filtImage if "flv" not in file]
+    filtImage = [file for file in filtImage if "mp3" not in file]
+    filtImage = [file for file in filtImage if "gif" not in file]
 #將資料寫入資料庫
-    # sql = "insert into spot(name,category,description,address,transport,mrt,latitude,longitude,images)values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-    # val = (name,category,description,address,transport,mrt,latitude,longitude,images)
-    # mycursor.execute(sql,val)
-    # mydb.commit()
+    sql = "insert into attractions(name,category,description,address,transport,mrt,latitude,longitude,images)values(%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+    val = (name,category,description,address,transport,mrt,latitude,longitude,json.dumps(filtImage))
+    mycursor.execute(sql,val)
+    mydb.commit()
