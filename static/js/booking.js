@@ -12,10 +12,10 @@ function menberSys(){
     //(流程1)檢查使用者狀況
     let signing = document.getElementById("signing");
     let nav = document.getElementById("nav");
-    let userStatusUrl = "/api/user/userstatus/";
+    let userStatusUrl = "/api/user/status/";
     fetch(userStatusUrl).then((res)=>res.json())
     .then((jsonData)=>{
-        if(jsonData != null){
+        if(jsonData["ok"] == true){
             myUser = jsonData["data"]["name"];
             signing.remove();
             let newSigning = document.createElement("p");
@@ -136,35 +136,35 @@ function menberSys(){
 let amountPrice = null; //參數記錄使用者付款價格
 let attractionDict = {} //記錄使用者行程資料供付款時確認資料
 function getBookingData(){
-    let bookDataUrl = "/api/booking/bookingcart/";
+    let bookDataUrl = "/api/booking/cart";
     fetch(bookDataUrl).then((res)=>res.json()).then((bookData)=>{
-        if(bookData!=null){
+        if(bookData["ok"] == true){
             let loadImg = document.querySelector(".load_spot");
             loadImg.style.display = "none";
         }
         //使用者已登入會員
         if(bookData["error"] != true){
-            if(bookData["message"] != "null"){
+            if(bookData["message"] != "empty"){
                 //景點id
-                attractionDict["id"] = bookData["data"]["attraction"]["id"];
+                attractionDict["id"] = bookData["attraction"]["id"];
                 //使用者名稱
                 let username = document.getElementById("username");
-                username.innerHTML = bookData["data"]["username"];
+                username.innerHTML = bookData["username"];
                 //景點圖片
                 let image = document.getElementById("slide_img");
-                image.src = bookData["data"]["attraction"]["image"];
-                attractionDict["image"] = bookData["data"]["attraction"]["image"];
+                image.src = bookData["attraction"]["image"];
+                attractionDict["image"] = bookData["attraction"]["image"];
                 //景點名稱
                 let spotname = document.getElementById("spotname");
-                spotname.innerHTML = bookData["data"]["attraction"]["name"];
-                attractionDict["name"] = bookData["data"]["attraction"]["name"];
+                spotname.innerHTML = bookData["attraction"]["name"];
+                attractionDict["name"] = bookData["attraction"]["name"];
                 //預定日期
                 let date = document.getElementById("date");
-                date.innerHTML = bookData["data"]["date"];
-                attractionDict["date"] = bookData["data"]["date"];
+                date.innerHTML = bookData["date"];
+                attractionDict["date"] = bookData["date"];
                 //預定時間
                 let showtime = document.getElementById("time");
-                let time = bookData["data"]["time"];
+                let time = bookData["time"];
                 if(time == "morning"){
                     showtime.innerHTML = "早上9點到下午4點";
                     attractionDict["time"] = "morning";
@@ -174,15 +174,15 @@ function getBookingData(){
                 };
                 //預定費用
                 let price = document.getElementById("price");
-                price.innerHTML = "新台幣"+bookData["data"]["price"]+"元";
-                attractionDict["price"] = bookData["data"]["price"]; 
+                price.innerHTML = "新台幣"+bookData["price"]+"元";
+                attractionDict["price"] = bookData["price"]; 
                 //景點地址
                 let address = document.getElementById("place");
-                address.innerHTML = bookData["data"]["attraction"]["address"];
-                attractionDict["address"] = bookData["data"]["attraction"]["address"];
+                address.innerHTML = bookData["attraction"]["address"];
+                attractionDict["address"] = bookData["attraction"]["address"];
                 //確認付款
                 let totalPrice = document.getElementById("total_price");
-                totalPrice.innerHTML = bookData["data"]["price"];
+                totalPrice.innerHTML = bookData["price"];
             }else{
                 let loadImg = document.querySelector(".load_spot");
                 loadImg.style.display = "none";
@@ -218,7 +218,7 @@ function getBookingData(){
 //刪除已預定的行程
 function deleteCurrentBooking(){
     let deleteBooking = document.querySelector(".delete_booking");
-    let deleteBookingUrl = "/api/booking/deleteschedule/";
+    let deleteBookingUrl = "/api/booking/cancle";
     deleteBooking.addEventListener("click",()=>{
         fetch(deleteBookingUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
         .then((res)=>res.json()).then((bookStatus)=>{

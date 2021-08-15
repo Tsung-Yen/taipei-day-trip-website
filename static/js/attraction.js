@@ -9,11 +9,11 @@ function init(){
 function menberSys(){
     //偵測使用者狀態
     let sign = document.getElementById("sign");
-    let statusUrl = "/api/user/userstatus/";
+    let statusUrl = "/api/user/status/";
     let nav = document.getElementById("nav");
     fetch(statusUrl).then((res=>res.json()))
     .then((user)=>{
-        if(user != null){
+        if(user["ok"] == true){
             //使用者已登入系統
             sign.remove();
             let newSign = document.createElement("p");
@@ -151,7 +151,7 @@ function bookSchedule(){
             "price":price
         }
         //將使用者選擇預定時間地點資料傳給後端
-        let newBookingUrl = "/api/booking/bookingschedule/";
+        let newBookingUrl = "/api/booking/schedule";
         fetch(newBookingUrl,{method:"POST",headers:{"Content-Type":"application/json"}
         ,body:JSON.stringify(data)}).then((res)=>res.json()).then((result)=>{
             let ok = result["ok"];
@@ -162,7 +162,7 @@ function bookSchedule(){
                 },200);
             }else{
                 let message = result["message"];
-                if(message == "尚未登入會員"){
+                if(message == "未登入"){
                     //使用者尚未登入，登入視窗彈出
                     let popupForm = document.querySelector(".popup_form");
                     let mask = document.querySelector(".mask");
@@ -189,11 +189,11 @@ function bookSchedule(){
 //查看預定完成後的購物車(使用者點擊預定行程，單純點擊跳轉程序)
 function bookingCart(){
     let booking = document.getElementById("booking");
-    let statusUrl = "/api/user/userstatus/";
+    let statusUrl = "/api/user/status/";
     booking.addEventListener("click",()=>{
         //先檢查使用者狀態(如果尚未登入直接倒回首頁，已登入可進入購物車頁面)
         fetch(statusUrl).then((res)=>res.json()).then((user)=>{
-            if(user!=null){
+            if(user["ok"]==true){
                 location.href = "/booking";
             }else{
                 //使用者尚未登入，登入視窗彈出

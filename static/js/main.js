@@ -85,10 +85,12 @@ let keyword = null;
 let keywordhistory = null;      //如果使用者未滑玩所有頁面再次搜尋，比對上次關鍵字結果不同。將div移除
 let kynextPage = null;
 let kypage = 1;
+let buttonPress = false;
 function keywordSearch(){
     keyword = document.querySelector(".insert").value;
     if(keyword != keywordhistory ){
         clearDiv();
+        buttonPress = true;
         kypage = 1;
     }else if(keyword == null){
         alert("關鍵字不存在")
@@ -150,7 +152,6 @@ function keywordSearch(){
             notfindSpot.style.color = "rgb(128, 118, 118)";
             let mask = document.querySelector(".mask");
         }
-        
     });
 }
 
@@ -168,10 +169,10 @@ function init(){
     checkUser();
     let sign = document.getElementById("sign");
     function checkUser(){
-        let userstatusUrl = "/api/user/userstatus/"
+        let userstatusUrl = "/api/user/status/"
         fetch(userstatusUrl).then((res)=>res.json())
         .then((jsonData)=>{
-            if(jsonData != null){
+            if(jsonData["ok"] == true){
                 //使用者已登入
                 sign.remove();
                 var newSign = document.createElement("p");
