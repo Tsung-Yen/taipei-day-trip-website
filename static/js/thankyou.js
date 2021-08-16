@@ -82,7 +82,7 @@ function menberSys(){
                     signing.textContent = "登入/註冊"
                     nav.append(signing);
                     window.setTimeout(()=>{
-                        location.reload()
+                        location.reload();
                     },600);
                 });
             });
