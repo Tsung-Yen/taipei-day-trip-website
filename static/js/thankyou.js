@@ -102,33 +102,6 @@ function menberSys(){
         mask.style.display = "block";
         cancleBox(signinCancle,popupSignin);
     });
-    //(流程3)使用者完成登入步驟
-    let signinForm = document.getElementById("signin_form");
-    let signinResult = document.getElementById("signin_result");
-    let signinUrl = "/api/user/signin/";
-    signinForm.addEventListener("submit",(e)=>{
-        e.preventDefault();
-        let email = document.getElementById("signin_email").value;
-        let password = document.getElementById("signin_pw").value;
-        let data = {
-            "email":email,
-            "password":password
-        };
-        fetch(signinUrl,{method:"PATCH",headers:{"Content-Type":"application/json"}
-        ,body:JSON.stringify(data)}).then((res)=>res.json())
-        .then((user)=>{
-            let ok = user["ok"];
-            if(ok != null){
-                signinResult.innerHTML = "登入成功!!";
-                window.setTimeout(()=>{
-                    location.reload()
-                },1000);
-            }else{
-                let message = user["message"];
-                signinResult.innerHTML = message;
-            }
-        });
-    });
     //(流程4)使用者尚未註冊
     let popupSignup = document.querySelector(".popup_signup_form");
     let signupCancle = document.getElementById("signup_cancle");

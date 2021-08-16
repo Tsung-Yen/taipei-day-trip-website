@@ -278,7 +278,7 @@ function init(){
         .then((user)=>{
             let ok = user["ok"];
             if(ok == true){
-                signupResult.innerHTML = "註冊成功!!";
+                signupResult.innerHTML = "註冊成功!!點此返回登入頁面";
             }else{
                 let message = user["message"];
                 signupResult.innerHTML = message;
