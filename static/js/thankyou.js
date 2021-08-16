@@ -24,10 +24,10 @@ function getData(){
             let num = document.getElementById("order_num");
             num.innerHTML = result["data"]["number"];
             let paidresult = document.getElementById("order_paid");
-            if(result["data"]["status"] == 1){
+            if(result["data"]["status"] == "已付款"){
                 paidresult.innerHTML = "付款成功!!";
                 //付款成功後將資料庫預定資料移除以免使用者重複付款
-                let deleteBookingdataUrl = "/api/booking/deleteschedule/" ;
+                let deleteBookingdataUrl = "/api/booking/cancle" ;
                 fetch(deleteBookingdataUrl,{method:"DELETE",headers:{"Content-Type":"application/json"}})
                 .then((res)=>res.json()).then((result)=>{
                     let ok = result["ok"];
@@ -57,7 +57,7 @@ function menberSys(){
     //(流程1)檢查使用者狀況
     let signing = document.getElementById("signing");
     let nav = document.getElementById("nav");
-    let userStatusUrl = "/api/user/userstatus/";
+    let userStatusUrl = "/api/user/status/";
     fetch(userStatusUrl).then((res)=>res.json())
     .then((jsonData)=>{
         if(jsonData != null){

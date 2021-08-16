@@ -106,8 +106,8 @@ class Menber:
             return
 
 #=======================================
-#Order
-class Order:
+#Booking
+class Booking:
     def schedule(data):
         try:
             connection = pool.get_connection()
@@ -165,6 +165,41 @@ class Order:
             connection.commit()
             connection.close()
             return True
+        except Exception as e:
+            connection.close()
+            print(e)
+            return
+
+#=====================================================
+#Order
+class Order:
+    def pay(userId, phone, number):
+        try:
+            connection = pool.get_connection()
+            cursor = connection.cursor()
+            sql = """update orders set phone=%s,number=%s,status=%s 
+            where userId=%s"""
+            val = (phone, number, "已付款", userId)
+            cursor.execute(sql,val)
+            connection.commit()
+            connection.close()
+            return True
+        except Exception as e:
+            connection.close()
+            print(e)
+            return
+    def check(id):
+        try:
+            connection = pool.get_connection()
+            cursor = connection.cursor()
+            sql = f"""select number,status from orders where userId='{id}'"""
+            cursor.execute(sql)
+            result = cursor.fetchone()
+            connection.close()
+            if result:
+                return result
+            else:
+                return False
         except Exception as e:
             connection.close()
             print(e)

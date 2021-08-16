@@ -294,16 +294,6 @@ function onClick(){
             "prime":prime,
             "order":{
                 "price":attractionDict["price"],
-                "trip":{
-                    "attraction":{
-                        "id":attractionDict["id"],
-                        "name":attractionDict["name"],
-                        "address":attractionDict["address"],
-                        "image":attractionDict["image"]
-                    },
-                    "date":attractionDict["date"],
-                    "time":attractionDict["time"]
-                },
                 "contact":{
                     "name":name,
                     "email":email,
