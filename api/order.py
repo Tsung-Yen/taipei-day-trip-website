@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from module.database import Order
 from datetime import datetime
 import requests
+import module.sendemail as send
+
 import os
 
 load_dotenv()
@@ -47,7 +49,7 @@ def postOrder():
             now = str(datetime.today().strftime('%Y%m%d%H%M'))
             number = now + str(user["id"])
             if response["status"] == 0:
-                result = Order.pay(user["id"], phone, number)
+                result = Order.pay(user["id"], phone, number, email)
                 if result == True:
                     return jsonify({
                         "ok":True,
@@ -70,6 +72,7 @@ def getOrder(orderNumber):
     if user != False:
         result = Order.check(user["id"])
         if result != False:
+            send.Email.client(result[2]) #寄 email 通知使用者付款成功
             return jsonify({"ok":True,"data":{"number":result[0],"status":result[1]}})
         else:
             return jsonify({"error":True,"message":"沒有付款紀錄"}),400

@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 import json
 import hashlib
+import module.sendemail as send
 
 load_dotenv()
 try:
@@ -33,7 +34,7 @@ class Attraction:
             return result
         except Exception as e:
             connection.close()
-            print(e)
+            send.Email.developer("attraction_error")
             return 
     def attractionId(id):
         try:
@@ -47,7 +48,7 @@ class Attraction:
             return result
         except Exception as e:
             connection.close()
-            print(e)
+            send.Email.developer("attraction_error")
             return
 
 #==================================
@@ -65,7 +66,7 @@ class Menber:
             return True
         except Exception as e:
             connection.close()
-            print(e)
+            send.Email.developer("user_error")
             return
     def signup(data):
         try:
@@ -87,7 +88,7 @@ class Menber:
                 return True
         except Exception as e:
             connection.close()
-            print(e)
+            send.Email.developer("user_error")
             return
     def signin(data):
         try:
@@ -105,7 +106,7 @@ class Menber:
                 return False
         except Exception as e:
             connection.close()
-            print(e)
+            send.Email.developer("user_error")
             return
 
 #=======================================
@@ -138,7 +139,7 @@ class Booking:
                 return {"ok":True,"message":"insert"}
         except Exception as e:
             connection.close()
-            print(e)
+            send.Email.developer("booking_error")
             return
     def cart(data):
         try:
@@ -157,7 +158,7 @@ class Booking:
                 return False
         except Exception as e:
             connection.close()
-            print(e)
+            send.Email.developer("booking_error")
             return
     def cancle(id):
         try:
@@ -170,32 +171,32 @@ class Booking:
             return True
         except Exception as e:
             connection.close()
-            print(e)
+            send.Email.developer("booking_error")
             return
 
 #=====================================================
 #Order
 class Order:
-    def pay(userId, phone, number):
+    def pay(userId, phone, number, mail):
         try:
             connection = pool.get_connection()
             cursor = connection.cursor()
-            sql = """update orders set phone=%s,number=%s,status=%s 
+            sql = """update orders set phone=%s,number=%s,mail=%s,status=%s 
             where userId=%s"""
-            val = (phone, number, "已付款", userId)
+            val = (phone, number, mail, "已付款", userId)
             cursor.execute(sql,val)
             connection.commit()
             connection.close()
             return True
         except Exception as e:
             connection.close()
-            print(e)
+            send.Email.developer("order_error")
             return
     def check(id):
         try:
             connection = pool.get_connection()
             cursor = connection.cursor()
-            sql = f"""select number,status from orders where userId= %s"""
+            sql = f"""select number,status,mail from orders where userId= %s"""
             cursor.execute(sql,(id,))
             result = cursor.fetchone()
             connection.close()
@@ -205,5 +206,5 @@ class Order:
                 return False
         except Exception as e:
             connection.close()
-            print(e)
+            send.Email.developer("order_error")
             return
