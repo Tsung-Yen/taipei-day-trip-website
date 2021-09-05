@@ -2,6 +2,7 @@ from mysql.connector import pooling
 from dotenv import load_dotenv
 import os
 import json
+import hashlib
 
 load_dotenv()
 try:
@@ -25,8 +26,8 @@ class Attraction:
             connection = pool.get_connection()
             cursor = connection.cursor()
             sql = f"""select * from attractions where name 
-            like '%{name}%' limit {startNum},12"""
-            cursor.execute(sql)
+            like %s limit %s,%s"""
+            cursor.execute(sql, (('%'+name+'%'), startNum, 12))
             result = cursor.fetchall()
             connection.close()
             return result
@@ -39,8 +40,8 @@ class Attraction:
             connection = pool.get_connection()
             cursor = connection.cursor()
             sql = f"""select * from attractions where 
-            id = {id}"""
-            cursor.execute(sql)
+            id = %s"""
+            cursor.execute(sql, (id,))
             result = cursor.fetchone()
             connection.close()
             return result
@@ -57,8 +58,8 @@ class Menber:
             connection = pool.get_connection()
             cursor = connection.cursor()
             sql = f"""select * from user where email
-            ='{email}'"""
-            cursor.execute(sql)
+            = %s"""
+            cursor.execute(sql, (email,))
             result = cursor.fetchone()
             connection.close()
             return True
@@ -70,15 +71,16 @@ class Menber:
         try:
             connection = pool.get_connection()
             cursor = connection.cursor()
-            sql = f"""select * from user where email = '{data["email"]}'"""
-            cursor.execute(sql)
+            sql = f"""select * from user where email = %s"""
+            cursor.execute(sql,(data["email"],))
             mydata = cursor.fetchone()
             if mydata:
                 connection.close()
                 return False
             else:
                 sql = "insert into user(name,email,password) values(%s,%s,%s)"
-                val = (data["name"],data["email"],data["password"])
+                val = (data["name"],data["email"],hashlib.sha256
+                ((data["password"]+os.getenv("Salt")).encode('utf-8')).hexdigest())
                 cursor.execute(sql, val)
                 connection.commit()
                 connection.close()
@@ -91,9 +93,10 @@ class Menber:
         try:
             connection = pool.get_connection()
             cursor = connection.cursor()
-            sql = f"""select * from user where email='{data["email"]}' 
-            and password='{data["password"]}'"""
-            cursor.execute(sql)
+            sql = f"""select * from user where email= %s 
+            and password= %s"""
+            cursor.execute(sql,(data["email"],hashlib.sha256
+            ((data["password"]+os.getenv("Salt")).encode('utf-8')).hexdigest()))
             result = cursor.fetchone()
             connection.close()
             if result:
@@ -144,8 +147,8 @@ class Booking:
             userId = data["id"]
             sql = f"""select a.id, a.name, a.address, a.images, b.date, 
             b.time, b.price from orders b join attractions a on 
-            b.attractionId=a.id where userId='{userId}'"""
-            cursor.execute(sql)
+            b.attractionId=a.id where userId= %s"""
+            cursor.execute(sql,(userId,))
             result = cursor.fetchone()
             connection.close()
             if(result):
@@ -160,8 +163,8 @@ class Booking:
         try:
             connection = pool.get_connection()
             cursor = connection.cursor()
-            sql = f"delete from orders where userId='{id}'"
-            cursor.execute(sql)
+            sql = f"delete from orders where userId= %s"
+            cursor.execute(sql,(id,))
             connection.commit()
             connection.close()
             return True
@@ -192,8 +195,8 @@ class Order:
         try:
             connection = pool.get_connection()
             cursor = connection.cursor()
-            sql = f"""select number,status from orders where userId='{id}'"""
-            cursor.execute(sql)
+            sql = f"""select number,status from orders where userId= %s"""
+            cursor.execute(sql,(id,))
             result = cursor.fetchone()
             connection.close()
             if result:

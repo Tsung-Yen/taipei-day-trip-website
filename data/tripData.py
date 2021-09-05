@@ -1,5 +1,4 @@
 import json
-from flask import request
 import mysql.connector
 import os
 from dotenv import load_dotenv

@@ -2,7 +2,6 @@ from flask import request, Blueprint, jsonify
 from flask.helpers import make_response
 from module.database import Menber
 from module.verify import Verify
-import hashlib
 
 status = Blueprint("status",__name__)
 signup = Blueprint("signup",__name__)
