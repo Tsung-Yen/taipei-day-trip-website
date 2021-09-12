@@ -51,7 +51,7 @@ nav>.item{
 .outter>.inner{
     height:300px;
     width:1200px;
-    background-image:url("https://www.linkpicture.com/q/welcome1.png");
+    background-image:url('/static/image/welcome\ 1.png');
     background-size:contain;
     background-repeat:no-repeat;
     background-position:right bottom;
@@ -258,7 +258,7 @@ form>.btn{
     margin-left:-1px;
     color:#448899;
     background: #448899;
-    background-image:url("https://www.linkpicture.com/q/icon_search_1.png");
+    background-image:url('/static/image/search.png');
     background-repeat: no-repeat;
     background-size: 30px;
     background-position:10px;
