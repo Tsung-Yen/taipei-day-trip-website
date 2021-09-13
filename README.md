@@ -8,7 +8,7 @@ ___
 #### Frontend: HTML, CSS, JavaScript
 #### Backend: Python – Flask
 #### Database: MySQL(Normalization, Connection Pool)
-#### Version Control: Git / Github
+#### Version Control: Git / GitHub
 #### Cloud Service: AWS EC2(Red Hat Enterprise)
 #### Design & Fetch API: RESTful APIs, AJAX
 #### Third-Party: TapPay SDK
